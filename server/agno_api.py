@@ -10,7 +10,17 @@ from pydantic import BaseModel, Field
 from agno.agent import Agent
 from agno.models.openai import OpenAIChat
 
-dotenv.load_dotenv()
+# Robust .env loader to avoid parser crashes on some environments.
+def _safe_load_env() -> None:
+    env_path = os.path.join(os.path.dirname(__file__), "..", ".env")
+    try:
+        dotenv.load_dotenv(env_path, override=True)
+    except Exception:
+        # Fallback to system environment variables.
+        return
+
+
+_safe_load_env()
 
 SYSTEM_PROMPT = """
 你是企業金融 RM 的授信報告助理。請依據對話與文件清單，產出三個 artifacts：摘要、翻譯、授信報告草稿，並提供任務路由狀態。
