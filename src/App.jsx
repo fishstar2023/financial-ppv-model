@@ -28,6 +28,8 @@ import termSheet from './docs/term-sheet.txt?raw';
 import kycAml from './docs/kyc-aml.txt?raw';
 import appraisal from './docs/appraisal.txt?raw';
 import industryOutlook from './docs/industry-outlook.txt?raw';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 const createId = () => Math.random().toString(36).slice(2, 10);
 
@@ -133,118 +135,27 @@ const initialMessages = [
     role: 'assistant',
     name: 'LLM',
     time: '10:11',
-    content: 'Artifacts 已更新完成，請於右側分頁檢視內容。',
+    content: 'Artifacts 生成中，完成後會即時更新右側分頁。',
     attachment: {
       title: 'Artifacts: 授信資料包',
-      detail: '更新 1 分鐘前 - 3 個分頁',
+      detail: '排程中 - 即將更新',
     },
   },
 ];
 
-const summaryOutput = `# 授信資料包摘要
+const summaryOutput = '';
 
-## Q2 2024 財務報表
-- 營收: 148.2M，年增 8.6%，毛利率 42.1%。
-- EBITDA: 28.4M，利潤率 19.2%，受運費上升影響下滑 80 bps。
-- 淨負債倍數: 2.6x，條款餘裕 1.2x。
-- 流動性: 現金 36.5M，未動用額度 52.0M。
+const translationOutput = '';
 
-## KYC / AML 資料包
-- 股權結構: 創辦人信託 72%，PE 少數 18%，管理層 10%。
-- 制裁與 PEP: 無匹配，兩家關聯方需定期覆核。
-- 負面新聞: 一起歷史勞資爭議，已結案。
-- 地域: TW、SG、VN 皆有營運據點與在地合規。`;
+const memoOutput = '';
 
-const translationOutput = `# 翻譯內容 (EN)
+const initialSummaryMetrics = [];
 
-## Facility Term Sheet
-- Facility type: Senior secured term loan and revolving credit.
-- Amount: USD 120.0M term loan + USD 40.0M revolver.
-- Tenor: 5 years with 24 month amortization holiday.
-- Pricing: SOFR + 275 bps, 25 bps undrawn fee.
-- Security: First lien on receivables and inventory.
+const initialRiskFlags = [];
 
-## Collateral Appraisal
-- Appraised value: USD 210.5M (fair market).
-- LTV: 57% on proposed facility.
-- Key assets: Plant equipment (62%), real estate (28%), vehicles (10%).
-- Sensitivity: 10% downside still within policy threshold.`;
+const initialTranslationPairs = [];
 
-const memoOutput = `# 授信報告草稿
-
-## 執行摘要
-借款人申請 USD 160M 擔保授信，用於再融資與資本支出。
-
-## 主要風險
-- 原物料波動造成毛利壓力。
-- 客戶集中度偏高，前三大客戶佔 41%。
-- VN 營運單位具有外匯風險。
-
-## 緩解因素
-- 65% 外匯曝險有避險安排。
-- 條款餘裕 1.2x，季度財務揭露。
-- 擔保品覆蓋率 1.31x。
-
-## 建議
-建議核准，條件為更新保險證明與 6 個月 DSRA。`;
-
-const initialSummaryMetrics = [
-  { id: 'metric-1', label: '營收', value: '148.2M', delta: '+8.6% YoY' },
-  { id: 'metric-2', label: 'EBITDA', value: '28.4M', delta: '19.2% 利潤率' },
-  { id: 'metric-3', label: '淨負債倍數', value: '2.6x', delta: '條款餘裕 1.2x' },
-  { id: 'metric-4', label: '流動性', value: '88.5M', delta: '現金 + 額度' },
-];
-
-const initialRiskFlags = [
-  { id: 'risk-1', label: '毛利率壓力', level: 'Medium' },
-  { id: 'risk-2', label: '客戶集中度', level: 'High' },
-  { id: 'risk-3', label: '外匯曝險', level: 'Medium' },
-  { id: 'risk-4', label: '資本支出執行', level: 'Low' },
-];
-
-const initialTranslationPairs = [
-  {
-    id: 'pair-1',
-    section: '授信額度',
-    source: '定期貸款 120.0M 與循環額度 40.0M，優先擔保。',
-    translated: 'USD 120.0M term loan plus USD 40.0M revolver, senior secured.',
-  },
-  {
-    id: 'pair-2',
-    section: '利率條款',
-    source: 'SOFR + 275 bps，未動用承諾費 25 bps。',
-    translated: 'SOFR + 275 bps with a 25 bps undrawn commitment fee.',
-  },
-  {
-    id: 'pair-3',
-    section: '擔保品價值',
-    source: '估價 210.5M，以公平市價為基準。',
-    translated: 'Appraised value of USD 210.5M on a fair market value basis.',
-  },
-];
-
-const initialMemoSections = [
-  {
-    id: 'memo-1',
-    title: '借款人概況',
-    detail: 'Atlas Manufacturing Co.，12 家廠區，亞洲出口導向。',
-  },
-  {
-    id: 'memo-2',
-    title: '授信結構',
-    detail: 'USD 160M 擔保授信，5 年期。',
-  },
-  {
-    id: 'memo-3',
-    title: '擔保品覆蓋',
-    detail: '覆蓋率 1.31x，第一順位抵押存貨、應收與設備。',
-  },
-  {
-    id: 'memo-4',
-    title: '財務條款',
-    detail: '淨負債上限 3.8x，利息覆蓋率 3.0x。',
-  },
-];
+const initialMemoSections = [];
 
 const artifactTabs = [
   { id: 'summary', label: '摘要', icon: FileText },
@@ -305,9 +216,9 @@ export default function App() {
     summary: {
       output: summaryOutput,
       borrower: {
-        name: 'Atlas Manufacturing Co.',
-        description: '亞洲出口導向的工業零組件製造商。',
-        rating: 'BBB-',
+        name: '',
+        description: '',
+        rating: '',
       },
       metrics: initialSummaryMetrics,
       risks: initialRiskFlags,
@@ -319,8 +230,8 @@ export default function App() {
     memo: {
       output: memoOutput,
       sections: initialMemoSections,
-      recommendation: '建議核准',
-      conditions: '需補齊保險證明與 6 個月 DSRA。',
+      recommendation: '',
+      conditions: '',
     },
   });
 
@@ -486,6 +397,14 @@ export default function App() {
       setIsLoading(false);
     }
   };
+
+  const renderMarkdown = (value) => (
+    <div className="markdown-body">
+      <ReactMarkdown remarkPlugins={[remarkGfm]}>
+        {value?.trim() || '尚未產出，請先在左側送出指示。'}
+      </ReactMarkdown>
+    </div>
+  );
 
   return (
     <ThemeProvider
@@ -776,9 +695,9 @@ export default function App() {
                     Markdown
                   </Tag>
                 </div>
-                <pre className="output-code">
-                  <code>{activeArtifact.output}</code>
-                </pre>
+                <div className="output-code">
+                  {renderMarkdown(activeArtifact.output)}
+                </div>
               </div>
 
               <div className="preview-card">
@@ -799,6 +718,16 @@ export default function App() {
                 </div>
 
                 <div className="preview-canvas">
+                  <div className="live-markdown">
+                    <div className="live-markdown-head">
+                      <div className="summary-kicker">Live Preview</div>
+                      <p className="live-markdown-hint">
+                        右側即時套用 LLM 輸出（Markdown），可直接作為委員會草稿
+                      </p>
+                    </div>
+                    {renderMarkdown(activeArtifact.output)}
+                  </div>
+
                   {activeTab === 'summary' ? (
                     <div className="preview-summary">
                       <div className="summary-header">
