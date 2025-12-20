@@ -1,0 +1,21 @@
+授信條款書（摘錄，擔保授信）
+Facility type: Senior secured term loan + revolving credit
+Total amount: USD 160.0M（Term 120.0M + Revolver 40.0M）
+Tenor: 5 years; amortization holiday 24 months，之後按季等額攤還
+Pricing: SOFR + 275 bps；未動用額度費 25 bps；前置手續費 75 bps
+Security: 第一順位擔保存貨、應收帳款、設備；最低擔保覆蓋率 1.25x
+Financial covenants:
+- Max Net Leverage: 3.8x（測試：季度）
+- Min Interest Coverage: 3.0x
+- Min Liquidity: USD 40M（含未動用額度）
+Reporting:
+- Quarterly: 財報、存貨與應收帳齡明細
+- Monthly: borrowing base certificate、DSRA 餘額
+Representations & Warranties:
+- 無重大稅務爭議；無制裁/PEP 直接持股
+Events of Default:
+- 30 日以上應付利息違約；重大不實陳述；交叉違約 > USD 10M
+
+備註：
+- DSRA：6 個月利息需於關帳後 30 天內備齊
+- 預付款：12 個月後可依 102%/101%/100% 遞減贖回

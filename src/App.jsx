@@ -23,6 +23,11 @@ import {
   Upload,
   Wand2,
 } from 'lucide-react';
+import q2Financials from './docs/q2-financials.txt?raw';
+import termSheet from './docs/term-sheet.txt?raw';
+import kycAml from './docs/kyc-aml.txt?raw';
+import appraisal from './docs/appraisal.txt?raw';
+import industryOutlook from './docs/industry-outlook.txt?raw';
 
 const createId = () => Math.random().toString(36).slice(2, 10);
 
@@ -42,7 +47,7 @@ const initialDocs = [
     type: 'PDF',
     pages: 42,
     tags: ['摘要', '納入報告'],
-    content: '',
+    content: q2Financials,
   },
   {
     id: 'doc-2',
@@ -50,7 +55,7 @@ const initialDocs = [
     type: 'DOCX',
     pages: 9,
     tags: ['翻譯', '納入報告'],
-    content: '',
+    content: termSheet,
   },
   {
     id: 'doc-3',
@@ -58,7 +63,7 @@ const initialDocs = [
     type: 'PDF',
     pages: 65,
     tags: ['摘要', '風險掃描'],
-    content: '',
+    content: kycAml,
   },
   {
     id: 'doc-4',
@@ -66,7 +71,7 @@ const initialDocs = [
     type: 'PDF',
     pages: 18,
     tags: ['翻譯'],
-    content: '',
+    content: appraisal,
   },
   {
     id: 'doc-5',
@@ -74,7 +79,7 @@ const initialDocs = [
     type: 'PPTX',
     pages: 22,
     tags: ['背景'],
-    content: '',
+    content: industryOutlook,
   },
 ];
 

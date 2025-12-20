@@ -1,6 +1,6 @@
 # LobeChat Claude Artifacts Screen
 
-以 LobeHub UI 建立的企業金融 RM 授信原型，模擬指派摘要/翻譯並將產出整理成 Artifacts 分頁，實際串 OpenAI。
+以 LobeHub UI 建立的企業金融 RM 授信原型，模擬指派摘要/翻譯並將產出整理成 Artifacts 分頁，後端改為 Agno（Python Agent）調用。
 
 ## 特色
 - Claude Artifacts 風格：暖色編輯系雙欄，左側對話/路由，右側輸出 + Live Preview。
@@ -16,19 +16,25 @@
    VITE_API_URL=http://localhost:8787
    ```
    使用 `npm run dev` 時可省略 `VITE_API_URL`（前端會走 proxy）。
-2. 安裝依賴
+2. 建立 Python venv 並安裝 Agno 服務端依賴
+   ```bash
+   python3 -m venv .venv
+   . .venv/bin/activate
+   pip install -r server/requirements.txt
+   ```
+3. 安裝前端依賴
    ```bash
    npm install
    ```
-3. 啟動 API
+4. 啟動 API（Agno + OpenAI 模型）
    ```bash
    npm run dev:api
    ```
-4. 另開終端啟動前端
+5. 另開終端啟動前端
    ```bash
    npm run dev -- --host 127.0.0.1 --port 5176 --strictPort --force --clearScreen false
    ```
-5. 打開 `http://127.0.0.1:5176/` 測試。
+6. 打開 `http://127.0.0.1:5176/` 測試。
 
 備註：PDF/DOCX 不會自動解析內容，如需精準輸出，請在左側「文件內容」貼上重點段落。
 
