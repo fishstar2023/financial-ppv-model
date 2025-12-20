@@ -1,6 +1,6 @@
 import json
 import os
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Union
 
 import dotenv
 from fastapi import FastAPI
@@ -66,7 +66,7 @@ class Document(BaseModel):
     id: Optional[str]
     name: Optional[str]
     type: Optional[str]
-    pages: Optional[int]
+    pages: Optional[Union[int, str]] = None
     tags: Optional[List[str]] = Field(default_factory=list)
     content: Optional[str] = ""
 
@@ -85,12 +85,13 @@ def build_doc_context(documents: List[Document]) -> str:
         content = (doc.content or "").strip()
         safe_content = content[:2000] if content else "未提供"
         tags = "、".join(doc.tags or []) if doc.tags else "無"
+        pages = doc.pages if doc.pages not in (None, "") else "-"
         lines.append(
             "\n".join(
                 [
                     f"{idx}. 名稱: {doc.name or '未命名'}",
                     f"   類型: {doc.type or '-'}",
-                    f"   頁數: {doc.pages or '-'}",
+                    f"   頁數: {pages}",
                     f"   標籤: {tags}",
                     f"   內容摘要: {safe_content}",
                 ]
