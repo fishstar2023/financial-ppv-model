@@ -1,5 +1,9 @@
+import dotenv from 'dotenv';
 import express from 'express';
 import OpenAI from 'openai';
+
+// Always prefer .env values even if shell has an existing OPENAI_API_KEY
+dotenv.config({ override: true });
 
 const app = express();
 const port = process.env.PORT || 8787;
