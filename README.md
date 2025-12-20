@@ -46,7 +46,8 @@ npm run preview
 ```
 
 ## 截圖
-可將截圖放入 `docs/`，並在此處引用：
-```
-![UI 截圖](docs/ui.png)
-```
+以下為介面截圖（檔案：`授信Artifacts工作台畫面.png`）：
+
+![授信 Artifacts 工作台](授信Artifacts工作台畫面.png)
+
+說明：左側為輸入與文件上傳區，右側為模型輸出與 Live Preview，適合用來審閱模型產出、生成授信草稿與匯出報告。
