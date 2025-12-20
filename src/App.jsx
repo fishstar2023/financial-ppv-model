@@ -398,13 +398,22 @@ export default function App() {
     }
   };
 
-  const renderMarkdown = (value) => (
-    <div className="markdown-body">
-      <ReactMarkdown remarkPlugins={[remarkGfm]}>
-        {value?.trim() || '尚未產出，請先在左側送出指示。'}
-      </ReactMarkdown>
-    </div>
-  );
+  const renderMarkdown = (value) => {
+    const safeText =
+      typeof value === 'string'
+        ? value.trim()
+        : value
+          ? JSON.stringify(value, null, 2)
+          : '';
+
+    return (
+      <div className="markdown-body">
+        <ReactMarkdown remarkPlugins={[remarkGfm]}>
+          {safeText || '尚未產出，請先在左側送出指示。'}
+        </ReactMarkdown>
+      </div>
+    );
+  };
 
   return (
     <ThemeProvider
