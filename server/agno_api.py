@@ -1,14 +1,13 @@
 import json
 import os
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Union, AsyncGenerator
 
 import dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
-
-from agno.agent import Agent
-from agno.models.openai import OpenAIChat
+from openai import OpenAI
 
 # Robust .env loader to avoid parser crashes on some environments.
 def _safe_load_env() -> None:
@@ -74,6 +73,7 @@ class Document(BaseModel):
 class ArtifactRequest(BaseModel):
     messages: List[Message] = Field(default_factory=list)
     documents: List[Document] = Field(default_factory=list)
+    stream: bool = False
 
 
 def build_doc_context(documents: List[Document]) -> str:
@@ -109,17 +109,15 @@ def build_conversation(messages: List[Message]) -> str:
     return "對話紀錄:\n" + "\n".join(parts)
 
 
-def get_agent() -> Agent:
+def get_openai_client() -> OpenAI:
     api_key = os.getenv("OPENAI_API_KEY")
-    model_id = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
     if not api_key:
         raise RuntimeError("OPENAI_API_KEY 未設定，無法呼叫模型")
-    model = OpenAIChat(id=model_id, api_key=api_key)
-    return Agent(
-        model=model,
-        system_message=SYSTEM_PROMPT,
-        markdown=False,
-    )
+    return OpenAI(api_key=api_key)
+
+
+def get_model_id() -> str:
+    return os.getenv("OPENAI_MODEL", "gpt-4o-mini")
 
 
 app = FastAPI(title="Agno Artifacts API", version="1.0.0")
@@ -136,23 +134,69 @@ async def health():
     return {"ok": True}
 
 
+async def generate_stream(prompt: str) -> AsyncGenerator[str, None]:
+    """Generate streaming response using OpenAI API."""
+    try:
+        client = get_openai_client()
+        model_id = get_model_id()
+
+        stream = client.chat.completions.create(
+            model=model_id,
+            messages=[
+                {"role": "system", "content": SYSTEM_PROMPT},
+                {"role": "user", "content": prompt},
+            ],
+            stream=True,
+        )
+
+        for chunk in stream:
+            if chunk.choices and chunk.choices[0].delta.content:
+                content = chunk.choices[0].delta.content
+                # Send as SSE format
+                yield f"data: {json.dumps({'chunk': content})}\n\n"
+
+        # Send done signal
+        yield f"data: {json.dumps({'done': True})}\n\n"
+
+    except Exception as exc:
+        yield f"data: {json.dumps({'error': str(exc)})}\n\n"
+
+
 @app.post("/api/artifacts")
 async def generate_artifacts(req: ArtifactRequest):
-    try:
-        agent = get_agent()
-    except RuntimeError as exc:
-        return {"error": str(exc)}
-
     doc_context = build_doc_context(req.documents)
     convo = build_conversation(req.messages)
     prompt = f"{convo}\n\n{doc_context}\n\n請依規則產出 JSON。"
 
+    if req.stream:
+        # Return streaming response
+        return StreamingResponse(
+            generate_stream(prompt),
+            media_type="text/event-stream",
+            headers={
+                "Cache-Control": "no-cache",
+                "Connection": "keep-alive",
+                "X-Accel-Buffering": "no",
+            },
+        )
+
+    # Non-streaming response (original behavior)
     try:
-        result = agent.run(prompt)
-        text = result.get_content_as_string()
+        client = get_openai_client()
+        model_id = get_model_id()
+
+        response = client.chat.completions.create(
+            model=model_id,
+            messages=[
+                {"role": "system", "content": SYSTEM_PROMPT},
+                {"role": "user", "content": prompt},
+            ],
+        )
+
+        text = response.choices[0].message.content or ""
         data: Dict[str, Any] = json.loads(text)
         return data
-    except Exception as exc:  # noqa: BLE001
+    except Exception as exc:
         return {
             "error": "LLM request failed",
             "detail": str(exc),

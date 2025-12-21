@@ -1,21 +1,39 @@
-授信條款書（摘錄，擔保授信）
-Facility type: Senior secured term loan + revolving credit
-Total amount: USD 160.0M（Term 120.0M + Revolver 40.0M）
-Tenor: 5 years; amortization holiday 24 months，之後按季等額攤還
-Pricing: SOFR + 275 bps；未動用額度費 25 bps；前置手續費 75 bps
-Security: 第一順位擔保存貨、應收帳款、設備；最低擔保覆蓋率 1.25x
-Financial covenants:
-- Max Net Leverage: 3.8x（測試：季度）
-- Min Interest Coverage: 3.0x
-- Min Liquidity: USD 40M（含未動用額度）
-Reporting:
-- Quarterly: 財報、存貨與應收帳齡明細
-- Monthly: borrowing base certificate、DSRA 餘額
-Representations & Warranties:
-- 無重大稅務爭議；無制裁/PEP 直接持股
-Events of Default:
-- 30 日以上應付利息違約；重大不實陳述；交叉違約 > USD 10M
+授信條款書（台積電 - 案例摘要）
 
-備註：
-- DSRA：6 個月利息需於關帳後 30 天內備齊
-- 預付款：12 個月後可依 102%/101%/100% 遞減贖回
+一、交易概要
+- 借款人：台灣積體電路製造股份有限公司（TSMC）
+- 額度：USD 2.0B（循環 1.2B + 定期 0.8B）
+- 用途：營運資金、資本支出、短期債務再融資
+- 期限：5 年；定貸前 2 年免攤還
+- 幣別：USD（可切換 JPY/EUR 之多幣別選項）
+
+二、定價與費用
+- 定貸利率：SOFR + 65 bps
+- 循環利率：SOFR + 75 bps
+- 未動用承諾費：15 bps
+- 安排費/前期費用：20 bps（一次性）
+
+三、擔保與順位
+- 擔保：無擔保（負抵押承諾）
+- 排名：一般無擔保、無從屬條款
+
+四、財務與行為條款
+- 淨負債倍數 ≤ 1.5x
+- 利息保障倍數 ≥ 6.0x
+- 重大資本支出需提前 30 天通知
+- 重大併購/投資需事前同意
+
+五、先決條件
+- KYC/AML 完成、董事會授權、法遵及法律意見書
+- 最近 2 季財報 + 當期營運回顧
+
+六、資訊揭露
+- 季度財報與年度審計報告
+- 半年內部風險評估與資本支出執行報告
+
+七、違約事件
+- 未付款、重大交叉違約、控制權變更
+- 重大制裁/出口管制違反
+
+八、其他
+- 適用法律：英國法（或交易文件指定）

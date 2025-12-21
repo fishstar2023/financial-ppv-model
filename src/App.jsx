@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect, useMemo } from 'react';
 import {
   ActionIcon,
   Button,
@@ -42,106 +42,95 @@ const nowTime = () =>
     minute: '2-digit',
   });
 
+// Estimate pages based on content length (roughly 3000 chars per page)
+const estimatePages = (content) => {
+  if (!content) return '-';
+  const chars = content.length;
+  return Math.max(1, Math.ceil(chars / 3000));
+};
+
 const initialDocs = [
   {
     id: 'doc-1',
     name: '2024 Q2 財務報表',
-    type: 'PDF',
-    pages: 42,
+    type: 'TXT',
+    pages: estimatePages(q2Financials),
     tags: ['摘要', '納入報告'],
     content: q2Financials,
   },
   {
     id: 'doc-2',
     name: '授信條款書',
-    type: 'DOCX',
-    pages: 9,
+    type: 'TXT',
+    pages: estimatePages(termSheet),
     tags: ['翻譯', '納入報告'],
     content: termSheet,
   },
   {
     id: 'doc-3',
     name: 'KYC / AML 資料包',
-    type: 'PDF',
-    pages: 65,
+    type: 'TXT',
+    pages: estimatePages(kycAml),
     tags: ['摘要', '風險掃描'],
     content: kycAml,
   },
   {
     id: 'doc-4',
     name: '擔保品估價報告',
-    type: 'PDF',
-    pages: 18,
+    type: 'TXT',
+    pages: estimatePages(appraisal),
     tags: ['翻譯'],
     content: appraisal,
   },
   {
     id: 'doc-5',
     name: '產業展望 Q2',
-    type: 'PPTX',
-    pages: 22,
+    type: 'TXT',
+    pages: estimatePages(industryOutlook),
     tags: ['背景'],
     content: industryOutlook,
   },
 ];
 
-const initialRoutingSteps = [
-  {
-    id: 'route-1',
-    label: '翻譯授信條款書',
-    status: 'running',
-    eta: '3 分鐘',
-  },
-  {
-    id: 'route-2',
-    label: '翻譯擔保品估價報告',
-    status: 'queued',
-    eta: '7 分鐘',
-  },
-  {
-    id: 'route-3',
-    label: '摘要 Q2 財報重點',
-    status: 'queued',
-    eta: '8 分鐘',
-  },
-  {
-    id: 'route-4',
-    label: '摘要 KYC/AML 風險',
-    status: 'done',
-    eta: '完成',
-  },
-];
+// Available tags for documents
+const availableTags = ['摘要', '翻譯', '納入報告', '風險掃描', '背景'];
 
-const initialMessages = [
-  {
-    id: 'msg-1',
-    role: 'user',
-    name: 'RM',
-    time: '10:08',
-    content:
-      '已上傳 Q2 財務報表、授信條款書、KYC/AML 資料包與擔保品估價報告。請將條款書與估價報告翻譯為英文，並摘要 Q2 財報與 KYC 風險。成果請放在不同的 Artifact 分頁。',
-  },
-  {
-    id: 'msg-2',
-    role: 'assistant',
-    name: 'LLM',
-    time: '10:09',
-    content:
-      '收到，已依指示進行文件分流與產出，並會同步更新授信報告草稿。',
-    bullets: ['摘要: Q2 財務與 KYC/AML', '翻譯: 條款書與估價報告', '授信報告: 委員會版本'],
-  },
-  {
-    id: 'msg-3',
-    role: 'assistant',
-    name: 'LLM',
-    time: '10:11',
-    content: 'Artifacts 生成中，完成後會即時更新右側分頁。',
-    attachment: {
-      title: 'Artifacts: 授信資料包',
-      detail: '排程中 - 即將更新',
-    },
-  },
-];
+const initialRoutingSteps = [];
+
+const initialMessages = [];
+
+// Generate case ID based on date
+const generateCaseId = () => {
+  const now = new Date();
+  const prefix = 'CASE';
+  const dateStr = now.toISOString().slice(2, 10).replace(/-/g, '');
+  const random = Math.random().toString(36).slice(2, 5).toUpperCase();
+  return `${prefix}-${dateStr}-${random}`;
+};
+
+// Format relative time
+const formatRelativeTime = (timestamp) => {
+  if (!timestamp) return '尚未更新';
+  const now = Date.now();
+  const diff = now - timestamp;
+  const seconds = Math.floor(diff / 1000);
+  const minutes = Math.floor(seconds / 60);
+  const hours = Math.floor(minutes / 60);
+
+  if (seconds < 60) return '剛剛';
+  if (minutes < 60) return `${minutes} 分鐘前`;
+  if (hours < 24) return `${hours} 小時前`;
+  return new Date(timestamp).toLocaleDateString('zh-TW');
+};
+
+// Calculate SLA remaining time
+const calculateSlaRemaining = (startTime, slaDurationMinutes = 45) => {
+  if (!startTime) return `${slaDurationMinutes} 分鐘`;
+  const elapsed = Math.floor((Date.now() - startTime) / 60000);
+  const remaining = slaDurationMinutes - elapsed;
+  if (remaining <= 0) return '已逾時';
+  return `剩餘 ${remaining} 分鐘`;
+};
 
 const summaryOutput = '';
 
@@ -163,11 +152,7 @@ const artifactTabs = [
   { id: 'memo', label: '授信報告', icon: ClipboardCheck },
 ];
 
-const tabMeta = {
-  summary: ['來源: 2 份文件', '格式: 摘要重點'],
-  translation: ['來源: 2 份文件', '語言: EN'],
-  memo: ['來源: 4 份文件', '委員會版本'],
-};
+// tabMeta will be computed dynamically in component
 
 const previewTags = {
   summary: '摘要視圖',
@@ -211,6 +196,35 @@ export default function App() {
   const [activeTab, setActiveTab] = useState('summary');
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+
+  // Dynamic metadata states
+  const [caseId] = useState(() => generateCaseId());
+  const [caseStartTime] = useState(() => Date.now());
+  const [lastUpdateTime, setLastUpdateTime] = useState(null);
+  const [ownerName, setOwnerName] = useState('RM Desk');
+  const [slaMinutes] = useState(45);
+  const [currentTime, setCurrentTime] = useState(Date.now());
+
+  // Update current time every minute for SLA calculation
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTime(Date.now());
+    }, 60000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Compute dynamic tab metadata based on documents
+  const tabMeta = useMemo(() => {
+    const summaryDocs = documents.filter((d) => d.tags.includes('摘要')).length;
+    const translationDocs = documents.filter((d) => d.tags.includes('翻譯')).length;
+    const memoDocs = documents.filter((d) => d.tags.includes('納入報告')).length || documents.length;
+
+    return {
+      summary: [`來源: ${summaryDocs} 份文件`, '格式: 摘要重點'],
+      translation: [`來源: ${translationDocs} 份文件`, '語言: EN'],
+      memo: [`來源: ${memoDocs} 份文件`, '委員會版本'],
+    };
+  }, [documents]);
 
   const [artifacts, setArtifacts] = useState({
     summary: {
@@ -260,7 +274,7 @@ export default function App() {
           id: createId(),
           name: file.name.replace(/\.[^.]+$/, ''),
           type: extension.toUpperCase() || 'FILE',
-          pages: '-',
+          pages: estimatePages(content),
           tags: [],
           content,
         };
@@ -275,9 +289,118 @@ export default function App() {
   const handleDocContentChange = (value) => {
     setDocuments((prev) =>
       prev.map((doc) =>
-        doc.id === selectedDocId ? { ...doc, content: value } : doc
+        doc.id === selectedDocId ? { ...doc, content: value, pages: estimatePages(value) } : doc
       )
     );
+  };
+
+  // Toggle tag on selected document
+  const handleToggleTag = (tag) => {
+    setDocuments((prev) =>
+      prev.map((doc) => {
+        if (doc.id !== selectedDocId) return doc;
+        const hasTag = doc.tags.includes(tag);
+        return {
+          ...doc,
+          tags: hasTag ? doc.tags.filter((t) => t !== tag) : [...doc.tags, tag],
+        };
+      })
+    );
+  };
+
+  // Delete a document
+  const handleDeleteDoc = (docId) => {
+    setDocuments((prev) => prev.filter((doc) => doc.id !== docId));
+    if (selectedDocId === docId) {
+      setSelectedDocId(documents[0]?.id || '');
+    }
+  };
+
+  // Copy artifact output to clipboard
+  const handleCopyOutput = async () => {
+    const content = activeArtifact.output;
+    if (!content) {
+      setErrorMessage('尚無內容可複製');
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(content);
+      setErrorMessage(''); // Clear any existing error
+      alert('已複製到剪貼簿');
+    } catch {
+      setErrorMessage('複製失敗，請手動選取複製');
+    }
+  };
+
+  // Download artifact output as file
+  const handleDownloadOutput = () => {
+    const content = activeArtifact.output;
+    if (!content) {
+      setErrorMessage('尚無內容可下載');
+      return;
+    }
+    const blob = new Blob([content], { type: 'text/markdown;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${activeTab}-${caseId}.md`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
+  // Regenerate artifacts (re-send last request)
+  const handleRegenerate = () => {
+    if (messages.length === 0) {
+      setErrorMessage('尚無對話記錄，無法重新產生');
+      return;
+    }
+    // Find last user message and resend
+    const lastUserMsg = [...messages].reverse().find((m) => m.role === 'user');
+    if (lastUserMsg) {
+      setComposerText(lastUserMsg.content);
+    }
+  };
+
+  // Create new case (reset all state)
+  const handleNewCase = () => {
+    if (messages.length > 0 || artifacts.summary.output || artifacts.translation.output || artifacts.memo.output) {
+      if (!window.confirm('確定要新增案件嗎？目前的對話和產出將會清空。')) {
+        return;
+      }
+    }
+    setMessages([]);
+    setRoutingSteps([]);
+    setArtifacts({
+      summary: { output: '', borrower: { name: '', description: '', rating: '' }, metrics: [], risks: [] },
+      translation: { output: '', clauses: [] },
+      memo: { output: '', sections: [], recommendation: '', conditions: '' },
+    });
+    setLastUpdateTime(null);
+    setErrorMessage('');
+    setComposerText('');
+  };
+
+  // Export all artifacts as a package
+  const handleExportPackage = () => {
+    const packageContent = {
+      caseId,
+      exportTime: new Date().toISOString(),
+      summary: artifacts.summary,
+      translation: artifacts.translation,
+      memo: artifacts.memo,
+      documents: documents.map((d) => ({ name: d.name, type: d.type, tags: d.tags })),
+    };
+    const blob = new Blob([JSON.stringify(packageContent, null, 2)], { type: 'application/json;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `artifacts-${caseId}.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   };
 
   const handleSend = async () => {
@@ -387,6 +510,7 @@ export default function App() {
       };
 
       setMessages((prev) => [...prev, assistantMessage]);
+      setLastUpdateTime(Date.now());
     } catch (error) {
       setErrorMessage(
         error instanceof Error
@@ -451,11 +575,11 @@ export default function App() {
           </div>
 
           <div className="header-actions">
-            <Button variant="outlined" icon={Briefcase}>
+            <Button variant="outlined" icon={Briefcase} onClick={handleNewCase}>
               新增案件
             </Button>
-            <Button type="primary" icon={FolderPlus}>
-              分享資料包
+            <Button type="primary" icon={FolderPlus} onClick={handleExportPackage}>
+              匯出資料包
             </Button>
           </div>
         </header>
@@ -473,10 +597,10 @@ export default function App() {
               </div>
               <div className="panel-actions">
                 <Tag size="small" variant="borderless">
-                  案件: ATLAS-102
+                  案件: {caseId}
                 </Tag>
                 <Tag size="small" variant="borderless">
-                  SLA: 45 分鐘
+                  SLA: {calculateSlaRemaining(caseStartTime, slaMinutes)}
                 </Tag>
               </div>
             </div>
@@ -532,14 +656,28 @@ export default function App() {
               </div>
               <div className="doc-detail">
                 <div className="detail-header">
-                  <span>文件內容 (可選)</span>
+                  <span>文件設定</span>
                   <Tag size="small" variant="borderless">
-                    只會送出文字內容
+                    頁數: {selectedDoc?.pages || '-'}
                   </Tag>
                 </div>
                 {selectedDoc ? (
                   <>
                     <div className="detail-title">{selectedDoc.name}</div>
+                    <div className="tag-selector">
+                      <span className="tag-label">標籤:</span>
+                      {availableTags.map((tag) => (
+                        <Tag
+                          key={tag}
+                          size="small"
+                          color={selectedDoc.tags.includes(tag) ? tagColors[tag] : 'default'}
+                          style={{ cursor: 'pointer', opacity: selectedDoc.tags.includes(tag) ? 1 : 0.5 }}
+                          onClick={() => handleToggleTag(tag)}
+                        >
+                          {tag}
+                        </Tag>
+                      ))}
+                    </div>
                     <TextArea
                       rows={4}
                       value={selectedDoc.content}
@@ -632,8 +770,8 @@ export default function App() {
               />
               {errorMessage ? <div className="error-banner">{errorMessage}</div> : null}
               <div className="composer-actions">
-                <Button icon={Paperclip} variant="outlined">
-                  附件
+                <Button icon={Paperclip} variant="outlined" onClick={handleUploadClick}>
+                  上傳文件
                 </Button>
                 <Button icon={ArrowUpRight} type="primary" onClick={handleSend} disabled={isLoading}>
                   {isLoading ? '產生中...' : '送出指示'}
@@ -653,11 +791,11 @@ export default function App() {
                 </Text>
               </div>
               <div className="panel-actions">
-                <Button icon={Wand2} variant="outlined" disabled={isLoading}>
+                <Button icon={Wand2} variant="outlined" disabled={isLoading} onClick={handleRegenerate}>
                   重新產生
                 </Button>
-                <ActionIcon icon={Copy} variant="outlined" />
-                <ActionIcon icon={Download} variant="outlined" />
+                <ActionIcon icon={Copy} variant="outlined" onClick={handleCopyOutput} title="複製內容" />
+                <ActionIcon icon={Download} variant="outlined" onClick={handleDownloadOutput} title="下載 Markdown" />
               </div>
             </div>
 
@@ -676,8 +814,8 @@ export default function App() {
             </div>
 
             <div className="artifact-meta">
-              <div className="meta-chip">更新: 1 分鐘前</div>
-              <div className="meta-chip">負責人: RM Desk</div>
+              <div className="meta-chip">更新: {formatRelativeTime(lastUpdateTime)}</div>
+              <div className="meta-chip">負責人: {ownerName}</div>
               {tabMeta[activeTab].map((item) => (
                 <div key={item} className="meta-chip">
                   {item}
@@ -836,7 +974,7 @@ export default function App() {
                             {activeArtifact.conditions || '內容不足，需補充'}
                           </div>
                         </div>
-                        <button className="preview-btn dark" type="button">
+                        <button className="preview-btn dark" type="button" onClick={handleDownloadOutput}>
                           匯出報告
                         </button>
                       </div>
