@@ -167,9 +167,7 @@ def get_last_user_message(messages: List[Message]) -> str:
     return ""
 
 
-def is_simple_greeting(text: str) -> bool:
-    if not text:
-        return False
+def _contains_task_keywords(text: str) -> bool:
     lowered = text.strip().lower()
     task_keywords = [
         "摘要",
@@ -192,7 +190,14 @@ def is_simple_greeting(text: str) -> bool:
         "analysis",
         "risk",
     ]
-    if any(keyword in lowered for keyword in task_keywords):
+    return any(keyword in lowered for keyword in task_keywords)
+
+
+def is_simple_greeting(text: str) -> bool:
+    if not text:
+        return False
+    lowered = text.strip().lower()
+    if _contains_task_keywords(lowered):
         return False
     if len(lowered) > 20:
         return False
@@ -221,6 +226,21 @@ def is_simple_greeting(text: str) -> bool:
         "在吗",
     }
     return normalized in greetings
+
+
+def is_smalltalk(text: str) -> bool:
+    if not text:
+        return False
+    lowered = text.strip().lower()
+    if _contains_task_keywords(lowered):
+        return False
+    thanks_pattern = re.compile(r"(thanks|thank you|thx|謝謝|感謝|辛苦了)", re.IGNORECASE)
+    if thanks_pattern.search(lowered):
+        return True
+    if len(lowered) <= 24 and not re.search(r"[?？]", lowered):
+        # short messages without question marks and without task keywords → treat as smalltalk
+        return True
+    return False
 
 
 def build_empty_response(message: str) -> Dict[str, Any]:
@@ -445,7 +465,7 @@ async def get_preloaded_documents():
 async def generate_artifacts(req: ArtifactRequest):
     try:
         last_user = get_last_user_message(req.messages)
-        if is_simple_greeting(last_user):
+        if is_simple_greeting(last_user) or is_smalltalk(last_user):
             return build_empty_response(
                 "你好！我是授信報告助理，可以協助摘要、翻譯、風險評估與授信報告草稿。請告訴我需要什麼協助？"
             )
