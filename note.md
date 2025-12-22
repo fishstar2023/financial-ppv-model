@@ -42,6 +42,12 @@
 - 創建 note.md 追蹤待辦任務
 - 建立工作流程：每次更動成功後 commit 至 GitHub
 
+### ✅ UI 簡化重構
+- 移除重複的"輸出內容"卡片
+- 將 streaming 效果整合至"委員會預覽"區塊
+- 簡化 Artifacts 面板佈局，提升使用體驗
+- Commit: e3c64e0
+
 ## 未來考慮 (Future Considerations)
 
 - 如果 App.jsx 持續增長，考慮拆分為獨立 components
