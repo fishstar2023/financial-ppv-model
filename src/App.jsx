@@ -950,10 +950,10 @@ export default function App() {
                 <div className="card-head">
                   <div>
                     <Text as="h3" weight="600" className="card-title">
-                      委員會預覽
+                      產出預覽
                     </Text>
                     <Text type="secondary" className="card-subtitle">
-                      結構化呈現授信分析結果
+                      結構化呈現分析產出
                     </Text>
                   </div>
                   <div className="preview-actions">
