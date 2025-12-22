@@ -151,6 +151,7 @@ body {
   flex-direction: column;
   gap: 18px;
   min-height: 0;
+  overflow: hidden;
 }
 
 .panel-header {
@@ -195,6 +196,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  flex-shrink: 0;
 }
 
 .tray-header {
@@ -269,6 +271,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  flex-shrink: 0;
 }
 
 .detail-header {
@@ -656,6 +659,7 @@ body {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
+  flex-shrink: 0;
 }
 
 .card-title {
@@ -773,6 +777,7 @@ body {
 
 .preview-canvas {
   flex: 1;
+  min-height: 0;
   background: linear-gradient(160deg, #fff8f1, #f6efe5);
   border-radius: 16px;
   padding: 18px;
