@@ -280,28 +280,55 @@ export default function App() {
   const handleUploadFiles = async (event) => {
     const files = Array.from(event.target.files || []);
     if (!files.length) return;
+    const nextDocs = [];
 
-    const nextDocs = await Promise.all(
-      files.map(async (file) => {
-        const extension = file.name.split('.').pop() || '';
-        const isTextFile =
-          file.type.startsWith('text/') ||
-          ['txt', 'md', 'csv'].includes(extension.toLowerCase());
+    for (const file of files) {
+      const extension = file.name.split('.').pop() || '';
+      const isTextFile =
+        file.type.startsWith('text/') ||
+        ['txt', 'md', 'csv'].includes(extension.toLowerCase());
+
+      if (extension.toLowerCase() === 'pdf' || file.type === 'application/pdf') {
+        try {
+          const form = new FormData();
+          form.append('file', file, file.name);
+          const res = await fetch(`${apiBase || ''}/api/upload_pdf`, {
+            method: 'POST',
+            body: form,
+          });
+          if (!res.ok) {
+            console.error('PDF upload failed', await res.text());
+            continue;
+          }
+          const data = await res.json();
+          nextDocs.push({
+            id: data.id || createId(),
+            name: file.name.replace(/\.[^.]+$/, ''),
+            type: 'PDF',
+            pages: data.pages || '-',
+            tags: [],
+            content: '',
+          });
+        } catch (err) {
+          console.error('PDF upload error', err);
+        }
+      } else {
         const content = isTextFile ? await file.text() : '';
-
-        return {
+        nextDocs.push({
           id: createId(),
           name: file.name.replace(/\.[^.]+$/, ''),
           type: extension.toUpperCase() || 'FILE',
           pages: estimatePages(content),
           tags: [],
           content,
-        };
-      })
-    );
+        });
+      }
+    }
 
-    setDocuments((prev) => [...nextDocs, ...prev]);
-    setSelectedDocId(nextDocs[0]?.id || selectedDocId);
+    if (nextDocs.length) {
+      setDocuments((prev) => [...nextDocs, ...prev]);
+      setSelectedDocId(nextDocs[0]?.id || selectedDocId);
+    }
     event.target.value = '';
   };
 
