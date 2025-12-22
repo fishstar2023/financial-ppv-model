@@ -263,6 +263,27 @@ def build_empty_response(message: str) -> Dict[str, Any]:
     }
 
 
+def run_smalltalk_agent(message: str) -> str:
+    """Use a lightweight chat agent to handle greetings/smalltalk via Agno."""
+    agent = Agent(
+        name="ChitChat",
+        role="簡短且親切的 RM 助理，僅做寒暄或確認需求，不要主動生成報告。",
+        model=get_model(),
+        instructions=[
+            "保持一句或兩句的自然回應，確認需求即可。",
+            "不要承諾開始產出報告或摘要；請詢問使用者需要什麼協助。",
+            "語氣友善、簡潔，避免冗長。",
+        ],
+        markdown=False,
+    )
+    try:
+        resp = agent.run(message)
+        return resp.get_content_as_string()
+    except Exception:
+        # fallback to static short response
+        return "你好！我是授信報告助理，可以協助摘要、翻譯、風險評估與授信報告草稿。請告訴我需要什麼協助？"
+
+
 def ensure_inline_documents_indexed(documents: List[Document]) -> None:
     for doc in documents:
         content = (doc.content or "").strip()
@@ -466,9 +487,8 @@ async def generate_artifacts(req: ArtifactRequest):
     try:
         last_user = get_last_user_message(req.messages)
         if is_simple_greeting(last_user) or is_smalltalk(last_user):
-            return build_empty_response(
-                "你好！我是授信報告助理，可以協助摘要、翻譯、風險評估與授信報告草稿。請告訴我需要什麼協助？"
-            )
+            reply = run_smalltalk_agent(last_user or "你好")
+            return build_empty_response(reply)
 
         ensure_inline_documents_indexed(req.documents)
         doc_context = build_doc_context(req.documents)
