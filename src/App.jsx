@@ -946,43 +946,14 @@ export default function App() {
             </div>
 
             <div className="artifact-stack">
-              <div className="output-card">
-                <div className="card-head">
-                  <div>
-                    <Text as="h3" weight="600" className="card-title">
-                      輸出內容
-                    </Text>
-                    <Text type="secondary" className="card-subtitle">
-                      依分頁顯示 LLM 產出文字
-                    </Text>
-                  </div>
-                  <Tag size="small" color="gold" variant="filled">
-                    Markdown
-                  </Tag>
-                </div>
-                <div className="output-code">
-                  {isLoading && streamingContent ? (
-                    <div className="streaming-wrapper">
-                      <div className="streaming-label">正在產生中...</div>
-                      <div className="streaming-content">
-                        <pre className="streaming-text">{streamingContent}</pre>
-                        <span className="streaming-cursor">▊</span>
-                      </div>
-                    </div>
-                  ) : (
-                    renderMarkdown(activeArtifact.output)
-                  )}
-                </div>
-              </div>
-
               <div className="preview-card">
                 <div className="card-head">
                   <div>
                     <Text as="h3" weight="600" className="card-title">
-                      右側預覽
+                      委員會預覽
                     </Text>
                     <Text type="secondary" className="card-subtitle">
-                      結構化呈現給授信委員會
+                      結構化呈現授信分析結果
                     </Text>
                   </div>
                   <div className="preview-actions">
@@ -997,10 +968,20 @@ export default function App() {
                     <div className="live-markdown-head">
                       <div className="summary-kicker">Live Preview</div>
                       <p className="live-markdown-hint">
-                        右側即時套用 LLM 輸出（Markdown），可直接作為委員會草稿
+                        即時產生 LLM 輸出（Markdown），可直接作為委員會草稿
                       </p>
                     </div>
-                    {renderMarkdown(activeArtifact.output)}
+                    {isLoading && streamingContent ? (
+                      <div className="streaming-wrapper">
+                        <div className="streaming-label">正在產生中...</div>
+                        <div className="streaming-content">
+                          <pre className="streaming-text">{streamingContent}</pre>
+                          <span className="streaming-cursor">▊</span>
+                        </div>
+                      </div>
+                    ) : (
+                      renderMarkdown(activeArtifact.output)
+                    )}
                   </div>
 
                   {activeTab === 'summary' ? (
