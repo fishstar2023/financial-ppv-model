@@ -3,11 +3,13 @@ import os
 from typing import Any, Dict, List, Optional, Union, AsyncGenerator
 
 import dotenv
-from fastapi import FastAPI
+from fastapi import FastAPI, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import StreamingResponse
+from fastapi.responses import StreamingResponse, JSONResponse
 from pydantic import BaseModel, Field
 from openai import OpenAI
+from .pdf_rag import store_pdf_bytes, retrieve_similar
+import uuid
 
 # Robust .env loader to avoid parser crashes on some environments.
 def _safe_load_env() -> None:
@@ -146,6 +148,18 @@ async def health():
     return {"ok": True}
 
 
+@app.post("/api/upload_pdf")
+async def upload_pdf(file: UploadFile = File(...)):
+    if not file:
+        return JSONResponse({"error": "No file provided"}, status_code=400)
+    try:
+        data = await file.read()
+        meta = store_pdf_bytes(data, file.filename)
+        return meta
+    except Exception as exc:
+        return JSONResponse({"error": "PDF 處理失敗", "detail": str(exc)}, status_code=500)
+
+
 async def generate_stream(messages: List[Dict[str, str]], doc_context: str) -> AsyncGenerator[str, None]:
     """Generate streaming response using OpenAI API."""
     try:
@@ -187,6 +201,31 @@ async def generate_stream(messages: List[Dict[str, str]], doc_context: str) -> A
 @app.post("/api/artifacts")
 async def generate_artifacts(req: ArtifactRequest):
     doc_context = build_doc_context(req.documents)
+
+    # If last user message exists, perform RAG retrieval for any PDF docs
+    try:
+        # last user query
+        last_user = ''
+        if req.messages:
+            for m in reversed(req.messages):
+                if m.role == 'user' and (m.content or '').strip():
+                    last_user = m.content.strip()
+                    break
+
+        if last_user:
+            rag_lines = []
+            for doc in req.documents:
+                if (doc.type or '').upper() == 'PDF' and doc.id:
+                    retrieved = retrieve_similar(doc.id, last_user, top_k=3)
+                    if retrieved:
+                        rag_lines.append(f"文檔 {doc.name or doc.id} (檢索片段):")
+                        for it in retrieved:
+                            safe = it.get('text', '').replace('\n', ' ')[:800]
+                            rag_lines.append(f"- {safe}")
+            if rag_lines:
+                doc_context += "\n\n[檢索結果 - RAG 相關片段]\n" + "\n".join(rag_lines)
+    except Exception:
+        pass
 
     # Convert messages to dict format
     messages = [{"role": msg.role, "content": msg.content} for msg in req.messages]

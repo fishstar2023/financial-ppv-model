@@ -2,3 +2,6 @@ agno==2.3.18
 fastapi==0.115.6
 uvicorn[standard]==0.32.1
 python-dotenv==1.0.1
+openai>=1.0.0
+PyPDF2>=3.0.0
+numpy>=1.26.0
