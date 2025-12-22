@@ -22,9 +22,9 @@ import {
   Languages,
   ListChecks,
   Paperclip,
+  X,
   Upload,
   Wand2,
-  X,
 } from 'lucide-react';
 import q2Financials from './docs/q2-financials.txt?raw';
 import termSheet from './docs/term-sheet.txt?raw';
@@ -200,7 +200,7 @@ export default function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [streamingContent, setStreamingContent] = useState('');
-  const [isDocPanelOpen, setIsDocPanelOpen] = useState(false);
+  const [isDocPanelOpen, setIsDocPanelOpen] = useState(true);
 
   // Dynamic metadata states
   const [caseId] = useState(() => generateCaseId());
