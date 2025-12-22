@@ -59,6 +59,15 @@ class RagStore:
     def _hash_text(self, text: str) -> str:
         return hashlib.md5(text.encode("utf-8")).hexdigest()
 
+    def _hash_bytes(self, data: bytes) -> str:
+        return hashlib.md5(data).hexdigest()
+
+    def _find_by_hash(self, content_hash: str) -> Optional[StoredDocument]:
+        for doc in self.docs.values():
+            if doc.content_hash == content_hash:
+                return doc
+        return None
+
     def _count_pdf_pages(self, data: bytes) -> Optional[int]:
         if PdfReader is None:
             return None
@@ -85,20 +94,34 @@ class RagStore:
             stored.preview = chunks[0].text[:400]
 
     def index_pdf_bytes(self, data: bytes, filename: str) -> StoredDocument:
+        content_hash = self._hash_bytes(data)
+        existing = self._find_by_hash(content_hash)
+        if existing:
+            return existing
         doc_id = str(uuid.uuid4())
         name = os.path.splitext(filename)[0]
         pages = self._count_pdf_pages(data)
         docs = self._pdf_reader.read(io.BytesIO(data), name=name)
-        stored = StoredDocument(id=doc_id, name=name, type="PDF", pages=pages)
+        stored = StoredDocument(
+            id=doc_id,
+            name=name,
+            type="PDF",
+            pages=pages,
+            content_hash=content_hash,
+        )
         self._index_documents(stored, docs)
         self.docs[doc_id] = stored
         return stored
 
     def index_text_bytes(self, data: bytes, filename: str) -> StoredDocument:
+        content_hash = self._hash_bytes(data)
+        existing = self._find_by_hash(content_hash)
+        if existing:
+            return existing
         doc_id = str(uuid.uuid4())
         name = os.path.splitext(filename)[0]
         docs = self._text_reader.read(io.BytesIO(data), name=name)
-        stored = StoredDocument(id=doc_id, name=name, type="TEXT")
+        stored = StoredDocument(id=doc_id, name=name, type="TEXT", content_hash=content_hash)
         self._index_documents(stored, docs)
         self.docs[doc_id] = stored
         return stored

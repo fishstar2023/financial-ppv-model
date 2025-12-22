@@ -232,12 +232,13 @@ export default function App() {
 
   const [activeTranslationIndex, setActiveTranslationIndex] = useState(0);
 
-  // Load preloaded PDF documents on startup
+  // Load preloaded PDF documents on startup (only once)
   useEffect(() => {
+    let isMounted = true;
     const loadPreloadedDocs = async () => {
       try {
         const response = await fetch(`${apiBase || ''}/api/documents/preloaded`);
-        if (!response.ok) return;
+        if (!response.ok || !isMounted) return;
         const data = await response.json();
         const pdfDocs = (data.documents || []).map((doc) => ({
           id: doc.id,
@@ -248,15 +249,32 @@ export default function App() {
           content: doc.preview || '',
           status: doc.status,
           message: doc.message,
+          source: 'preloaded',
         }));
-        if (pdfDocs.length > 0) {
-          setDocuments((prev) => [...prev, ...pdfDocs]);
+        if (pdfDocs.length > 0 && isMounted) {
+          setDocuments((prev) => {
+            // Deduplicate by ID
+            const existingIds = new Set(prev.map((d) => d.id).filter(Boolean));
+            const existingKeys = new Set(
+              prev
+                .filter((d) => d.source === 'preloaded')
+                .map((d) => `${(d.name || '').toLowerCase()}::${(d.type || '').toLowerCase()}`)
+            );
+            const newDocs = pdfDocs.filter((doc) => {
+              const key = `${(doc.name || '').toLowerCase()}::${(doc.type || '').toLowerCase()}`;
+              const idOk = doc.id ? !existingIds.has(doc.id) : true;
+              const keyOk = !existingKeys.has(key);
+              return idOk && keyOk;
+            });
+            return newDocs.length > 0 ? [...prev, ...newDocs] : prev;
+          });
         }
       } catch (error) {
         console.error('載入預加載文檔失敗:', error);
       }
     };
     loadPreloadedDocs();
+    return () => { isMounted = false; };
   }, []);
 
   // Update current time every minute for SLA calculation
@@ -336,6 +354,7 @@ export default function App() {
         content: doc.preview || '',
         status: doc.status,
         message: doc.message,
+        source: 'uploaded',
       }));
 
       if (!nextDocs.length) {
@@ -506,7 +525,7 @@ export default function App() {
             content: item.content,
           })),
           documents,
-          stream: true,
+          stream: false,
         }),
       });
 
@@ -515,135 +534,80 @@ export default function App() {
         throw new Error(errorText || 'API request failed');
       }
 
-      // Handle SSE streaming
-      const reader = response.body.getReader();
-      const decoder = new TextDecoder();
-      let accumulated = '';
-      let buffer = '';
+      const data = await response.json();
+      console.log('📦 Received data from API:', data);
 
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-
-        buffer += decoder.decode(value, { stream: true });
-        const lines = buffer.split('\n');
-        buffer = lines.pop() || '';
-
-        for (const line of lines) {
-          if (line.startsWith('data: ')) {
-            try {
-              const jsonStr = line.slice(6);
-              const payload = JSON.parse(jsonStr);
-
-              if (payload.chunk) {
-                accumulated += payload.chunk;
-                setStreamingContent(accumulated);
-              }
-
-              if (payload.done) {
-                // Parse final JSON
-                try {
-                  const data = JSON.parse(accumulated);
-                  console.log('📦 Received data from API:', data);
-
-                  if (data.summary || data.translation || data.memo) {
-                    setArtifacts((prev) => {
-                      console.log('📝 Current translations count:', prev.translations.length);
-                      console.log('🔍 Translation data:', data.translation);
-
-                      const newArtifacts = {
-                        summary: {
-                          ...prev.summary,
-                          output: data.summary?.output || prev.summary.output,
-                          borrower: {
-                            ...prev.summary.borrower,
-                            ...(data.summary?.borrower || {}),
-                          },
-                          metrics: data.summary?.metrics || prev.summary.metrics,
-                          risks: data.summary?.risks || prev.summary.risks,
-                        },
-                        translations: prev.translations,
-                        memo: {
-                          ...prev.memo,
-                          output: data.memo?.output || prev.memo.output,
-                          sections: data.memo?.sections || prev.memo.sections,
-                          recommendation:
-                            data.memo?.recommendation || prev.memo.recommendation,
-                          conditions: data.memo?.conditions || prev.memo.conditions,
-                        },
-                      };
-
-                      // Add new translation version if present
-                      if (data.translation && (data.translation.output || data.translation.clauses?.length > 0)) {
-                        const newTranslation = {
-                          id: createId(),
-                          timestamp: Date.now(),
-                          title: `翻譯 #${prev.translations.length + 1}`,
-                          output: data.translation.output || '',
-                          clauses: data.translation.clauses || [],
-                        };
-                        newArtifacts.translations = [...prev.translations, newTranslation];
-                        console.log('✅ Added new translation #', prev.translations.length + 1);
-                        console.log('📋 Total translations:', newArtifacts.translations.length);
-                        // Switch to the new translation
-                        setActiveTranslationIndex(newArtifacts.translations.length - 1);
-                      } else {
-                        console.log('⚠️ No translation data to add');
-                      }
-
-                      return newArtifacts;
-                    });
-                  }
-
-                  if (Array.isArray(data.routing)) {
-                    setRoutingSteps(
-                      data.routing.map((step) => ({
-                        id: step.id || createId(),
-                        label: step.label || '任務更新',
-                        status: step.status || 'done',
-                        eta: step.eta || '完成',
-                      }))
-                    );
-                  } else {
-                    setRoutingSteps((prev) =>
-                      prev.map((step) => ({ ...step, status: 'done', eta: '完成' }))
-                    );
-                  }
-
-                  const assistantMessage = {
-                    id: createId(),
-                    role: 'assistant',
-                    name: 'LLM',
-                    time: nowTime(),
-                    content: data.assistant?.content || '已完成最新授信產出。',
-                    bullets: data.assistant?.bullets,
-                    attachment: {
-                      title: 'Artifacts: 授信資料包',
-                      detail: `更新 ${nowTime()} - 3 個分頁`,
-                    },
-                  };
-
-                  setMessages((prev) => [...prev, assistantMessage]);
-                  setLastUpdateTime(Date.now());
-                } catch {
-                  // JSON parsing failed, show what we have
-                  console.error('Failed to parse final JSON:', accumulated);
-                }
-                setStreamingContent('');
-              }
-
-              if (payload.error) {
-                throw new Error(payload.error);
-              }
-            } catch (parseError) {
-              // Skip invalid JSON chunks
-              if (parseError.message !== 'Unexpected end of JSON input') {
-                console.warn('SSE parse error:', parseError);
-              }
-            }
-          }
-        }
+      if (data.error) {
+        throw new Error(data.error + (data.detail ? `: ${data.detail}` : ''));
       }
+
+      // Update artifacts
+      if (data.summary || data.translation || data.memo) {
+        setArtifacts((prev) => {
+          const newArtifacts = {
+            summary: {
+              ...prev.summary,
+              output: data.summary?.output || prev.summary.output,
+              borrower: {
+                ...prev.summary.borrower,
+                ...(data.summary?.borrower || {}),
+              },
+              metrics: data.summary?.metrics || prev.summary.metrics,
+              risks: data.summary?.risks || prev.summary.risks,
+            },
+            translations: prev.translations,
+            memo: {
+              ...prev.memo,
+              output: data.memo?.output || prev.memo.output,
+              sections: data.memo?.sections || prev.memo.sections,
+              recommendation: data.memo?.recommendation || prev.memo.recommendation,
+              conditions: data.memo?.conditions || prev.memo.conditions,
+            },
+          };
+
+          // Add new translation version if present
+          if (data.translation && (data.translation.output || data.translation.clauses?.length > 0)) {
+            const newTranslation = {
+              id: createId(),
+              timestamp: Date.now(),
+              title: `翻譯 #${prev.translations.length + 1}`,
+              output: data.translation.output || '',
+              clauses: data.translation.clauses || [],
+            };
+            newArtifacts.translations = [...prev.translations, newTranslation];
+            setActiveTranslationIndex(newArtifacts.translations.length - 1);
+          }
+
+          return newArtifacts;
+        });
+      }
+
+      // Update routing
+      if (Array.isArray(data.routing)) {
+        setRoutingSteps(
+          data.routing.map((step) => ({
+            id: step.id || createId(),
+            label: step.label || '任務更新',
+            status: step.status || 'done',
+            eta: step.eta || '完成',
+          }))
+        );
+      } else {
+        setRoutingSteps([]);
+      }
+
+      // Add assistant message
+      const assistantMessage = {
+        id: createId(),
+        role: 'assistant',
+        name: 'LLM',
+        time: nowTime(),
+        content: data.assistant?.content || '已完成處理。',
+        bullets: data.assistant?.bullets,
+      };
+
+      setMessages((prev) => [...prev, assistantMessage]);
+      setLastUpdateTime(Date.now());
     } catch (error) {
       setErrorMessage(
         error instanceof Error

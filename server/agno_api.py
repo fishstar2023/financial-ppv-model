@@ -1,6 +1,7 @@
 import json
 import os
 import uuid
+from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 
 import dotenv
@@ -12,6 +13,7 @@ from pydantic import BaseModel, Field
 from agno.agent import Agent
 from agno.team import Team
 from agno.models.openai import OpenAIChat
+from agno.tools.duckduckgo import DuckDuckGoTools
 
 from rag_store import RagStore
 
@@ -29,41 +31,49 @@ def _safe_load_env() -> None:
 _safe_load_env()
 
 TEAM_INSTRUCTIONS = [
-    "你是企業金融 RM 授信報告助理的 Team Leader，對話即是與團隊溝通。",
-    "當使用者要求摘要、翻譯、授信報告或風險分析時，必須先使用 delegate_task_to_members 委派給 RAG Agent 檢索上傳文件。",
-    "根據 RAG Agent 回傳的片段與對話內容產出 artifacts；資料不足時標註『內容不足，需補充』。",
-    "如果使用者只是問候或一般閒聊，僅回覆 assistant.content，其餘 artifacts 欄位保持空值。",
-    "回覆必須是嚴格 JSON，不可輸出 Markdown code fence 或多餘說明。",
-    "summary.output 與 memo.output 用繁體中文；translation.output 與 translation.clauses[].translated 用英文。",
-    "summary.risks[].level 僅能是 High、Medium、Low；routing[].status 只能是 running、queued、done。",
-    "每個陣列控制在 3-6 個項目，避免過長。",
-    "routing 必須反映實際執行的任務步驟，根據使用者需求動態產生：",
-    "  - 若使用者要求摘要：routing 包含『檢索文件』『產生摘要』",
-    "  - 若使用者要求翻譯：routing 包含『檢索文件』『翻譯條款』",
-    "  - 若使用者要求報告：routing 包含『檢索文件』『產生摘要』『風險評估』『撰寫報告』",
-    "  - 若只是閒聊：routing 保持空陣列 []",
-    "  - 所有步驟的 status 都設為 'done'，eta 設為 '完成'",
+    "你是企業金融 RM（Relationship Manager）授信報告助理，專精於企業授信分析、風險評估與金融市場研究。",
+    "你可以與使用者自然對話，回答授信、金融、企業分析相關問題。",
+    "",
+    "【重要】根據使用者意圖選擇回覆模式：",
+    "1. 問候/閒聊（如 hi, hello, 你好）→ 使用「簡單模式」",
+    "2. 需要文件分析（如 摘要、翻譯、報告）→ 使用「完整模式」並委派 RAG Agent",
+    "3. 需要市場資訊（如 查詢企業、產業動態）→ 使用「完整模式」並使用 duckduckgo_search",
+    "",
+    "【簡單模式】僅填充 assistant.content，其他欄位必須為空或空陣列：",
+    '{"assistant": {"content": "你好！有什麼可以幫助你的嗎？", "bullets": []}, "summary": {"output": "", "borrower": null, "metrics": [], "risks": []}, "translation": {"output": "", "clauses": []}, "memo": {"output": "", "sections": [], "recommendation": "", "conditions": ""}, "routing": []}',
+    "",
+    "【完整模式】填充相關 artifacts 並記錄 routing 步驟",
+    "",
+    "【JSON 格式要求】",
+    "- 回覆必須是嚴格 JSON，不可輸出 Markdown code fence 或多餘說明",
+    "- summary.output 與 memo.output 用繁體中文",
+    "- translation.output 與 translation.clauses[].translated 用英文",
+    "- summary.risks[].level 僅能是 High、Medium、Low",
+    "- routing[].status 只能是 done（完成後才回傳）",
+    "- routing 只在使用工具時記錄，閒聊必須為 []",
 ]
 
 EXPECTED_OUTPUT = """
+簡單模式範例（問候/閒聊）：
 {
-  "assistant": { "content": "...", "bullets": ["..."] },
+  "assistant": { "content": "你好！我是授信報告助理，可以協助您進行企業授信分析、文件摘要、翻譯等工作。有什麼我能幫忙的嗎？", "bullets": [] },
+  "summary": { "output": "", "borrower": null, "metrics": [], "risks": [] },
+  "translation": { "output": "", "clauses": [] },
+  "memo": { "output": "", "sections": [], "recommendation": "", "conditions": "" },
+  "routing": []
+}
+
+完整模式範例（文件分析/市場查詢）：
+{
+  "assistant": { "content": "已完成文件摘要分析", "bullets": ["識別借款人資訊", "分析財務指標", "評估風險等級"] },
   "summary": {
-    "output": "...",
-    "borrower": { "name": "...", "description": "...", "rating": "..." },
-    "metrics": [{ "label": "...", "value": "...", "delta": "..." }],
-    "risks": [{ "label": "...", "level": "High" }]
+    "output": "## 摘要內容...",
+    "borrower": { "name": "公司名稱", "description": "簡介", "rating": "A+" },
+    "metrics": [{ "label": "營收", "value": "100M", "delta": "+10%" }],
+    "risks": [{ "label": "市場風險", "level": "Medium" }]
   },
-  "translation": {
-    "output": "...",
-    "clauses": [{ "section": "...", "source": "...", "translated": "..." }]
-  },
-  "memo": {
-    "output": "...",
-    "sections": [{ "title": "...", "detail": "..." }],
-    "recommendation": "...",
-    "conditions": "..."
-  },
+  "translation": { "output": "", "clauses": [] },
+  "memo": { "output": "", "sections": [], "recommendation": "", "conditions": "" },
   "routing": [
     { "label": "檢索文件", "status": "done", "eta": "完成" },
     { "label": "產生摘要", "status": "done", "eta": "完成" }
@@ -192,11 +202,14 @@ def build_team(doc_ids: List[str]) -> Team:
     model = get_model()
     rag_agent = build_rag_agent(doc_ids, model)
     return Team(
+        name="授信報告助理",
         members=[rag_agent],
         model=model,
         instructions=TEAM_INSTRUCTIONS,
         expected_output=EXPECTED_OUTPUT,
-        delegate_to_all_members=True,
+        tools=[DuckDuckGoTools()],  # Web search capability
+        delegate_to_all_members=False,  # Team Leader decides when to delegate
+        markdown=False,
     )
 
 
@@ -305,6 +318,44 @@ async def upload_documents(files: List[UploadFile] = File(...)):
     return {"documents": results}
 
 
+@app.get("/api/documents/preloaded")
+async def get_preloaded_documents():
+    docs_dir = Path(__file__).resolve().parent.parent / "src" / "docs"
+    if not docs_dir.exists():
+        return {"documents": []}
+
+    results = []
+    for file_path in docs_dir.glob("*.pdf"):
+        try:
+            data = file_path.read_bytes()
+            stored = rag_store.index_pdf_bytes(data, file_path.name)
+            results.append(
+                {
+                    "id": stored.id,
+                    "name": stored.name,
+                    "type": stored.type,
+                    "pages": stored.pages or "-",
+                    "status": stored.status,
+                    "message": stored.message,
+                    "preview": stored.preview,
+                }
+            )
+        except Exception as exc:
+            results.append(
+                {
+                    "id": str(uuid.uuid4()),
+                    "name": file_path.stem,
+                    "type": "PDF",
+                    "pages": "-",
+                    "status": "failed",
+                    "message": str(exc),
+                    "preview": "",
+                }
+            )
+
+    return {"documents": results}
+
+
 @app.post("/api/artifacts")
 async def generate_artifacts(req: ArtifactRequest):
     try:
@@ -329,14 +380,22 @@ async def generate_artifacts(req: ArtifactRequest):
                 accumulated = ""
                 try:
                     for chunk in response:
-                        content = chunk.get_content_as_string() if hasattr(chunk, 'get_content_as_string') else str(chunk)
+                        # Skip non-content events (RunStartedEvent, etc.)
+                        if not hasattr(chunk, 'get_content_as_string'):
+                            continue
+
+                        content = chunk.get_content_as_string()
+                        if not content:  # Skip empty content
+                            continue
+
                         accumulated += content
                         # Send chunk to frontend
                         yield f"data: {json.dumps({'chunk': content})}\n\n"
 
                     # Parse and send final complete message
-                    final_data = safe_parse_json(accumulated)
-                    yield f"data: {json.dumps(final_data)}\n\n"
+                    if accumulated:
+                        final_data = safe_parse_json(accumulated)
+                        yield f"data: {json.dumps(final_data)}\n\n"
                     yield f"data: {json.dumps({'done': True})}\n\n"
                 except Exception as exc:
                     yield f"data: {json.dumps({'error': str(exc)})}\n\n"

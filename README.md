@@ -6,7 +6,8 @@
 - Claude Artifacts 風格：暖色編輯系雙欄，左側對話/路由，右側輸出 + Live Preview。
 - 真實串接：送出指令會打 OpenAI，回填摘要/翻譯/授信報告分頁與任務路由。
 - Markdown 預覽：右側 Live Preview 直接渲染模型輸出的 Markdown，預設不填示意值，送出指令後才生成。
-- 文件工作流：可上傳檔案並貼入重點文字，指派摘要/翻譯，生成授信草稿。
+- Agent Team + RAG：對話直接溝通 Team，指派 RAG Agent 解析 PDF 並檢索相關段落。
+- 文件工作流：可上傳 PDF/TXT，指派摘要/翻譯，生成授信草稿。
 
 ## 快速開始
 1. 建立 `.env`（參考 `.env.example`）
@@ -37,7 +38,7 @@
    ```
 6. 打開 `http://127.0.0.1:5176/` 測試。
 
-備註：PDF/DOCX 不會自動解析內容，如需精準輸出，請在左側「文件內容」貼上重點段落。
+備註：PDF 會自動索引並可 RAG 檢索；DOCX/PPTX 尚未支援解析，需手動貼上文字內容。
 
 ## Build / Preview
 ```bash

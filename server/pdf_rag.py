@@ -53,7 +53,7 @@ def chunk_text(text: str, chunk_size: int = 1200, overlap: int = 200) -> List[st
 def get_openai_client() -> OpenAI:
     api_key = os.getenv("OPENAI_API_KEY")
     if not api_key:
-        raise RuntimeError("OPENAI_API_KEY 未設定，無法呼叫模型")
+        return None
     return OpenAI(api_key=api_key)
 
 
@@ -61,6 +61,9 @@ def compute_embeddings(client: OpenAI, texts: List[str]) -> List[List[float]]:
     model = os.getenv("OPENAI_EMBEDDING_MODEL", "text-embedding-3-small")
     if not texts:
         return []
+    if client is None:
+        # No API key available — return empty embeddings placeholders
+        return [[] for _ in texts]
     resp = client.embeddings.create(model=model, input=texts)
     return [item.embedding for item in resp.data]
 
