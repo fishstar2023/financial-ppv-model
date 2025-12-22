@@ -11,6 +11,8 @@ import {
 import {
   ArrowUpRight,
   Briefcase,
+  ChevronDown,
+  ChevronUp,
   ClipboardCheck,
   Copy,
   Download,
@@ -22,6 +24,7 @@ import {
   Paperclip,
   Upload,
   Wand2,
+  X,
 } from 'lucide-react';
 import q2Financials from './docs/q2-financials.txt?raw';
 import termSheet from './docs/term-sheet.txt?raw';
@@ -197,6 +200,7 @@ export default function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [streamingContent, setStreamingContent] = useState('');
+  const [isDocPanelOpen, setIsDocPanelOpen] = useState(false);
 
   // Dynamic metadata states
   const [caseId] = useState(() => generateCaseId());
@@ -487,11 +491,9 @@ export default function App() {
     setIsLoading(true);
     setErrorMessage('');
     setStreamingContent('');
+    // Show initial loading state - will be replaced by real routing data from LLM
     setRoutingSteps([
-      { id: createId(), label: '分析文件', status: 'running', eta: '進行中' },
-      { id: createId(), label: '產生摘要', status: 'queued', eta: '等待中' },
-      { id: createId(), label: '翻譯條款', status: 'queued', eta: '等待中' },
-      { id: createId(), label: '撰寫報告', status: 'queued', eta: '等待中' },
+      { id: createId(), label: '處理請求中...', status: 'running', eta: '進行中' },
     ]);
 
     try {
@@ -536,36 +538,6 @@ export default function App() {
               if (payload.chunk) {
                 accumulated += payload.chunk;
                 setStreamingContent(accumulated);
-                console.log('⚡ Streaming chunk received, accumulated length:', accumulated.length);
-
-                // Update routing status based on content
-                if (accumulated.includes('"summary"')) {
-                  setRoutingSteps((prev) =>
-                    prev.map((step, i) => ({
-                      ...step,
-                      status: i === 0 ? 'done' : i === 1 ? 'running' : step.status,
-                      eta: i === 0 ? '完成' : i === 1 ? '進行中' : step.eta,
-                    }))
-                  );
-                }
-                if (accumulated.includes('"translation"')) {
-                  setRoutingSteps((prev) =>
-                    prev.map((step, i) => ({
-                      ...step,
-                      status: i < 2 ? 'done' : i === 2 ? 'running' : step.status,
-                      eta: i < 2 ? '完成' : i === 2 ? '進行中' : step.eta,
-                    }))
-                  );
-                }
-                if (accumulated.includes('"memo"')) {
-                  setRoutingSteps((prev) =>
-                    prev.map((step, i) => ({
-                      ...step,
-                      status: i < 3 ? 'done' : i === 3 ? 'running' : step.status,
-                      eta: i < 3 ? '完成' : i === 3 ? '進行中' : step.eta,
-                    }))
-                  );
-                }
               }
 
               if (payload.done) {
@@ -767,39 +739,43 @@ export default function App() {
               </div>
             </div>
 
-            <div className="doc-tray">
-              <div className="tray-header">
-                <div className="tray-title">
-                  <Icon icon={Upload} size="small" />
-                  <span>已上傳文件</span>
-                </div>
-                <Button size="small" variant="outlined" icon={Upload} onClick={handleUploadClick}>
-                  上傳
-                </Button>
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  multiple
-                  className="file-input"
-                  onChange={handleUploadFiles}
-                />
-              </div>
-              <div className="doc-grid">
-                {documents.map((doc) => (
-                  <button
-                    key={doc.id}
-                    type="button"
-                    className={`doc-card${doc.id === selectedDocId ? ' is-active' : ''}`}
-                    onClick={() => setSelectedDocId(doc.id)}
-                  >
-                    <div className="doc-title">{doc.name}</div>
-                    <div className="doc-meta">
-                      <span>{doc.type}</span>
-                      <span>{doc.pages} 頁</span>
-                    </div>
-                    <div className="doc-tags">
-                      {doc.tags.length ? (
-                        doc.tags.map((tag) => (
+            {/* Collapsible Document Panel Toggle */}
+            <button
+              type="button"
+              className={`doc-panel-toggle${isDocPanelOpen ? ' is-open' : ''}`}
+              onClick={() => setIsDocPanelOpen(!isDocPanelOpen)}
+            >
+              <Icon icon={isDocPanelOpen ? ChevronUp : ChevronDown} size="small" />
+              <span>文件管理 ({documents.length})</span>
+              <Button size="small" variant="outlined" icon={Upload} onClick={(e) => { e.stopPropagation(); handleUploadClick(); }}>
+                上傳
+              </Button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                multiple
+                className="file-input"
+                onChange={handleUploadFiles}
+              />
+            </button>
+
+            {/* Collapsible Document Panel */}
+            {isDocPanelOpen && (
+              <div className="doc-drawer">
+                <div className="doc-list">
+                  {documents.map((doc) => (
+                    <div
+                      key={doc.id}
+                      className={`doc-row${doc.id === selectedDocId ? ' is-active' : ''}`}
+                      onClick={() => setSelectedDocId(doc.id)}
+                    >
+                      <Icon icon={FileText} size="small" className="doc-icon" />
+                      <div className="doc-info">
+                        <span className="doc-name">{doc.name}</span>
+                        <span className="doc-type">{doc.type} · {doc.pages} 頁</span>
+                      </div>
+                      <div className="doc-row-tags">
+                        {doc.tags.slice(0, 2).map((tag) => (
                           <Tag
                             key={`${doc.id}-${tag}`}
                             size="small"
@@ -808,26 +784,26 @@ export default function App() {
                           >
                             {tag}
                           </Tag>
-                        ))
-                      ) : (
-                        <span className="doc-empty">尚未標註</span>
-                      )}
+                        ))}
+                        {doc.tags.length > 2 && <span className="more-tags">+{doc.tags.length - 2}</span>}
+                      </div>
+                      <ActionIcon
+                        icon={X}
+                        size="small"
+                        variant="ghost"
+                        onClick={(e) => { e.stopPropagation(); handleDeleteDoc(doc.id); }}
+                        title="刪除"
+                      />
                     </div>
-                  </button>
-                ))}
-              </div>
-              <div className="doc-detail">
-                <div className="detail-header">
-                  <span>文件設定</span>
-                  <Tag size="small" variant="borderless">
-                    頁數: {selectedDoc?.pages || '-'}
-                  </Tag>
+                  ))}
                 </div>
-                {selectedDoc ? (
-                  <>
-                    <div className="detail-title">{selectedDoc.name}</div>
+                {selectedDoc && (
+                  <div className="doc-settings">
+                    <div className="settings-header">
+                      <span className="settings-title">{selectedDoc.name}</span>
+                      <Tag size="small" variant="borderless">{selectedDoc.pages} 頁</Tag>
+                    </div>
                     <div className="tag-selector">
-                      <span className="tag-label">標籤:</span>
                       {availableTags.map((tag) => (
                         <Tag
                           key={tag}
@@ -841,17 +817,15 @@ export default function App() {
                       ))}
                     </div>
                     <TextArea
-                      rows={4}
+                      rows={3}
                       value={selectedDoc.content}
                       onChange={(event) => handleDocContentChange(event.target.value)}
-                      placeholder="貼上關鍵段落或摘要，讓 LLM 產出更準確"
+                      placeholder="貼上關鍵段落或摘要..."
                     />
-                  </>
-                ) : (
-                  <Text type="secondary">請先選擇文件再貼上內容。</Text>
+                  </div>
                 )}
               </div>
-            </div>
+            )}
 
             <div className="routing-panel">
               <div className="routing-header">

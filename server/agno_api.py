@@ -37,6 +37,12 @@ TEAM_INSTRUCTIONS = [
     "summary.output 與 memo.output 用繁體中文；translation.output 與 translation.clauses[].translated 用英文。",
     "summary.risks[].level 僅能是 High、Medium、Low；routing[].status 只能是 running、queued、done。",
     "每個陣列控制在 3-6 個項目，避免過長。",
+    "routing 必須反映實際執行的任務步驟，根據使用者需求動態產生：",
+    "  - 若使用者要求摘要：routing 包含『檢索文件』『產生摘要』",
+    "  - 若使用者要求翻譯：routing 包含『檢索文件』『翻譯條款』",
+    "  - 若使用者要求報告：routing 包含『檢索文件』『產生摘要』『風險評估』『撰寫報告』",
+    "  - 若只是閒聊：routing 保持空陣列 []",
+    "  - 所有步驟的 status 都設為 'done'，eta 設為 '完成'",
 ]
 
 EXPECTED_OUTPUT = """
@@ -58,7 +64,10 @@ EXPECTED_OUTPUT = """
     "recommendation": "...",
     "conditions": "..."
   },
-  "routing": [{ "label": "...", "status": "queued", "eta": "..." }]
+  "routing": [
+    { "label": "檢索文件", "status": "done", "eta": "完成" },
+    { "label": "產生摘要", "status": "done", "eta": "完成" }
+  ]
 }
 """.strip()
 
