@@ -228,6 +228,33 @@ export default function App() {
 
   const [activeTranslationIndex, setActiveTranslationIndex] = useState(0);
 
+  // Load preloaded PDF documents on startup
+  useEffect(() => {
+    const loadPreloadedDocs = async () => {
+      try {
+        const response = await fetch(`${apiBase || ''}/api/documents/preloaded`);
+        if (!response.ok) return;
+        const data = await response.json();
+        const pdfDocs = (data.documents || []).map((doc) => ({
+          id: doc.id,
+          name: doc.name,
+          type: doc.type,
+          pages: doc.pages ?? '-',
+          tags: [],
+          content: doc.preview || '',
+          status: doc.status,
+          message: doc.message,
+        }));
+        if (pdfDocs.length > 0) {
+          setDocuments((prev) => [...prev, ...pdfDocs]);
+        }
+      } catch (error) {
+        console.error('載入預加載文檔失敗:', error);
+      }
+    };
+    loadPreloadedDocs();
+  }, []);
+
   // Update current time every minute for SLA calculation
   useEffect(() => {
     const interval = setInterval(() => {
@@ -280,56 +307,46 @@ export default function App() {
   const handleUploadFiles = async (event) => {
     const files = Array.from(event.target.files || []);
     if (!files.length) return;
-    const nextDocs = [];
+    setErrorMessage('');
 
-    for (const file of files) {
-      const extension = file.name.split('.').pop() || '';
-      const isTextFile =
-        file.type.startsWith('text/') ||
-        ['txt', 'md', 'csv'].includes(extension.toLowerCase());
+    try {
+      const formData = new FormData();
+      files.forEach((file) => formData.append('files', file));
 
-      if (extension.toLowerCase() === 'pdf' || file.type === 'application/pdf') {
-        try {
-          const form = new FormData();
-          form.append('file', file, file.name);
-          const res = await fetch(`${apiBase || ''}/api/upload_pdf`, {
-            method: 'POST',
-            body: form,
-          });
-          if (!res.ok) {
-            console.error('PDF upload failed', await res.text());
-            continue;
-          }
-          const data = await res.json();
-          nextDocs.push({
-            id: data.id || createId(),
-            name: file.name.replace(/\.[^.]+$/, ''),
-            type: 'PDF',
-            pages: data.pages || '-',
-            tags: [],
-            content: '',
-          });
-        } catch (err) {
-          console.error('PDF upload error', err);
-        }
-      } else {
-        const content = isTextFile ? await file.text() : '';
-        nextDocs.push({
-          id: createId(),
-          name: file.name.replace(/\.[^.]+$/, ''),
-          type: extension.toUpperCase() || 'FILE',
-          pages: estimatePages(content),
-          tags: [],
-          content,
-        });
+      const response = await fetch(`${apiBase || ''}/api/documents`, {
+        method: 'POST',
+        body: formData,
+      });
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || '文件上傳失敗');
       }
-    }
 
-    if (nextDocs.length) {
+      const nextDocs = (data.documents || []).map((doc) => ({
+        id: doc.id || createId(),
+        name: doc.name || '未命名',
+        type: doc.type || 'FILE',
+        pages: doc.pages ?? '-',
+        tags: [],
+        content: doc.preview || '',
+        status: doc.status,
+        message: doc.message,
+      }));
+
+      if (!nextDocs.length) {
+        throw new Error('未取得文件資訊');
+      }
+
       setDocuments((prev) => [...nextDocs, ...prev]);
       setSelectedDocId(nextDocs[0]?.id || selectedDocId);
+    } catch (error) {
+      setErrorMessage(
+        error instanceof Error ? `上傳失敗: ${error.message}` : '上傳失敗，請稍後再試。'
+      );
+    } finally {
+      event.target.value = '';
     }
-    event.target.value = '';
   };
 
   const handleDocContentChange = (value) => {

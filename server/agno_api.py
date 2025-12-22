@@ -1,15 +1,20 @@
 import json
 import os
-from typing import Any, Dict, List, Optional, Union, AsyncGenerator
+import uuid
+from typing import Any, Dict, List, Optional, Union
 
 import dotenv
 from fastapi import FastAPI, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import StreamingResponse, JSONResponse
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
-from openai import OpenAI
-from .pdf_rag import store_pdf_bytes, retrieve_similar
-import uuid
+
+from agno.agent import Agent
+from agno.team import Team
+from agno.models.openai import OpenAIChat
+
+from rag_store import RagStore
+
 
 # Robust .env loader to avoid parser crashes on some environments.
 def _safe_load_env() -> None:
@@ -23,51 +28,48 @@ def _safe_load_env() -> None:
 
 _safe_load_env()
 
-SYSTEM_PROMPT = """
-你是企業金融 RM 的授信報告助理。根據用戶的對話需求，靈活回應：
+TEAM_INSTRUCTIONS = [
+    "你是企業金融 RM 授信報告助理的 Team Leader，對話即是與團隊溝通。",
+    "當使用者要求摘要、翻譯、授信報告或風險分析時，必須先使用 delegate_task_to_members 委派給 RAG Agent 檢索上傳文件。",
+    "根據 RAG Agent 回傳的片段與對話內容產出 artifacts；資料不足時標註『內容不足，需補充』。",
+    "如果使用者只是問候或一般閒聊，僅回覆 assistant.content，其餘 artifacts 欄位保持空值。",
+    "回覆必須是嚴格 JSON，不可輸出 Markdown code fence 或多餘說明。",
+    "summary.output 與 memo.output 用繁體中文；translation.output 與 translation.clauses[].translated 用英文。",
+    "summary.risks[].level 僅能是 High、Medium、Low；routing[].status 只能是 running、queued、done。",
+    "每個陣列控制在 3-6 個項目，避免過長。",
+]
 
-**判斷用戶意圖：**
-- 如果用戶只是問候（如「hi」、「你好」）或普通對話，在 assistant.content 中自然回應，artifacts 欄位留空即可
-- 只有當用戶明確要求分析、摘要、翻譯、產生報告時，才產出完整的 artifacts 內容
-- 識別關鍵詞：「請摘要」、「分析」、「翻譯」、「產生報告」、「評估風險」等
-
-**輸出規則：**
-1) 回傳內容必須是嚴格 JSON，不要額外說明或 Markdown code fence
-2) summary.output 與 memo.output 使用繁體中文；translation.output 以及 translation.clauses[].translated 使用英文
-3) summary.risks[].level 必須是 High、Medium、Low
-4) routing[].status 必須是 running、queued、done
-5) 若文件內容不足，請明確註記「內容不足，需補充」
-6) 每個陣列控制在 3-6 個項目
-
-**JSON 格式：**
+EXPECTED_OUTPUT = """
 {
-  "assistant": { "content": "你的回應內容", "bullets": ["可選的要點列表"] },
+  "assistant": { "content": "...", "bullets": ["..."] },
   "summary": {
-    "output": "摘要 markdown（如不需要則留空字串）",
-    "borrower": { "name": "", "description": "", "rating": "" },
-    "metrics": [],
-    "risks": []
+    "output": "...",
+    "borrower": { "name": "...", "description": "...", "rating": "..." },
+    "metrics": [{ "label": "...", "value": "...", "delta": "..." }],
+    "risks": [{ "label": "...", "level": "High" }]
   },
   "translation": {
-    "output": "翻譯 markdown（如不需要則留空字串）",
-    "clauses": []
+    "output": "...",
+    "clauses": [{ "section": "...", "source": "...", "translated": "..." }]
   },
   "memo": {
-    "output": "報告 markdown（如不需要則留空字串）",
-    "sections": [],
-    "recommendation": "",
-    "conditions": ""
+    "output": "...",
+    "sections": [{ "title": "...", "detail": "..." }],
+    "recommendation": "...",
+    "conditions": "..."
   },
-  "routing": []
+  "routing": [{ "label": "...", "status": "queued", "eta": "..." }]
 }
-
-**範例：**
-用戶：「hi 你好」
-回應：{"assistant": {"content": "你好！我是授信報告助理，可以協助您產生摘要、翻譯條款、或撰寫授信報告。請告訴我需要什麼協助？", "bullets": []}, "summary": {"output": "", "borrower": {"name": "", "description": "", "rating": ""}, "metrics": [], "risks": []}, "translation": {"output": "", "clauses": []}, "memo": {"output": "", "sections": [], "recommendation": "", "conditions": ""}, "routing": []}
-
-用戶：「請產生摘要和翻譯」
-回應：產出完整的 summary、translation 等 artifacts 內容
 """.strip()
+
+RAG_AGENT_INSTRUCTIONS = [
+    "你是文件檢索與解析專員，負責使用 RAG 搜尋上傳文件。",
+    "收到任務後，先使用 search_knowledge_base 工具檢索相關片段。",
+    "回覆請列出與需求最相關的摘錄與頁碼/段落資訊，避免編造。",
+    "若找不到相關內容，請明確回覆『未找到相關段落』。",
+]
+
+rag_store = RagStore()
 
 
 class Message(BaseModel):
@@ -90,6 +92,17 @@ class ArtifactRequest(BaseModel):
     stream: bool = False
 
 
+def get_model_id() -> str:
+    return os.getenv("OPENAI_MODEL", "gpt-4o-mini")
+
+
+def get_model() -> OpenAIChat:
+    api_key = os.getenv("OPENAI_API_KEY")
+    if not api_key:
+        raise RuntimeError("OPENAI_API_KEY 未設定，無法呼叫模型")
+    return OpenAIChat(id=get_model_id(), api_key=api_key)
+
+
 def build_doc_context(documents: List[Document]) -> str:
     if not documents:
         return "文件清單: 無。"
@@ -97,9 +110,12 @@ def build_doc_context(documents: List[Document]) -> str:
     lines = []
     for idx, doc in enumerate(documents, start=1):
         content = (doc.content or "").strip()
-        safe_content = content[:2000] if content else "未提供"
         tags = "、".join(doc.tags or []) if doc.tags else "無"
         pages = doc.pages if doc.pages not in (None, "") else "-"
+        stored = rag_store.docs.get(doc.id or "") if doc.id else None
+        if not content and stored and stored.preview:
+            content = f"PDF 已索引（可 RAG 檢索）。預覽：{stored.preview}"
+        safe_content = content[:2000] if content else "未提供"
         lines.append(
             "\n".join(
                 [
@@ -123,18 +139,70 @@ def build_conversation(messages: List[Message]) -> str:
     return "對話紀錄:\n" + "\n".join(parts)
 
 
-def get_openai_client() -> OpenAI:
-    api_key = os.getenv("OPENAI_API_KEY")
-    if not api_key:
-        raise RuntimeError("OPENAI_API_KEY 未設定，無法呼叫模型")
-    return OpenAI(api_key=api_key)
+def ensure_inline_documents_indexed(documents: List[Document]) -> None:
+    for doc in documents:
+        content = (doc.content or "").strip()
+        if not content:
+            continue
+        if not doc.id:
+            doc.id = str(uuid.uuid4())
+        name = doc.name or doc.id
+        rag_store.index_inline_text(doc.id, name, content, doc.type or "TEXT")
 
 
-def get_model_id() -> str:
-    return os.getenv("OPENAI_MODEL", "gpt-4o-mini")
+def build_rag_agent(doc_ids: List[str], model: OpenAIChat) -> Agent:
+    def knowledge_retriever(
+        query: str,
+        num_documents: Optional[int] = None,
+        filters: Optional[Dict[str, Any]] = None,
+        dependencies: Optional[Dict[str, Any]] = None,
+        **_: Any,
+    ) -> Optional[List[Dict[str, Any]]]:
+        ids: Optional[List[str]] = None
+        if isinstance(filters, dict) and filters.get("doc_ids"):
+            ids = filters.get("doc_ids")
+        if dependencies and dependencies.get("doc_ids"):
+            ids = dependencies.get("doc_ids")
+        if not ids:
+            ids = doc_ids
+        return rag_store.search(query, doc_ids=ids, top_k=num_documents or 5)
+
+    return Agent(
+        name="RAG Agent",
+        role="文件檢索與解析",
+        model=model,
+        instructions=RAG_AGENT_INSTRUCTIONS,
+        knowledge_retriever=knowledge_retriever,
+        search_knowledge=True,
+        add_knowledge_to_context=True,
+        markdown=False,
+    )
 
 
-app = FastAPI(title="Agno Artifacts API", version="1.0.0")
+def build_team(doc_ids: List[str]) -> Team:
+    model = get_model()
+    rag_agent = build_rag_agent(doc_ids, model)
+    return Team(
+        members=[rag_agent],
+        model=model,
+        instructions=TEAM_INSTRUCTIONS,
+        expected_output=EXPECTED_OUTPUT,
+        delegate_to_all_members=True,
+    )
+
+
+def safe_parse_json(text: str) -> Dict[str, Any]:
+    try:
+        return json.loads(text)
+    except json.JSONDecodeError:
+        start = text.find("{")
+        end = text.rfind("}")
+        if start != -1 and end != -1 and end > start:
+            return json.loads(text[start : end + 1])
+        raise
+
+
+app = FastAPI(title="Agno Artifacts API", version="1.1.0")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -143,130 +211,114 @@ app.add_middleware(
 )
 
 
+def preload_sample_pdfs() -> None:
+    """預加載 src/docs 目錄下的示例 PDF 文件"""
+    docs_dir = os.path.join(os.path.dirname(__file__), "..", "src", "docs")
+    if not os.path.isdir(docs_dir):
+        return
+
+    for filename in os.listdir(docs_dir):
+        if not filename.lower().endswith(".pdf"):
+            continue
+        filepath = os.path.join(docs_dir, filename)
+        try:
+            with open(filepath, "rb") as f:
+                data = f.read()
+            rag_store.index_pdf_bytes(data, filename)
+            print(f"✓ 預加載 PDF: {filename}")
+        except Exception as exc:
+            print(f"✗ 預加載 PDF 失敗 {filename}: {exc}")
+
+
+@app.on_event("startup")
+async def startup_event():
+    """應用啟動時預加載示例 PDF"""
+    preload_sample_pdfs()
+
+
 @app.get("/api/health")
 async def health():
     return {"ok": True}
 
 
-@app.post("/api/upload_pdf")
-async def upload_pdf(file: UploadFile = File(...)):
-    if not file:
-        return JSONResponse({"error": "No file provided"}, status_code=400)
-    try:
+@app.get("/api/documents/preloaded")
+async def get_preloaded_documents():
+    """獲取預加載的文檔列表"""
+    documents = []
+    for doc_id, stored in rag_store.docs.items():
+        documents.append(
+            {
+                "id": stored.id,
+                "name": stored.name,
+                "type": stored.type,
+                "pages": stored.pages or "-",
+                "status": stored.status,
+                "message": stored.message,
+                "preview": stored.preview,
+            }
+        )
+    return {"documents": documents}
+
+
+@app.post("/api/documents")
+async def upload_documents(files: List[UploadFile] = File(...)):
+    if not files:
+        return JSONResponse({"error": "No files provided"}, status_code=400)
+
+    results = []
+    for file in files:
+        filename = file.filename or f"upload-{uuid.uuid4()}"
+        ext = os.path.splitext(filename)[1].lower()
         data = await file.read()
-        meta = store_pdf_bytes(data, file.filename)
-        return meta
-    except Exception as exc:
-        return JSONResponse({"error": "PDF 處理失敗", "detail": str(exc)}, status_code=500)
 
+        try:
+            if ext == ".pdf":
+                stored = rag_store.index_pdf_bytes(data, filename)
+            elif ext in {".txt", ".md", ".csv"}:
+                stored = rag_store.index_text_bytes(data, filename)
+            else:
+                stored = rag_store.register_stub(filename, ext.upper().lstrip(".") or "FILE", "尚未支援此格式")
+        except Exception as exc:
+            stored = rag_store.register_stub(filename, ext.upper().lstrip(".") or "FILE", str(exc))
 
-async def generate_stream(messages: List[Dict[str, str]], doc_context: str) -> AsyncGenerator[str, None]:
-    """Generate streaming response using OpenAI API."""
-    try:
-        client = get_openai_client()
-        model_id = get_model_id()
-
-        # Build full message list with system prompt and conversation history
-        full_messages = [{"role": "system", "content": SYSTEM_PROMPT}]
-
-        # Add conversation history
-        for msg in messages:
-            full_messages.append({"role": msg["role"], "content": msg["content"]})
-
-        # Append document context to the last user message (or create new one)
-        if full_messages and full_messages[-1]["role"] == "user":
-            full_messages[-1]["content"] += f"\n\n{doc_context}\n\n請依規則產出 JSON。"
-        else:
-            full_messages.append({"role": "user", "content": f"{doc_context}\n\n請依規則產出 JSON。"})
-
-        stream = client.chat.completions.create(
-            model=model_id,
-            messages=full_messages,
-            stream=True,
+        results.append(
+            {
+                "id": stored.id,
+                "name": stored.name,
+                "type": stored.type,
+                "pages": stored.pages or "-",
+                "status": stored.status,
+                "message": stored.message,
+                "preview": stored.preview,
+            }
         )
 
-        for chunk in stream:
-            if chunk.choices and chunk.choices[0].delta.content:
-                content = chunk.choices[0].delta.content
-                # Send as SSE format
-                yield f"data: {json.dumps({'chunk': content})}\n\n"
-
-        # Send done signal
-        yield f"data: {json.dumps({'done': True})}\n\n"
-
-    except Exception as exc:
-        yield f"data: {json.dumps({'error': str(exc)})}\n\n"
+    return {"documents": results}
 
 
 @app.post("/api/artifacts")
 async def generate_artifacts(req: ArtifactRequest):
-    doc_context = build_doc_context(req.documents)
-
-    # If last user message exists, perform RAG retrieval for any PDF docs
-    try:
-        # last user query
-        last_user = ''
-        if req.messages:
-            for m in reversed(req.messages):
-                if m.role == 'user' and (m.content or '').strip():
-                    last_user = m.content.strip()
-                    break
-
-        if last_user:
-            rag_lines = []
-            for doc in req.documents:
-                if (doc.type or '').upper() == 'PDF' and doc.id:
-                    retrieved = retrieve_similar(doc.id, last_user, top_k=3)
-                    if retrieved:
-                        rag_lines.append(f"文檔 {doc.name or doc.id} (檢索片段):")
-                        for it in retrieved:
-                            safe = it.get('text', '').replace('\n', ' ')[:800]
-                            rag_lines.append(f"- {safe}")
-            if rag_lines:
-                doc_context += "\n\n[檢索結果 - RAG 相關片段]\n" + "\n".join(rag_lines)
-    except Exception:
-        pass
-
-    # Convert messages to dict format
-    messages = [{"role": msg.role, "content": msg.content} for msg in req.messages]
-
     if req.stream:
-        # Return streaming response
-        return StreamingResponse(
-            generate_stream(messages, doc_context),
-            media_type="text/event-stream",
-            headers={
-                "Cache-Control": "no-cache",
-                "Connection": "keep-alive",
-                "X-Accel-Buffering": "no",
-            },
-        )
+        return JSONResponse({"error": "streaming not supported"}, status_code=400)
 
-    # Non-streaming response (original behavior)
     try:
-        client = get_openai_client()
-        model_id = get_model_id()
+        ensure_inline_documents_indexed(req.documents)
+        doc_context = build_doc_context(req.documents)
+        convo = build_conversation(req.messages)
+        doc_ids = [doc.id for doc in req.documents if doc.id and doc.id in rag_store.docs]
 
-        # Build full message list
-        full_messages = [{"role": "system", "content": SYSTEM_PROMPT}]
-        for msg in messages:
-            full_messages.append(msg)
-
-        # Append document context to the last user message
-        if full_messages and full_messages[-1]["role"] == "user":
-            full_messages[-1]["content"] += f"\n\n{doc_context}\n\n請依規則產出 JSON。"
-        else:
-            full_messages.append({"role": "user", "content": f"{doc_context}\n\n請依規則產出 JSON。"})
-
-        response = client.chat.completions.create(
-            model=model_id,
-            messages=full_messages,
+        prompt = f"{convo}\n\n{doc_context}\n\n請依規則產出 JSON。"
+        team = build_team(doc_ids)
+        response = team.run(
+            prompt,
+            dependencies={"doc_ids": doc_ids},
+            add_dependencies_to_context=True,
         )
 
-        text = response.choices[0].message.content or ""
-        data: Dict[str, Any] = json.loads(text)
+        text = response.get_content_as_string()
+        data: Dict[str, Any] = safe_parse_json(text)
         return data
-    except Exception as exc:
+    except Exception as exc:  # noqa: BLE001
         return {
             "error": "LLM request failed",
             "detail": str(exc),

@@ -9,7 +9,14 @@ LobeChat-based prototype for enterprise banking RM credit approval workflows. Us
 **Tech Stack:**
 - Frontend: React 19 + Vite + @lobehub/ui + Ant Design
 - Backend: Python FastAPI + Agno (agent framework) + OpenAI API
+- RAG: Agno Knowledge Base with OpenAI Embeddings + Vector Search
 - Rendering: ReactMarkdown with remark-gfm for live Markdown preview
+
+**RAG & Agent Team:**
+- Agno Team with RAG Agent for document retrieval and analysis
+- PDF parsing via pypdf + OpenAI embeddings (text-embedding-3-small)
+- Sample PDFs auto-indexed on backend startup from src/docs/
+- Frontend loads preloaded PDFs via /api/documents/preloaded
 
 ## Development Commands
 
@@ -49,24 +56,46 @@ npm run preview
 ## Architecture
 
 ### Data Flow
-1. User uploads documents and sends instructions via left panel
-2. Frontend sends POST to `/api/artifacts` with:
-   - `messages[]`: conversation history (role, content)
-   - `documents[]`: uploaded files with metadata and text content
-3. Backend (Agno agent) processes request through OpenAI
-4. Returns strict JSON with three artifacts + routing status
-5. Frontend updates right panel with live Markdown preview
+1. **Document Upload & Indexing:**
+   - User uploads PDF/text files via left panel
+   - Frontend calls POST `/api/documents` with multipart form data
+   - Backend indexes files using Agno PDFReader + OpenAIEmbedder
+   - Returns document metadata (id, name, type, pages, preview)
+   - Documents stored in RagStore with chunked embeddings
+
+2. **Conversation with Agent Team:**
+   - User sends message via left panel chat composer
+   - Frontend calls POST `/api/artifacts` with messages[] and documents[]
+   - Backend creates Agno Team with RAG Agent member
+   - Team Leader delegates to RAG Agent for document retrieval
+   - RAG Agent searches indexed documents using vector similarity
+   - Team Leader generates structured JSON artifacts based on retrieved content
+   - Frontend updates right panel with live Markdown preview
+
+3. **Preloaded Sample PDFs:**
+   - Backend auto-indexes PDFs from src/docs/ on startup
+   - Frontend calls GET `/api/documents/preloaded` on mount
+   - Sample PDFs appear in document tray alongside static text docs
 
 ### Key Files
-- [src/App.jsx](src/App.jsx): Single-file frontend component (850+ lines)
+- [src/App.jsx](src/App.jsx): Single-file frontend component (900+ lines)
   - Manages all state: documents, messages, artifacts, routing steps
   - Handles file uploads, API calls, Markdown rendering
   - Three artifact tabs: summary (摘要), translation (翻譯), memo (授信報告)
-- [server/agno_api.py](server/agno_api.py): FastAPI backend with single `/api/artifacts` endpoint
-  - Uses Agno Agent with OpenAI model (configured via env vars)
-  - System prompt defines strict JSON output schema
-  - Builds context from last 8 messages + first 2000 chars of each document
-- [src/docs/](src/docs/): Static sample documents (.txt files) imported at build time
+  - Loads preloaded PDFs on startup via `/api/documents/preloaded`
+- [server/agno_api.py](server/agno_api.py): FastAPI backend with Agno Team + RAG Agent
+  - Three endpoints: `/api/health`, `/api/documents`, `/api/documents/preloaded`, `/api/artifacts`
+  - Uses Agno Team with RAG Agent for document retrieval
+  - Auto-indexes sample PDFs from src/docs/ on startup
+  - Team instructions define delegation logic and JSON schema
+- [server/rag_store.py](server/rag_store.py): RAG storage and retrieval engine
+  - Indexes PDF/text documents with Agno PDFReader/TextReader
+  - Chunks documents (1200 chars, 200 overlap) and generates embeddings
+  - Vector search using cosine similarity + keyword fallback
+  - Stores indexed documents in memory with metadata
+- [src/docs/](src/docs/): Sample documents (.txt and .pdf files)
+  - Text files imported as raw strings via Vite `?raw` import
+  - PDF files auto-indexed by backend on startup
 
 ### Critical JSON Schema
 Backend must return JSON matching this exact structure. The system prompt now intelligently handles both casual conversation and formal artifact generation based on user intent (see [agno_api.py:24-68](server/agno_api.py#L24-L68)):
@@ -94,11 +123,13 @@ Backend must return JSON matching this exact structure. The system prompt now in
 ```
 
 ### Important Constraints
-- **Document content**: PDF/DOCX files are NOT auto-parsed. Users must paste key text into "文件內容" field for accurate results.
-- **Risk levels**: Must be exactly "High", "Medium", or "Low" (case-sensitive). Frontend normalizes via [normalizeRiskLevel](src/App.jsx#L192-L203).
-- **Markdown safety**: Non-string outputs are JSON.stringify'd before rendering ([renderMarkdown](src/App.jsx#L401-L416)).
-- **API base URL**: Uses `VITE_API_URL` from .env; if not set, falls back to Vite dev proxy (`/api` → `http://localhost:8787`, see [vite.config.js:10-12](vite.config.js#L10-L12)).
-- **Context limits**: Backend truncates document content to 2000 chars, uses last 8 messages only.
+- **PDF parsing**: PDFs are automatically indexed with RAG on upload. RAG Agent retrieves relevant chunks via vector search.
+- **Document content**: Inline text content (pasted into "文件內容") is also indexed for RAG retrieval.
+- **RAG limitations**: Only retrieves top 5 chunks by default. Complex queries may need rephrasing.
+- **Risk levels**: Must be exactly "High", "Medium", or "Low" (case-sensitive). Frontend normalizes via [normalizeRiskLevel](src/App.jsx#L177-L188).
+- **Markdown safety**: Non-string outputs are JSON.stringify'd before rendering.
+- **API base URL**: Uses `VITE_API_URL` from .env; if not set, falls back to Vite dev proxy (`/api` → `http://localhost:8787`).
+- **Context limits**: RAG retrieves up to 5 chunks per query. Conversation uses last 8 messages only.
 
 ### State Management
 All state lives in [App.jsx](src/App.jsx) via useState hooks:
@@ -121,8 +152,9 @@ Uses @lobehub/ui (LobeHub design system):
 ## Environment Variables
 
 Required in `.env`:
-- `OPENAI_API_KEY`: OpenAI API key for backend
+- `OPENAI_API_KEY`: OpenAI API key for backend (required for LLM and embeddings)
 - `OPENAI_MODEL`: Model ID (default: gpt-4o-mini)
+- `OPENAI_EMBEDDING_MODEL`: Embedding model (default: text-embedding-3-small)
 - `PORT`: Backend server port (default: 8787)
 - `VITE_API_URL`: Frontend API endpoint (optional, defaults to Vite proxy)
 
