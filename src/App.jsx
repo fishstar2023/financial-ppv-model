@@ -11,8 +11,6 @@ import {
 import {
   ArrowUpRight,
   Briefcase,
-  ChevronDown,
-  ChevronUp,
   ClipboardCheck,
   Copy,
   Download,
@@ -200,7 +198,6 @@ export default function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [streamingContent, setStreamingContent] = useState('');
-  const [isDocPanelOpen, setIsDocPanelOpen] = useState(true);
 
   // Dynamic metadata states
   const [caseId] = useState(() => generateCaseId());
@@ -396,10 +393,13 @@ export default function App() {
 
   // Delete a document
   const handleDeleteDoc = (docId) => {
-    setDocuments((prev) => prev.filter((doc) => doc.id !== docId));
-    if (selectedDocId === docId) {
-      setSelectedDocId(documents[0]?.id || '');
-    }
+    setDocuments((prev) => {
+      const next = prev.filter((doc) => doc.id !== docId);
+      if (selectedDocId === docId) {
+        setSelectedDocId(next[0]?.id || '');
+      }
+      return next;
+    });
   };
 
   // Copy artifact output to clipboard
@@ -683,201 +683,130 @@ export default function App() {
         </header>
 
         <div className="artifact-shell">
-          <section className="panel chat-panel">
+          <section className="panel docs-panel">
             <div className="panel-header">
               <div>
                 <Text as="h2" weight="600" className="panel-title">
-                  RM 對話
+                  文件集
                 </Text>
                 <Text type="secondary" className="panel-subtitle">
-                  將文件指派到摘要/翻譯任務並生成授信內容
+                  上傳授信附件，指派摘要或翻譯，提供給 Agent 團隊
                 </Text>
               </div>
               <div className="panel-actions">
-                <Tag size="small" variant="borderless">
-                  案件: {caseId}
-                </Tag>
-                <Tag size="small" variant="borderless">
-                  SLA: {calculateSlaRemaining(caseStartTime, slaMinutes)}
-                </Tag>
-              </div>
-            </div>
-
-            {/* Collapsible Document Panel Toggle */}
-            <button
-              type="button"
-              className={`doc-panel-toggle${isDocPanelOpen ? ' is-open' : ''}`}
-              onClick={() => setIsDocPanelOpen(!isDocPanelOpen)}
-            >
-              <Icon icon={isDocPanelOpen ? ChevronUp : ChevronDown} size="small" />
-              <span>文件管理 ({documents.length})</span>
-              <Button size="small" variant="outlined" icon={Upload} onClick={(e) => { e.stopPropagation(); handleUploadClick(); }}>
-                上傳
-              </Button>
-              <input
-                ref={fileInputRef}
-                type="file"
-                multiple
-                className="file-input"
-                onChange={handleUploadFiles}
-              />
-            </button>
-
-            {/* Collapsible Document Panel */}
-            {isDocPanelOpen && (
-              <div className="doc-drawer">
-                <div className="doc-list">
-                  {documents.map((doc) => (
-                    <div
-                      key={doc.id}
-                      className={`doc-row${doc.id === selectedDocId ? ' is-active' : ''}`}
-                      onClick={() => setSelectedDocId(doc.id)}
-                    >
-                      <Icon icon={FileText} size="small" className="doc-icon" />
-                      <div className="doc-info">
-                        <span className="doc-name">{doc.name}</span>
-                        <span className="doc-type">{doc.type} · {doc.pages} 頁</span>
-                      </div>
-                      <div className="doc-row-tags">
-                        {doc.tags.slice(0, 2).map((tag) => (
-                          <Tag
-                            key={`${doc.id}-${tag}`}
-                            size="small"
-                            variant="borderless"
-                            color={tagColors[tag] || 'default'}
-                          >
-                            {tag}
-                          </Tag>
-                        ))}
-                        {doc.tags.length > 2 && <span className="more-tags">+{doc.tags.length - 2}</span>}
-                      </div>
-                      <ActionIcon
-                        icon={X}
-                        size="small"
-                        variant="ghost"
-                        onClick={(e) => { e.stopPropagation(); handleDeleteDoc(doc.id); }}
-                        title="刪除"
-                      />
-                    </div>
-                  ))}
-                </div>
-                {selectedDoc && (
-                  <div className="doc-settings">
-                    <div className="settings-header">
-                      <span className="settings-title">{selectedDoc.name}</span>
-                      <Tag size="small" variant="borderless">{selectedDoc.pages} 頁</Tag>
-                    </div>
-                    <div className="tag-selector">
-                      {availableTags.map((tag) => (
-                        <Tag
-                          key={tag}
-                          size="small"
-                          color={selectedDoc.tags.includes(tag) ? tagColors[tag] : 'default'}
-                          style={{ cursor: 'pointer', opacity: selectedDoc.tags.includes(tag) ? 1 : 0.5 }}
-                          onClick={() => handleToggleTag(tag)}
-                        >
-                          {tag}
-                        </Tag>
-                      ))}
-                    </div>
-                    <TextArea
-                      rows={3}
-                      value={selectedDoc.content}
-                      onChange={(event) => handleDocContentChange(event.target.value)}
-                      placeholder="貼上關鍵段落或摘要..."
-                    />
-                  </div>
-                )}
-              </div>
-            )}
-
-            <div className="routing-panel">
-              <div className="routing-header">
-                <div className="tray-title">
-                  <Icon icon={ListChecks} size="small" />
-                  <span>任務路由</span>
-                </div>
-                <Tag size="small" variant="borderless">
-                  自動分類
-                </Tag>
-              </div>
-              <div className="routing-list">
-                {routingSteps.map((step) => (
-                  <div key={step.id} className="routing-item">
-                    <div className={`status-dot ${statusMeta[step.status]?.className || ''}`} />
-                    <div className="routing-body">
-                      <div className="routing-label">{step.label}</div>
-                      <div className="routing-meta">
-                        <span
-                          className={`status-pill ${statusMeta[step.status]?.className || ''}`}
-                        >
-                          {statusMeta[step.status]?.label || '等待中'}
-                        </span>
-                        <span className="routing-eta">{step.eta}</span>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="chat-stream">
-              {messages.map((message, index) => (
-                <div
-                  key={message.id}
-                  className={`message ${
-                    message.role === 'user' ? 'is-user' : 'is-assistant'
-                  }`}
-                  style={{ '--delay': `${index * 120}ms` }}
-                >
-                  <div className="message-avatar">
-                    {message.role === 'user' ? 'RM' : 'AI'}
-                  </div>
-                  <div className="message-bubble">
-                    <div className="message-meta">
-                      <span className="message-name">{message.name}</span>
-                      <span className="message-time">{message.time}</span>
-                    </div>
-                    <p className="message-text">{message.content}</p>
-                    {message.bullets ? (
-                      <ul className="message-list">
-                        {message.bullets.map((item) => (
-                          <li key={item}>{item}</li>
-                        ))}
-                      </ul>
-                    ) : null}
-                    {message.attachment ? (
-                      <div className="message-attachment">
-                        <div className="attachment-title">
-                          {message.attachment.title}
-                        </div>
-                        <div className="attachment-detail">
-                          {message.attachment.detail}
-                        </div>
-                      </div>
-                    ) : null}
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <div className="chat-composer">
-              <TextArea
-                rows={3}
-                value={composerText}
-                onChange={(event) => setComposerText(event.target.value)}
-                placeholder="輸入指示，例如：請翻譯條款書第 3-6 條，並更新風險摘要"
-              />
-              {errorMessage ? <div className="error-banner">{errorMessage}</div> : null}
-              <div className="composer-actions">
-                <Button icon={Paperclip} variant="outlined" onClick={handleUploadClick}>
+                <Button icon={Upload} variant="outlined" onClick={handleUploadClick}>
                   上傳文件
                 </Button>
-                <Button icon={ArrowUpRight} type="primary" onClick={handleSend} disabled={isLoading}>
-                  {isLoading ? '產生中...' : '送出指示'}
-                </Button>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  multiple
+                  className="file-input"
+                  onChange={handleUploadFiles}
+                />
               </div>
             </div>
+
+            <div className="doc-tray">
+              <div className="tray-header">
+                <div className="tray-title">
+                  <Icon icon={FileText} size="small" />
+                  <span>文件列表</span>
+                </div>
+                <Tag size="small" variant="borderless">
+                  {documents.length} 份
+                </Tag>
+              </div>
+              {documents.length > 0 ? (
+                <div className="doc-grid">
+                  {documents.map((doc) => (
+                    <button
+                      key={doc.id}
+                      type="button"
+                      className={`doc-card${doc.id === selectedDocId ? ' is-active' : ''}`}
+                      onClick={() => setSelectedDocId(doc.id)}
+                    >
+                      <div className="doc-title">{doc.name}</div>
+                      <div className="doc-meta">
+                        <span>{doc.type}</span>
+                        <span>{doc.pages} 頁</span>
+                        {doc.source ? <span>{doc.source === 'preloaded' ? '預載' : '上傳'}</span> : null}
+                      </div>
+                      <div className="doc-tags">
+                        {doc.tags?.length ? (
+                          doc.tags.map((tag) => (
+                            <Tag
+                              key={`${doc.id}-${tag}`}
+                              size="small"
+                              color={tagColors[tag] || 'default'}
+                            >
+                              {tag}
+                            </Tag>
+                          ))
+                        ) : (
+                          <span className="doc-empty">尚未指派標籤</span>
+                        )}
+                      </div>
+                      {doc.status === 'error' ? (
+                        <div className="doc-empty">解析失敗</div>
+                      ) : null}
+                    </button>
+                  ))}
+                </div>
+              ) : (
+                <div className="doc-empty">尚未上傳文件，支援 PDF / TXT</div>
+              )}
+            </div>
+
+            {selectedDoc ? (
+              <div className="doc-detail">
+                <div className="detail-header">
+                  <span className="detail-title">{selectedDoc.name}</span>
+                  <div className="detail-actions">
+                    <Tag size="small" variant="borderless">
+                      {selectedDoc.pages} 頁
+                    </Tag>
+                    <Tag size="small" variant="borderless">
+                      {selectedDoc.type}
+                    </Tag>
+                    <ActionIcon
+                      icon={X}
+                      size="small"
+                      variant="ghost"
+                      onClick={() => handleDeleteDoc(selectedDoc.id)}
+                      title="移除文件"
+                    />
+                  </div>
+                </div>
+
+                <div className="tag-selector">
+                  {availableTags.map((tag) => (
+                    <Tag
+                      key={tag}
+                      size="small"
+                      color={selectedDoc.tags.includes(tag) ? tagColors[tag] : 'default'}
+                      style={{ cursor: 'pointer', opacity: selectedDoc.tags.includes(tag) ? 1 : 0.5 }}
+                      onClick={() => handleToggleTag(tag)}
+                    >
+                      {tag}
+                    </Tag>
+                  ))}
+                </div>
+
+                {selectedDoc.message ? (
+                  <div className="doc-status">{selectedDoc.message}</div>
+                ) : null}
+
+                <TextArea
+                  rows={6}
+                  value={selectedDoc.content || ''}
+                  onChange={(event) => handleDocContentChange(event.target.value)}
+                  placeholder="貼上文件重點或修正解析結果..."
+                />
+              </div>
+            ) : (
+              <div className="doc-empty">選取或上傳文件以查看細節</div>
+            )}
           </section>
 
           <section className="panel artifact-panel">
@@ -916,7 +845,7 @@ export default function App() {
             <div className="artifact-meta">
               <div className="meta-chip">更新: {formatRelativeTime(lastUpdateTime)}</div>
               <div className="meta-chip">負責人: {ownerName}</div>
-              {tabMeta[activeTab].map((item) => (
+              {(tabMeta[activeTab] || []).map((item) => (
                 <div key={item} className="meta-chip">
                   {item}
                 </div>
@@ -1088,6 +1017,115 @@ export default function App() {
                     </div>
                   ) : null}
                 </div>
+              </div>
+            </div>
+          </section>
+
+          <section className="panel chat-panel">
+            <div className="panel-header">
+              <div>
+                <Text as="h2" weight="600" className="panel-title">
+                  RM 對話
+                </Text>
+                <Text type="secondary" className="panel-subtitle">
+                  與 Agent Team 溝通，派送摘要/翻譯/查核任務
+                </Text>
+              </div>
+              <div className="panel-actions">
+                <Tag size="small" variant="borderless">
+                  案件: {caseId}
+                </Tag>
+                <Tag size="small" variant="borderless">
+                  SLA: {calculateSlaRemaining(caseStartTime, slaMinutes)}
+                </Tag>
+              </div>
+            </div>
+
+            <div className="routing-panel">
+              <div className="routing-header">
+                <div className="tray-title">
+                  <Icon icon={ListChecks} size="small" />
+                  <span>任務路由</span>
+                </div>
+                <Tag size="small" variant="borderless">
+                  自動分類
+                </Tag>
+              </div>
+              <div className="routing-list">
+                {routingSteps.map((step) => (
+                  <div key={step.id} className="routing-item">
+                    <div className={`status-dot ${statusMeta[step.status]?.className || ''}`} />
+                    <div className="routing-body">
+                      <div className="routing-label">{step.label}</div>
+                      <div className="routing-meta">
+                        <span
+                          className={`status-pill ${statusMeta[step.status]?.className || ''}`}
+                        >
+                          {statusMeta[step.status]?.label || '等待中'}
+                        </span>
+                        <span className="routing-eta">{step.eta}</span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="chat-stream">
+              {messages.map((message, index) => (
+                <div
+                  key={message.id}
+                  className={`message ${
+                    message.role === 'user' ? 'is-user' : 'is-assistant'
+                  }`}
+                  style={{ '--delay': `${index * 120}ms` }}
+                >
+                  <div className="message-avatar">
+                    {message.role === 'user' ? 'RM' : 'AI'}
+                  </div>
+                  <div className="message-bubble">
+                    <div className="message-meta">
+                      <span className="message-name">{message.name}</span>
+                      <span className="message-time">{message.time}</span>
+                    </div>
+                    <p className="message-text">{message.content}</p>
+                    {message.bullets ? (
+                      <ul className="message-list">
+                        {message.bullets.map((item) => (
+                          <li key={item}>{item}</li>
+                        ))}
+                      </ul>
+                    ) : null}
+                    {message.attachment ? (
+                      <div className="message-attachment">
+                        <div className="attachment-title">
+                          {message.attachment.title}
+                        </div>
+                        <div className="attachment-detail">
+                          {message.attachment.detail}
+                        </div>
+                      </div>
+                    ) : null}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="chat-composer">
+              <TextArea
+                rows={3}
+                value={composerText}
+                onChange={(event) => setComposerText(event.target.value)}
+                placeholder="輸入指示，例如：請翻譯條款書第 3-6 條，並更新風險摘要"
+              />
+              {errorMessage ? <div className="error-banner">{errorMessage}</div> : null}
+              <div className="composer-actions">
+                <Button icon={Paperclip} variant="outlined" onClick={handleUploadClick}>
+                  上傳文件
+                </Button>
+                <Button icon={ArrowUpRight} type="primary" onClick={handleSend} disabled={isLoading}>
+                  {isLoading ? '產生中...' : '送出指示'}
+                </Button>
               </div>
             </div>
           </section>
