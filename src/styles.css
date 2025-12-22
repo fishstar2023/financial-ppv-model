@@ -624,9 +624,10 @@ body {
 }
 
 .artifact-stack {
-  display: grid;
-  grid-template-rows: minmax(220px, 0.9fr) minmax(260px, 1.1fr);
+  display: flex;
+  flex-direction: column;
   gap: 16px;
+  flex: 1;
   min-height: 0;
 }
 
@@ -639,6 +640,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  flex: 1;
   min-height: 0;
   box-shadow: var(--shadow-soft);
 }
