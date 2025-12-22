@@ -22,37 +22,49 @@ def _safe_load_env() -> None:
 _safe_load_env()
 
 SYSTEM_PROMPT = """
-你是企業金融 RM 的授信報告助理。請依據對話與文件清單，產出三個 artifacts：摘要、翻譯、授信報告草稿，並提供任務路由狀態。
+你是企業金融 RM 的授信報告助理。根據用戶的對話需求，靈活回應：
 
-輸出規則：
-1) 回傳內容必須是嚴格 JSON，不要額外說明或 Markdown code fence。
-2) summary.output 與 memo.output 使用繁體中文；translation.output 以及 translation.clauses[].translated 使用英文。
-3) summary.risks[].level 必須是 High、Medium、Low。
-4) routing[].status 必須是 running、queued、done。
-5) 若文件內容不足，請明確註記「內容不足，需補充」。
-6) 請控制每個陣列 3-6 個項目，避免過長。
+**判斷用戶意圖：**
+- 如果用戶只是問候（如「hi」、「你好」）或普通對話，在 assistant.content 中自然回應，artifacts 欄位留空即可
+- 只有當用戶明確要求分析、摘要、翻譯、產生報告時，才產出完整的 artifacts 內容
+- 識別關鍵詞：「請摘要」、「分析」、「翻譯」、「產生報告」、「評估風險」等
 
-JSON 格式：
+**輸出規則：**
+1) 回傳內容必須是嚴格 JSON，不要額外說明或 Markdown code fence
+2) summary.output 與 memo.output 使用繁體中文；translation.output 以及 translation.clauses[].translated 使用英文
+3) summary.risks[].level 必須是 High、Medium、Low
+4) routing[].status 必須是 running、queued、done
+5) 若文件內容不足，請明確註記「內容不足，需補充」
+6) 每個陣列控制在 3-6 個項目
+
+**JSON 格式：**
 {
-  "assistant": { "content": "...", "bullets": ["...", "..."] },
+  "assistant": { "content": "你的回應內容", "bullets": ["可選的要點列表"] },
   "summary": {
-    "output": "...",
-    "borrower": { "name": "...", "description": "...", "rating": "..." },
-    "metrics": [{ "label": "...", "value": "...", "delta": "..." }],
-    "risks": [{ "label": "...", "level": "High" }]
+    "output": "摘要 markdown（如不需要則留空字串）",
+    "borrower": { "name": "", "description": "", "rating": "" },
+    "metrics": [],
+    "risks": []
   },
   "translation": {
-    "output": "...",
-    "clauses": [{ "section": "...", "source": "...", "translated": "..." }]
+    "output": "翻譯 markdown（如不需要則留空字串）",
+    "clauses": []
   },
   "memo": {
-    "output": "...",
-    "sections": [{ "title": "...", "detail": "..." }],
-    "recommendation": "...",
-    "conditions": "..."
+    "output": "報告 markdown（如不需要則留空字串）",
+    "sections": [],
+    "recommendation": "",
+    "conditions": ""
   },
-  "routing": [{ "label": "...", "status": "queued", "eta": "..." }]
+  "routing": []
 }
+
+**範例：**
+用戶：「hi 你好」
+回應：{"assistant": {"content": "你好！我是授信報告助理，可以協助您產生摘要、翻譯條款、或撰寫授信報告。請告訴我需要什麼協助？", "bullets": []}, "summary": {"output": "", "borrower": {"name": "", "description": "", "rating": ""}, "metrics": [], "risks": []}, "translation": {"output": "", "clauses": []}, "memo": {"output": "", "sections": [], "recommendation": "", "conditions": ""}, "routing": []}
+
+用戶：「請產生摘要和翻譯」
+回應：產出完整的 summary、translation 等 artifacts 內容
 """.strip()
 
 
@@ -134,18 +146,28 @@ async def health():
     return {"ok": True}
 
 
-async def generate_stream(prompt: str) -> AsyncGenerator[str, None]:
+async def generate_stream(messages: List[Dict[str, str]], doc_context: str) -> AsyncGenerator[str, None]:
     """Generate streaming response using OpenAI API."""
     try:
         client = get_openai_client()
         model_id = get_model_id()
 
+        # Build full message list with system prompt and conversation history
+        full_messages = [{"role": "system", "content": SYSTEM_PROMPT}]
+
+        # Add conversation history
+        for msg in messages:
+            full_messages.append({"role": msg["role"], "content": msg["content"]})
+
+        # Append document context to the last user message (or create new one)
+        if full_messages and full_messages[-1]["role"] == "user":
+            full_messages[-1]["content"] += f"\n\n{doc_context}\n\n請依規則產出 JSON。"
+        else:
+            full_messages.append({"role": "user", "content": f"{doc_context}\n\n請依規則產出 JSON。"})
+
         stream = client.chat.completions.create(
             model=model_id,
-            messages=[
-                {"role": "system", "content": SYSTEM_PROMPT},
-                {"role": "user", "content": prompt},
-            ],
+            messages=full_messages,
             stream=True,
         )
 
@@ -165,13 +187,14 @@ async def generate_stream(prompt: str) -> AsyncGenerator[str, None]:
 @app.post("/api/artifacts")
 async def generate_artifacts(req: ArtifactRequest):
     doc_context = build_doc_context(req.documents)
-    convo = build_conversation(req.messages)
-    prompt = f"{convo}\n\n{doc_context}\n\n請依規則產出 JSON。"
+
+    # Convert messages to dict format
+    messages = [{"role": msg.role, "content": msg.content} for msg in req.messages]
 
     if req.stream:
         # Return streaming response
         return StreamingResponse(
-            generate_stream(prompt),
+            generate_stream(messages, doc_context),
             media_type="text/event-stream",
             headers={
                 "Cache-Control": "no-cache",
@@ -185,12 +208,20 @@ async def generate_artifacts(req: ArtifactRequest):
         client = get_openai_client()
         model_id = get_model_id()
 
+        # Build full message list
+        full_messages = [{"role": "system", "content": SYSTEM_PROMPT}]
+        for msg in messages:
+            full_messages.append(msg)
+
+        # Append document context to the last user message
+        if full_messages and full_messages[-1]["role"] == "user":
+            full_messages[-1]["content"] += f"\n\n{doc_context}\n\n請依規則產出 JSON。"
+        else:
+            full_messages.append({"role": "user", "content": f"{doc_context}\n\n請依規則產出 JSON。"})
+
         response = client.chat.completions.create(
             model=model_id,
-            messages=[
-                {"role": "system", "content": SYSTEM_PROMPT},
-                {"role": "user", "content": prompt},
-            ],
+            messages=full_messages,
         )
 
         text = response.choices[0].message.content or ""

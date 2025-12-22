@@ -69,7 +69,7 @@ npm run preview
 - [src/docs/](src/docs/): Static sample documents (.txt files) imported at build time
 
 ### Critical JSON Schema
-Backend must return JSON matching this exact structure (see [agno_api.py:36-56](server/agno_api.py#L36-L56)):
+Backend must return JSON matching this exact structure. The system prompt now intelligently handles both casual conversation and formal artifact generation based on user intent (see [agno_api.py:24-68](server/agno_api.py#L24-L68)):
 ```json
 {
   "assistant": { "content": "...", "bullets": ["..."] },
@@ -103,7 +103,10 @@ Backend must return JSON matching this exact structure (see [agno_api.py:36-56](
 ### State Management
 All state lives in [App.jsx](src/App.jsx) via useState hooks:
 - `documents`: uploaded files + initial sample docs
-- `artifacts`: nested object with summary/translation/memo data
+- `artifacts`: nested object with summary/translations[]/memo data
+  - `translations` is an array to preserve history of all translation tasks
+  - Each translation has: `{id, timestamp, title, output, clauses}`
+- `activeTranslationIndex`: tracks which translation version is currently displayed
 - `routingSteps`: task status visualization
 - `messages`: chat history
 - `isLoading`: controls UI state during API calls
@@ -126,7 +129,10 @@ Required in `.env`:
 ## Development Notes
 
 - Frontend is a single large component - consider extracting panels/tabs if adding major features
-- Backend uses synchronous `agent.run()` - responses block until completion (no streaming)
+- Backend supports SSE streaming via `stream: true` parameter - frontend displays real-time typewriter effect
+- System prompt intelligently distinguishes casual conversation from formal artifact requests - only generates full artifacts when explicitly requested
+- Conversation history is preserved in full message format (not compressed to string) for proper context understanding
+- **Translation history**: Multiple translation requests create separate sub-tabs (翻譯 #1, #2, #3...) - all previous translations are preserved and accessible
 - Sample documents in [src/docs/](src/docs/) are imported as raw text via Vite's `?raw` import
 - File uploads only extract text content from text/* files and .txt/.md/.csv extensions
 - Error handling shows errors in chat composer area ([App.jsx:633](src/App.jsx#L633))

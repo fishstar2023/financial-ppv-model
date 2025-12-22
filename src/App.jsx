@@ -196,6 +196,7 @@ export default function App() {
   const [activeTab, setActiveTab] = useState('summary');
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [streamingContent, setStreamingContent] = useState('');
 
   // Dynamic metadata states
   const [caseId] = useState(() => generateCaseId());
@@ -205,6 +206,28 @@ export default function App() {
   const [slaMinutes] = useState(45);
   const [currentTime, setCurrentTime] = useState(Date.now());
 
+  const [artifacts, setArtifacts] = useState({
+    summary: {
+      output: summaryOutput,
+      borrower: {
+        name: '',
+        description: '',
+        rating: '',
+      },
+      metrics: initialSummaryMetrics,
+      risks: initialRiskFlags,
+    },
+    translations: [],  // Changed to array for history
+    memo: {
+      output: memoOutput,
+      sections: initialMemoSections,
+      recommendation: '',
+      conditions: '',
+    },
+  });
+
+  const [activeTranslationIndex, setActiveTranslationIndex] = useState(0);
+
   // Update current time every minute for SLA calculation
   useEffect(() => {
     const interval = setInterval(() => {
@@ -212,6 +235,13 @@ export default function App() {
     }, 60000);
     return () => clearInterval(interval);
   }, []);
+
+  // Ensure activeTranslationIndex is within bounds
+  useEffect(() => {
+    if (artifacts.translations.length > 0 && activeTranslationIndex >= artifacts.translations.length) {
+      setActiveTranslationIndex(artifacts.translations.length - 1);
+    }
+  }, [artifacts.translations.length, activeTranslationIndex]);
 
   // Compute dynamic tab metadata based on documents
   const tabMeta = useMemo(() => {
@@ -226,32 +256,21 @@ export default function App() {
     };
   }, [documents]);
 
-  const [artifacts, setArtifacts] = useState({
-    summary: {
-      output: summaryOutput,
-      borrower: {
-        name: '',
-        description: '',
-        rating: '',
-      },
-      metrics: initialSummaryMetrics,
-      risks: initialRiskFlags,
-    },
-    translation: {
-      output: translationOutput,
-      clauses: initialTranslationPairs,
-    },
-    memo: {
-      output: memoOutput,
-      sections: initialMemoSections,
-      recommendation: '',
-      conditions: '',
-    },
-  });
-
   const fileInputRef = useRef(null);
 
-  const activeArtifact = artifacts[activeTab];
+  // Get active artifact based on tab
+  const getActiveArtifact = () => {
+    if (activeTab === 'translation') {
+      const translations = artifacts.translations;
+      if (translations.length === 0) {
+        return { output: '', clauses: [] };
+      }
+      return translations[activeTranslationIndex] || translations[0];
+    }
+    return artifacts[activeTab];
+  };
+
+  const activeArtifact = getActiveArtifact();
   const selectedDoc = documents.find((doc) => doc.id === selectedDocId);
 
   const handleUploadClick = () => {
@@ -365,7 +384,8 @@ export default function App() {
 
   // Create new case (reset all state)
   const handleNewCase = () => {
-    if (messages.length > 0 || artifacts.summary.output || artifacts.translation.output || artifacts.memo.output) {
+    const hasContent = messages.length > 0 || artifacts.summary.output || artifacts.translations.length > 0 || artifacts.memo.output;
+    if (hasContent) {
       if (!window.confirm('確定要新增案件嗎？目前的對話和產出將會清空。')) {
         return;
       }
@@ -374,9 +394,10 @@ export default function App() {
     setRoutingSteps([]);
     setArtifacts({
       summary: { output: '', borrower: { name: '', description: '', rating: '' }, metrics: [], risks: [] },
-      translation: { output: '', clauses: [] },
+      translations: [],
       memo: { output: '', sections: [], recommendation: '', conditions: '' },
     });
+    setActiveTranslationIndex(0);
     setLastUpdateTime(null);
     setErrorMessage('');
     setComposerText('');
@@ -388,7 +409,7 @@ export default function App() {
       caseId,
       exportTime: new Date().toISOString(),
       summary: artifacts.summary,
-      translation: artifacts.translation,
+      translations: artifacts.translations,
       memo: artifacts.memo,
       documents: documents.map((d) => ({ name: d.name, type: d.type, tags: d.tags })),
     };
@@ -421,13 +442,13 @@ export default function App() {
     setComposerText('');
     setIsLoading(true);
     setErrorMessage('');
-    setRoutingSteps((prev) =>
-      prev.map((step, index) => ({
-        ...step,
-        status: index === 0 ? 'running' : 'queued',
-        eta: index === 0 ? '進行中' : step.eta,
-      }))
-    );
+    setStreamingContent('');
+    setRoutingSteps([
+      { id: createId(), label: '分析文件', status: 'running', eta: '進行中' },
+      { id: createId(), label: '產生摘要', status: 'queued', eta: '等待中' },
+      { id: createId(), label: '翻譯條款', status: 'queued', eta: '等待中' },
+      { id: createId(), label: '撰寫報告', status: 'queued', eta: '等待中' },
+    ]);
 
     try {
       const response = await fetch(`${apiBase}/api/artifacts`, {
@@ -439,6 +460,7 @@ export default function App() {
             content: item.content,
           })),
           documents,
+          stream: true,
         }),
       });
 
@@ -447,70 +469,165 @@ export default function App() {
         throw new Error(errorText || 'API request failed');
       }
 
-      const data = await response.json();
+      // Handle SSE streaming
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let accumulated = '';
+      let buffer = '';
 
-      if (data.error) {
-        throw new Error(data.error);
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split('\n');
+        buffer = lines.pop() || '';
+
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            try {
+              const jsonStr = line.slice(6);
+              const payload = JSON.parse(jsonStr);
+
+              if (payload.chunk) {
+                accumulated += payload.chunk;
+                setStreamingContent(accumulated);
+                console.log('⚡ Streaming chunk received, accumulated length:', accumulated.length);
+
+                // Update routing status based on content
+                if (accumulated.includes('"summary"')) {
+                  setRoutingSteps((prev) =>
+                    prev.map((step, i) => ({
+                      ...step,
+                      status: i === 0 ? 'done' : i === 1 ? 'running' : step.status,
+                      eta: i === 0 ? '完成' : i === 1 ? '進行中' : step.eta,
+                    }))
+                  );
+                }
+                if (accumulated.includes('"translation"')) {
+                  setRoutingSteps((prev) =>
+                    prev.map((step, i) => ({
+                      ...step,
+                      status: i < 2 ? 'done' : i === 2 ? 'running' : step.status,
+                      eta: i < 2 ? '完成' : i === 2 ? '進行中' : step.eta,
+                    }))
+                  );
+                }
+                if (accumulated.includes('"memo"')) {
+                  setRoutingSteps((prev) =>
+                    prev.map((step, i) => ({
+                      ...step,
+                      status: i < 3 ? 'done' : i === 3 ? 'running' : step.status,
+                      eta: i < 3 ? '完成' : i === 3 ? '進行中' : step.eta,
+                    }))
+                  );
+                }
+              }
+
+              if (payload.done) {
+                // Parse final JSON
+                try {
+                  const data = JSON.parse(accumulated);
+                  console.log('📦 Received data from API:', data);
+
+                  if (data.summary || data.translation || data.memo) {
+                    setArtifacts((prev) => {
+                      console.log('📝 Current translations count:', prev.translations.length);
+                      console.log('🔍 Translation data:', data.translation);
+
+                      const newArtifacts = {
+                        summary: {
+                          ...prev.summary,
+                          output: data.summary?.output || prev.summary.output,
+                          borrower: {
+                            ...prev.summary.borrower,
+                            ...(data.summary?.borrower || {}),
+                          },
+                          metrics: data.summary?.metrics || prev.summary.metrics,
+                          risks: data.summary?.risks || prev.summary.risks,
+                        },
+                        translations: prev.translations,
+                        memo: {
+                          ...prev.memo,
+                          output: data.memo?.output || prev.memo.output,
+                          sections: data.memo?.sections || prev.memo.sections,
+                          recommendation:
+                            data.memo?.recommendation || prev.memo.recommendation,
+                          conditions: data.memo?.conditions || prev.memo.conditions,
+                        },
+                      };
+
+                      // Add new translation version if present
+                      if (data.translation && (data.translation.output || data.translation.clauses?.length > 0)) {
+                        const newTranslation = {
+                          id: createId(),
+                          timestamp: Date.now(),
+                          title: `翻譯 #${prev.translations.length + 1}`,
+                          output: data.translation.output || '',
+                          clauses: data.translation.clauses || [],
+                        };
+                        newArtifacts.translations = [...prev.translations, newTranslation];
+                        console.log('✅ Added new translation #', prev.translations.length + 1);
+                        console.log('📋 Total translations:', newArtifacts.translations.length);
+                        // Switch to the new translation
+                        setActiveTranslationIndex(newArtifacts.translations.length - 1);
+                      } else {
+                        console.log('⚠️ No translation data to add');
+                      }
+
+                      return newArtifacts;
+                    });
+                  }
+
+                  if (Array.isArray(data.routing)) {
+                    setRoutingSteps(
+                      data.routing.map((step) => ({
+                        id: step.id || createId(),
+                        label: step.label || '任務更新',
+                        status: step.status || 'done',
+                        eta: step.eta || '完成',
+                      }))
+                    );
+                  } else {
+                    setRoutingSteps((prev) =>
+                      prev.map((step) => ({ ...step, status: 'done', eta: '完成' }))
+                    );
+                  }
+
+                  const assistantMessage = {
+                    id: createId(),
+                    role: 'assistant',
+                    name: 'LLM',
+                    time: nowTime(),
+                    content: data.assistant?.content || '已完成最新授信產出。',
+                    bullets: data.assistant?.bullets,
+                    attachment: {
+                      title: 'Artifacts: 授信資料包',
+                      detail: `更新 ${nowTime()} - 3 個分頁`,
+                    },
+                  };
+
+                  setMessages((prev) => [...prev, assistantMessage]);
+                  setLastUpdateTime(Date.now());
+                } catch {
+                  // JSON parsing failed, show what we have
+                  console.error('Failed to parse final JSON:', accumulated);
+                }
+                setStreamingContent('');
+              }
+
+              if (payload.error) {
+                throw new Error(payload.error);
+              }
+            } catch (parseError) {
+              // Skip invalid JSON chunks
+              if (parseError.message !== 'Unexpected end of JSON input') {
+                console.warn('SSE parse error:', parseError);
+              }
+            }
+          }
+        }
       }
-
-      if (data.summary || data.translation || data.memo) {
-        setArtifacts((prev) => ({
-          summary: {
-            ...prev.summary,
-            output: data.summary?.output || prev.summary.output,
-            borrower: {
-              ...prev.summary.borrower,
-              ...(data.summary?.borrower || {}),
-            },
-            metrics: data.summary?.metrics || prev.summary.metrics,
-            risks: data.summary?.risks || prev.summary.risks,
-          },
-          translation: {
-            ...prev.translation,
-            output: data.translation?.output || prev.translation.output,
-            clauses: data.translation?.clauses || prev.translation.clauses,
-          },
-          memo: {
-            ...prev.memo,
-            output: data.memo?.output || prev.memo.output,
-            sections: data.memo?.sections || prev.memo.sections,
-            recommendation:
-              data.memo?.recommendation || prev.memo.recommendation,
-            conditions: data.memo?.conditions || prev.memo.conditions,
-          },
-        }));
-      }
-
-      if (Array.isArray(data.routing)) {
-        setRoutingSteps(
-          data.routing.map((step) => ({
-            id: step.id || createId(),
-            label: step.label || '任務更新',
-            status: step.status || 'queued',
-            eta: step.eta || '等待中',
-          }))
-        );
-      } else {
-        setRoutingSteps((prev) =>
-          prev.map((step) => ({ ...step, status: 'done', eta: '完成' }))
-        );
-      }
-
-      const assistantMessage = {
-        id: createId(),
-        role: 'assistant',
-        name: 'LLM',
-        time: nowTime(),
-        content: data.assistant?.content || '已完成最新授信產出。',
-        bullets: data.assistant?.bullets,
-        attachment: {
-          title: 'Artifacts: 授信資料包',
-          detail: `更新 ${nowTime()} - 3 個分頁`,
-        },
-      };
-
-      setMessages((prev) => [...prev, assistantMessage]);
-      setLastUpdateTime(Date.now());
     } catch (error) {
       setErrorMessage(
         error instanceof Error
@@ -519,6 +636,7 @@ export default function App() {
       );
     } finally {
       setIsLoading(false);
+      setStreamingContent('');
     }
   };
 
@@ -843,7 +961,17 @@ export default function App() {
                   </Tag>
                 </div>
                 <div className="output-code">
-                  {renderMarkdown(activeArtifact.output)}
+                  {isLoading && streamingContent ? (
+                    <div className="streaming-wrapper">
+                      <div className="streaming-label">正在產生中...</div>
+                      <div className="streaming-content">
+                        <pre className="streaming-text">{streamingContent}</pre>
+                        <span className="streaming-cursor">▊</span>
+                      </div>
+                    </div>
+                  ) : (
+                    renderMarkdown(activeArtifact.output)
+                  )}
                 </div>
               </div>
 
@@ -927,6 +1055,22 @@ export default function App() {
                           {(activeArtifact.clauses || []).length} 條
                         </Tag>
                       </div>
+
+                      {artifacts.translations.length > 1 && (
+                        <div className="translation-tabs">
+                          {artifacts.translations.map((trans, index) => (
+                            <button
+                              key={trans.id}
+                              type="button"
+                              className={`translation-tab${index === activeTranslationIndex ? ' is-active' : ''}`}
+                              onClick={() => setActiveTranslationIndex(index)}
+                            >
+                              {trans.title}
+                            </button>
+                          ))}
+                        </div>
+                      )}
+
                       <div className="translation-list">
                         {(activeArtifact.clauses || []).map((pair) => (
                           <div key={pair.id || pair.section} className="translation-block">
