@@ -1,5 +1,6 @@
 import json
 import os
+import re
 import uuid
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
@@ -156,6 +157,90 @@ def build_conversation(messages: List[Message]) -> str:
     for msg in messages[-8:]:
         parts.append(f"{msg.role}: {msg.content}")
     return "對話紀錄:\n" + "\n".join(parts)
+
+
+def get_last_user_message(messages: List[Message]) -> str:
+    for msg in reversed(messages or []):
+        content = (msg.content or "").strip()
+        if msg.role == "user" and content:
+            return content
+    return ""
+
+
+def is_simple_greeting(text: str) -> bool:
+    if not text:
+        return False
+    lowered = text.strip().lower()
+    task_keywords = [
+        "摘要",
+        "翻譯",
+        "翻译",
+        "分析",
+        "報告",
+        "报告",
+        "評估",
+        "风險",
+        "風險",
+        "條款",
+        "条款",
+        "翻成",
+        "summarize",
+        "summary",
+        "translate",
+        "translation",
+        "report",
+        "analysis",
+        "risk",
+    ]
+    if any(keyword in lowered for keyword in task_keywords):
+        return False
+    if len(lowered) > 20:
+        return False
+    greeting_pattern = re.compile(
+        r"^(hi|hello|hey|yo|hola|嗨|你好|哈囉|哈啰|早安|午安|晚安|在嗎|在么|在吗)[!！。,.…~\\s]*$",
+        re.IGNORECASE,
+    )
+    if greeting_pattern.match(lowered):
+        return True
+    normalized = re.sub(r"[\\s\\W_]+", "", lowered, flags=re.UNICODE)
+    greetings = {
+        "hi",
+        "hello",
+        "hey",
+        "yo",
+        "hola",
+        "嗨",
+        "你好",
+        "哈囉",
+        "哈啰",
+        "早安",
+        "午安",
+        "晚安",
+        "在嗎",
+        "在么",
+        "在吗",
+    }
+    return normalized in greetings
+
+
+def build_empty_response(message: str) -> Dict[str, Any]:
+    return {
+        "assistant": {"content": message, "bullets": []},
+        "summary": {
+            "output": "",
+            "borrower": {"name": "", "description": "", "rating": ""},
+            "metrics": [],
+            "risks": [],
+        },
+        "translation": {"output": "", "clauses": []},
+        "memo": {
+            "output": "",
+            "sections": [],
+            "recommendation": "",
+            "conditions": "",
+        },
+        "routing": [],
+    }
 
 
 def ensure_inline_documents_indexed(documents: List[Document]) -> None:
@@ -359,6 +444,12 @@ async def get_preloaded_documents():
 @app.post("/api/artifacts")
 async def generate_artifacts(req: ArtifactRequest):
     try:
+        last_user = get_last_user_message(req.messages)
+        if is_simple_greeting(last_user):
+            return build_empty_response(
+                "你好！我是授信報告助理，可以協助摘要、翻譯、風險評估與授信報告草稿。請告訴我需要什麼協助？"
+            )
+
         ensure_inline_documents_indexed(req.documents)
         doc_context = build_doc_context(req.documents)
         convo = build_conversation(req.messages)
