@@ -6,7 +6,7 @@ from typing import Any, Dict, List, Optional, Union
 import dotenv
 from fastapi import FastAPI, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, StreamingResponse
 from pydantic import BaseModel, Field
 
 from agno.agent import Agent
@@ -298,9 +298,6 @@ async def upload_documents(files: List[UploadFile] = File(...)):
 
 @app.post("/api/artifacts")
 async def generate_artifacts(req: ArtifactRequest):
-    if req.stream:
-        return JSONResponse({"error": "streaming not supported"}, status_code=400)
-
     try:
         ensure_inline_documents_indexed(req.documents)
         doc_context = build_doc_context(req.documents)
@@ -309,15 +306,43 @@ async def generate_artifacts(req: ArtifactRequest):
 
         prompt = f"{convo}\n\n{doc_context}\n\n請依規則產出 JSON。"
         team = build_team(doc_ids)
-        response = team.run(
-            prompt,
-            dependencies={"doc_ids": doc_ids},
-            add_dependencies_to_context=True,
-        )
 
-        text = response.get_content_as_string()
-        data: Dict[str, Any] = safe_parse_json(text)
-        return data
+        if req.stream:
+            # Use streaming response
+            response = team.run(
+                prompt,
+                dependencies={"doc_ids": doc_ids},
+                add_dependencies_to_context=True,
+                stream=True,
+            )
+
+            async def generate_sse():
+                accumulated = ""
+                try:
+                    for chunk in response:
+                        content = chunk.get_content_as_string() if hasattr(chunk, 'get_content_as_string') else str(chunk)
+                        accumulated += content
+                        # Send chunk to frontend
+                        yield f"data: {json.dumps({'chunk': content})}\n\n"
+
+                    # Parse and send final complete message
+                    final_data = safe_parse_json(accumulated)
+                    yield f"data: {json.dumps(final_data)}\n\n"
+                    yield f"data: {json.dumps({'done': True})}\n\n"
+                except Exception as exc:
+                    yield f"data: {json.dumps({'error': str(exc)})}\n\n"
+
+            return StreamingResponse(generate_sse(), media_type="text/event-stream")
+        else:
+            # Non-streaming response
+            response = team.run(
+                prompt,
+                dependencies={"doc_ids": doc_ids},
+                add_dependencies_to_context=True,
+            )
+            text = response.get_content_as_string()
+            data: Dict[str, Any] = safe_parse_json(text)
+            return data
     except Exception as exc:  # noqa: BLE001
         return {
             "error": "LLM request failed",
