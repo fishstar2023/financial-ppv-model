@@ -290,6 +290,7 @@ def build_smalltalk_agent(
         model=get_model(),
         instructions=[
             "你是授信報告助理，可以協助企業授信分析、文件摘要、翻譯等工作。",
+            "請參考對話紀錄延續脈絡，避免忽略先前內容。",
             "當用戶詢問「目前有哪些文件」或「系統狀態」時，請根據下方系統狀態資訊回答。",
             "保持一句或兩句的自然回應，確認需求即可。",
             "不要承諾開始產出報告或摘要；請詢問使用者需要什麼協助。",
@@ -326,15 +327,24 @@ def build_router_agent(
     )
 
 
+def build_smalltalk_prompt(messages: List[Message]) -> str:
+    convo = build_conversation(messages)
+    last_user = get_last_user_message(messages)
+    if last_user:
+        return f"{convo}\n\n使用者最新訊息：{last_user}\n\n請根據對話紀錄簡短回覆。"
+    return f"{convo}\n\n請簡短回覆。"
+
+
 def run_smalltalk_agent(
-    message: str,
+    messages: List[Message],
     documents: List[Document],
     system_context: Optional[SystemContext],
 ) -> str:
     """Use a lightweight chat agent to handle greetings/smalltalk via Agno."""
     agent = build_smalltalk_agent(documents, system_context)
     try:
-        resp = agent.run(message)
+        prompt = build_smalltalk_prompt(messages)
+        resp = agent.run(prompt)
         return resp.get_content_as_string()
     except Exception:
         # fallback to static short response
@@ -654,7 +664,8 @@ async def generate_artifacts(req: ArtifactRequest):
             # Return SSE format if streaming is requested
             if req.stream:
                 agent = build_smalltalk_agent(req.documents, req.system_context)
-                response = agent.run(last_user or "你好", stream=True, stream_events=True)
+                smalltalk_prompt = build_smalltalk_prompt(req.messages)
+                response = agent.run(smalltalk_prompt or "你好", stream=True, stream_events=True)
 
                 async def generate_smalltalk_sse():
                     accumulated = ""
@@ -680,7 +691,7 @@ async def generate_artifacts(req: ArtifactRequest):
                 )
 
             reply = run_smalltalk_agent(
-                last_user or "你好", req.documents, req.system_context
+                req.messages, req.documents, req.system_context
             )
             response_data = build_empty_response(reply)
             return response_data
