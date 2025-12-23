@@ -37,7 +37,7 @@ TEAM_INSTRUCTIONS = [
     "【重要】根據使用者意圖選擇回覆模式：",
     "1. 問候/閒聊（如 hi, hello, 你好）→ 使用「簡單模式」",
     "2. 需要文件分析（如 摘要、翻譯、報告）→ 使用「完整模式」並委派 RAG Agent",
-    "3. 需要市場資訊（如 查詢企業、產業動態）→ 使用「完整模式」並使用 duckduckgo_search",
+    "3. 需要市場/即時資訊（如 查詢企業、產業動態、新聞、股市、總經事件）→ 使用「完整模式」並必須啟用 web_search（呼叫時已開啟 web_search），先查後答，禁止直接拒絕。",
     "",
     "【簡單模式】僅填充 assistant.content，其他欄位必須為空或空陣列：",
     '{"assistant": {"content": "你好！有什麼可以幫助你的嗎？", "bullets": []}, "summary": {"output": "", "borrower": null, "metrics": [], "risks": []}, "translation": {"output": "", "clauses": []}, "memo": {"output": "", "sections": [], "recommendation": "", "conditions": ""}, "routing": []}',
@@ -75,6 +75,7 @@ EXPECTED_OUTPUT = """
   "translation": { "output": "", "clauses": [] },
   "memo": { "output": "", "sections": [], "recommendation": "", "conditions": "" },
   "routing": [
+    { "label": "啟用 web_search 查詢最新資訊", "status": "done", "eta": "完成" },
     { "label": "檢索文件", "status": "done", "eta": "完成" },
     { "label": "產生摘要", "status": "done", "eta": "完成" }
   ]
@@ -591,6 +592,7 @@ async def generate_artifacts(req: ArtifactRequest):
                 prompt,
                 dependencies={"doc_ids": doc_ids},
                 add_dependencies_to_context=True,
+                extra_body={"web_search": True},
                 stream=True,
             )
 
@@ -632,6 +634,7 @@ async def generate_artifacts(req: ArtifactRequest):
                 prompt,
                 dependencies={"doc_ids": doc_ids},
                 add_dependencies_to_context=True,
+                extra_body={"web_search": True},
             )
             text = response.get_content_as_string()
             data: Dict[str, Any] = safe_parse_json(text)
