@@ -3,7 +3,7 @@ import os
 import re
 import uuid
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, Iterator, List, Optional, Union
 
 import dotenv
 from fastapi import FastAPI, UploadFile, File
@@ -328,15 +328,12 @@ def build_empty_response(message: str) -> Dict[str, Any]:
     }
 
 
-def run_smalltalk_agent(
-    message: str,
+def build_smalltalk_agent(
     documents: List[Document],
     system_context: Optional[SystemContext],
-) -> str:
-    """Use a lightweight chat agent to handle greetings/smalltalk via Agno."""
+) -> Agent:
     system_status = build_system_status(documents, system_context)
-
-    agent = Agent(
+    return Agent(
         name="ChitChat",
         role="簡短且親切的 RM 助理，僅做寒暄或確認需求，不要主動生成報告。",
         model=get_model(),
@@ -351,12 +348,55 @@ def run_smalltalk_agent(
         ],
         markdown=False,
     )
+
+
+def run_smalltalk_agent(
+    message: str,
+    documents: List[Document],
+    system_context: Optional[SystemContext],
+) -> str:
+    """Use a lightweight chat agent to handle greetings/smalltalk via Agno."""
+    agent = build_smalltalk_agent(documents, system_context)
     try:
         resp = agent.run(message)
         return resp.get_content_as_string()
     except Exception:
         # fallback to static short response
         return "你好！我是授信報告助理，可以協助摘要、翻譯、風險評估與授信報告草稿。請告訴我需要什麼協助？"
+
+
+def extract_stream_text(event: Any) -> Optional[str]:
+    event_name = getattr(event, "event", "") or ""
+    if event_name in {
+        "TeamRunContent",
+        "TeamRunIntermediateContent",
+        "RunContent",
+        "RunIntermediateContent",
+    }:
+        content = getattr(event, "content", None)
+        if content is None:
+            return None
+        if isinstance(content, str):
+            return content
+        try:
+            return json.dumps(content, ensure_ascii=False)
+        except TypeError:
+            return str(content)
+    return None
+
+
+def iter_stream_chunks(response: Any) -> Iterator[str]:
+    saw_delta = False
+    for event in response:
+        delta = extract_stream_text(event)
+        if delta:
+            saw_delta = True
+            yield delta
+            continue
+        if hasattr(event, "get_content_as_string") and not saw_delta:
+            content = event.get_content_as_string()
+            if content:
+                yield content
 
 
 def ensure_inline_documents_indexed(documents: List[Document]) -> None:
@@ -468,6 +508,13 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+SSE_HEADERS = {
+    "Cache-Control": "no-cache, no-transform",
+    "X-Accel-Buffering": "no",
+    "Connection": "keep-alive",
+    "Transfer-Encoding": "chunked",
+}
 
 
 def preload_sample_pdfs() -> None:
@@ -598,18 +645,38 @@ async def generate_artifacts(req: ArtifactRequest):
     try:
         last_user = get_last_user_message(req.messages)
         if is_simple_greeting(last_user) or is_smalltalk(last_user):
+            # Return SSE format if streaming is requested
+            if req.stream:
+                agent = build_smalltalk_agent(req.documents, req.system_context)
+                response = agent.run(last_user or "你好", stream=True, stream_events=True)
+
+                async def generate_smalltalk_sse():
+                    accumulated = ""
+                    try:
+                        for chunk in iter_stream_chunks(response):
+                            accumulated += chunk
+                            yield f"data: {json.dumps({'chunk': chunk})}\n\n"
+
+                        final_data = build_empty_response(
+                            accumulated
+                            or "你好！我是授信報告助理，可以協助摘要、翻譯、風險評估與授信報告草稿。"
+                        )
+                        yield f"data: {json.dumps(final_data)}\n\n"
+                    except Exception as exc:
+                        error_response = build_empty_response(f"處理過程中發生錯誤：{str(exc)}")
+                        yield f"data: {json.dumps(error_response)}\n\n"
+                    yield f"data: {json.dumps({'done': True})}\n\n"
+
+                return StreamingResponse(
+                    generate_smalltalk_sse(),
+                    media_type="text/event-stream",
+                    headers=SSE_HEADERS,
+                )
+
             reply = run_smalltalk_agent(
                 last_user or "你好", req.documents, req.system_context
             )
             response_data = build_empty_response(reply)
-
-            # Return SSE format if streaming is requested
-            if req.stream:
-                async def generate_smalltalk_sse():
-                    yield f"data: {json.dumps(response_data)}\n\n"
-                    yield f"data: {json.dumps({'done': True})}\n\n"
-                return StreamingResponse(generate_smalltalk_sse(), media_type="text/event-stream")
-
             return response_data
 
         ensure_inline_documents_indexed(req.documents)
@@ -630,22 +697,16 @@ async def generate_artifacts(req: ArtifactRequest):
                 add_dependencies_to_context=True,
                 extra_body={"web_search": True},
                 stream=True,
+                stream_events=True,
             )
 
             async def generate_sse():
                 accumulated = ""
                 try:
-                    for chunk in response:
-                        # Skip non-content events (RunStartedEvent, etc.)
-                        if not hasattr(chunk, "get_content_as_string"):
-                            continue
-
-                        content = chunk.get_content_as_string()
+                    for content in iter_stream_chunks(response):
                         if not content:  # Skip empty content
                             continue
-
                         accumulated += content
-                        # Send chunk to frontend
                         yield f"data: {json.dumps({'chunk': content})}\n\n"
 
                     # Parse and send final complete message
@@ -664,12 +725,7 @@ async def generate_artifacts(req: ArtifactRequest):
             return StreamingResponse(
                 generate_sse(),
                 media_type="text/event-stream",
-                headers={
-                    "Cache-Control": "no-cache, no-transform",
-                    "X-Accel-Buffering": "no",
-                    "Connection": "keep-alive",
-                    "Transfer-Encoding": "chunked",
-                },
+                headers=SSE_HEADERS,
             )
         else:
             # Non-streaming response
