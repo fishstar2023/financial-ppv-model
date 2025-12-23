@@ -721,18 +721,6 @@ export default function App() {
             </div>
           </div>
 
-          <div className="header-tags">
-            <Tag size="small" color="gold">
-              企業金融
-            </Tag>
-            <Tag size="small" color="cyan">
-              RM 工作區
-            </Tag>
-            <Tag size="small" color="green">
-              Artifacts 即時
-            </Tag>
-          </div>
-
           <div className="header-actions">
             <Button variant="outlined" icon={Briefcase} onClick={handleNewCase}>
               新增案件
