@@ -661,7 +661,16 @@ async def generate_artifacts(req: ArtifactRequest):
                     yield f"data: {json.dumps(error_response)}\n\n"
                 yield f"data: {json.dumps({'done': True})}\n\n"
 
-            return StreamingResponse(generate_sse(), media_type="text/event-stream")
+            return StreamingResponse(
+                generate_sse(),
+                media_type="text/event-stream",
+                headers={
+                    "Cache-Control": "no-cache, no-transform",
+                    "X-Accel-Buffering": "no",
+                    "Connection": "keep-alive",
+                    "Transfer-Encoding": "chunked",
+                },
+            )
         else:
             # Non-streaming response
             response = team.run(
