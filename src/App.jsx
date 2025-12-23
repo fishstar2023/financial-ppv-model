@@ -949,19 +949,103 @@ export default function App() {
                 </div>
 
                 <div className="preview-canvas">
-                  <div className="live-markdown">
-                    {isLoading && streamingContent ? (
-                      <div className="streaming-wrapper">
-                        <div className="streaming-label">正在產生中...</div>
-                        <div className="streaming-content">
-                          <pre className="streaming-text">{streamingContent}</pre>
-                          <span className="streaming-cursor">▊</span>
+                  {activeTab === 'documents' ? (
+                    <div className="preview-documents">
+                      {(() => {
+                        const selectedDoc = documents.find((doc) => doc.id === selectedDocId);
+                        if (!selectedDoc) {
+                          return <div className="doc-empty">尚未選擇文件</div>;
+                        }
+                        return (
+                          <>
+                            <div className="doc-preview-header">
+                              <Icon icon={FileText} size="small" />
+                              <span className="doc-preview-name">{selectedDoc.name}</span>
+                              <Tag size="small" color="blue">{selectedDoc.type}</Tag>
+                              <span className="doc-preview-meta">{selectedDoc.pages} 頁</span>
+                            </div>
+                            {selectedDoc.tags && selectedDoc.tags.length > 0 && (
+                              <div className="doc-preview-tags">
+                                {selectedDoc.tags.map((tag) => (
+                                  <Tag
+                                    key={tag}
+                                    size="small"
+                                    color={tagColors[tag] || (customTags.includes(tag) ? 'purple' : 'default')}
+                                  >
+                                    {tag}
+                                  </Tag>
+                                ))}
+                              </div>
+                            )}
+                            <div className="doc-preview-content-full">
+                              {selectedDoc.content ? (
+                                <pre className="doc-preview-text">{selectedDoc.content}</pre>
+                              ) : (
+                                <div className="no-preview-full">
+                                  <Icon icon={FileText} size="large" />
+                                  <p>無文字預覽內容</p>
+                                  <p className="no-preview-hint">
+                                    此 PDF 文件已索引，可透過 RAG 檢索內容
+                                  </p>
+                                </div>
+                              )}
+                            </div>
+                          </>
+                        );
+                      })()}
+                    </div>
+                  ) : (
+                    <div className="live-markdown">
+                      {isLoading && streamingContent ? (
+                        <div className="streaming-wrapper">
+                          <div className="streaming-label">正在產生中...</div>
+                          <div className="streaming-content">
+                            <pre className="streaming-text">{streamingContent}</pre>
+                            <span className="streaming-cursor">▊</span>
+                          </div>
                         </div>
+                      ) : (
+                        renderMarkdown(activeArtifact?.output || '')
+                      )}
+                    </div>
+                  )}
+
+                  {activeTab === 'translation' ? (
+                    <div className="preview-translation">
+                      {artifacts.translations.length > 1 && (
+                        <div className="translation-tabs">
+                          {artifacts.translations.map((trans, index) => (
+                            <button
+                              key={trans.id}
+                              type="button"
+                              className={`translation-tab${index === activeTranslationIndex ? ' is-active' : ''}`}
+                              onClick={() => setActiveTranslationIndex(index)}
+                            >
+                              {trans.title}
+                            </button>
+                          ))}
+                        </div>
+                      )}
+
+                      <div className="translation-list">
+                        {(activeArtifact.clauses || []).map((pair) => (
+                          <div key={pair.id || pair.section} className="translation-block">
+                            <div className="translation-label">{pair.section}</div>
+                            <div className="translation-columns">
+                              <div className="translation-col">
+                                <div className="translation-caption">原文</div>
+                                <p>{pair.source}</p>
+                              </div>
+                              <div className="translation-col">
+                                <div className="translation-caption">英文</div>
+                                <p>{pair.translated}</p>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
                       </div>
-                    ) : (
-                      renderMarkdown(activeArtifact?.output || '')
-                    )}
-                  </div>
+                    </div>
+                  ) : null}
                 </div>
               </div>
             </div>
