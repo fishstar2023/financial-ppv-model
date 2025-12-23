@@ -14,6 +14,7 @@ from pydantic import BaseModel, Field
 from agno.agent import Agent
 from agno.team import Team
 from agno.models.openai import OpenAIChat
+from agno.models.openai.responses import OpenAIResponses
 
 from rag_store import RagStore
 
@@ -37,7 +38,7 @@ TEAM_INSTRUCTIONS = [
     "【重要】根據使用者意圖選擇回覆模式：",
     "1. 問候/閒聊（如 hi, hello, 你好）→ 使用「簡單模式」",
     "2. 需要文件分析（如 摘要、翻譯、報告）→ 使用「完整模式」並委派 RAG Agent（文件檢索）",
-    "3. 需要市場/即時資訊（企業、產業、新聞、股市、總經事件）→ 使用「完整模式」並委派 Web Research Agent，必須啟用 web_search，先查後答，不可直接拒絕。",
+    "3. 需要市場/即時資訊（企業、產業、新聞、股市、總經事件）→ 使用「完整模式」並委派 Web Research Agent，必須使用 web_search 工具先查後答，不可直接拒絕。",
     "4. 使用者提供截圖/照片/影像 → 委派 Vision Agent 讀圖與 OCR，並回傳重點與文字內容。",
     "",
     "【簡單模式】僅填充 assistant.content，其他欄位必須為空或空陣列：",
@@ -128,21 +129,33 @@ def get_model_id() -> str:
     return os.getenv("OPENAI_MODEL", "gpt-4o-mini")
 
 
-def get_model(enable_web_search: bool = False, enable_vision: bool = False) -> OpenAIChat:
+WEB_SEARCH_TOOL = {"type": "web_search_preview"}
+
+
+def get_model(
+    enable_web_search: bool = False,
+    enable_vision: bool = False,
+    model_id: Optional[str] = None,
+) -> Any:
     api_key = os.getenv("OPENAI_API_KEY")
     if not api_key:
         raise RuntimeError("OPENAI_API_KEY 未設定，無法呼叫模型")
 
-    kwargs: Dict[str, Any] = {"id": get_model_id(), "api_key": api_key}
+    model_name = model_id or get_model_id()
 
-    # OpenAI web search via request body (no native kwarg in current agno version)
+    # Use Responses API when web search is required
     if enable_web_search:
-        kwargs["extra_body"] = {"web_search": True}
+        return OpenAIResponses(id=model_name, api_key=api_key)
 
+    kwargs: Dict[str, Any] = {"id": model_name, "api_key": api_key}
     if enable_vision:
         kwargs["modalities"] = ["text", "image"]
 
     return OpenAIChat(**kwargs)
+
+
+def get_research_model_id() -> str:
+    return os.getenv("OPENAI_RESEARCH_MODEL", get_model_id())
 
 
 def build_system_status(
@@ -440,7 +453,7 @@ def build_rag_agent(doc_ids: List[str], model: OpenAIChat) -> Agent:
 
 
 def build_research_agent() -> Agent:
-    model = get_model(enable_web_search=True)
+    model = get_model(enable_web_search=True, model_id=get_research_model_id())
     return Agent(
         name="Web Research Agent",
         role="網路檢索與深度研究",
@@ -449,6 +462,7 @@ def build_research_agent() -> Agent:
             "遇到需要即時新聞、市場、總經或網路資訊時，必須執行 web_search 並給出引用來源。",
             "可進行多輪搜尋與歸納，避免主觀推測，缺資料時請說明。",
         ],
+        tools=[WEB_SEARCH_TOOL],
         search_knowledge=True,
         add_knowledge_to_context=True,
         markdown=False,
@@ -481,6 +495,7 @@ def build_team(doc_ids: List[str]) -> Team:
         model=model,
         instructions=TEAM_INSTRUCTIONS,
         expected_output=EXPECTED_OUTPUT,
+        tools=[WEB_SEARCH_TOOL],
         delegate_to_all_members=False,  # Team Leader decides when to delegate
         markdown=False,
     )
@@ -695,7 +710,6 @@ async def generate_artifacts(req: ArtifactRequest):
                 prompt,
                 dependencies={"doc_ids": doc_ids},
                 add_dependencies_to_context=True,
-                extra_body={"web_search": True},
                 stream=True,
                 stream_events=True,
             )
@@ -733,7 +747,6 @@ async def generate_artifacts(req: ArtifactRequest):
                 prompt,
                 dependencies={"doc_ids": doc_ids},
                 add_dependencies_to_context=True,
-                extra_body={"web_search": True},
             )
             text = response.get_content_as_string()
             data: Dict[str, Any] = safe_parse_json(text)
