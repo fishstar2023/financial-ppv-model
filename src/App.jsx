@@ -713,7 +713,7 @@ export default function App() {
             </div>
             <div>
               <Text as="h1" weight="700" className="brand-title">
-                授信 Artifacts 工作台
+                Credit Memo 工作台
               </Text>
               <Text type="secondary" className="brand-subtitle">
                 企業金融 RM 授信報告工作流程
