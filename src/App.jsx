@@ -137,7 +137,7 @@ const artifactTabs = [
   { id: 'documents', label: '文件', icon: FolderOpen },
   { id: 'summary', label: '摘要', icon: FileText },
   { id: 'translation', label: '翻譯', icon: Languages },
-  { id: 'memo', label: '授信報告', icon: ClipboardCheck },
+  { id: 'memo', label: 'Credit Memo', icon: ClipboardCheck },
 ];
 
 // 預設標籤分類
