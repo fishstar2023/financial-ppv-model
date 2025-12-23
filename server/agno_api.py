@@ -3,7 +3,7 @@ import os
 import re
 import uuid
 from pathlib import Path
-from typing import Any, Dict, Iterator, List, Optional, Union
+from typing import Any, Dict, Iterator, List, Optional, Union, Literal
 
 import dotenv
 from fastapi import FastAPI, UploadFile, File
@@ -125,6 +125,14 @@ class SystemContext(BaseModel):
     translation_count: int = 0
 
 
+class RouteDecision(BaseModel):
+    mode: Literal["simple", "full"] = "full"
+    needs_web_search: bool = False
+    needs_rag: bool = False
+    needs_vision: bool = False
+    reason: Optional[str] = None
+
+
 class ArtifactRequest(BaseModel):
     messages: List[Message] = Field(default_factory=list)
     documents: List[Document] = Field(default_factory=list)
@@ -163,6 +171,10 @@ def get_model(
 
 def get_research_model_id() -> str:
     return os.getenv("OPENAI_RESEARCH_MODEL", get_model_id())
+
+
+def get_router_model_id() -> str:
+    return os.getenv("OPENAI_ROUTER_MODEL", get_model_id())
 
 
 def build_system_status(
@@ -388,6 +400,31 @@ def build_smalltalk_agent(
     )
 
 
+def build_router_agent(
+    documents: List[Document],
+    system_context: Optional[SystemContext],
+) -> Agent:
+    system_status = build_system_status(documents, system_context)
+    return Agent(
+        name="Router",
+        role="判斷使用者需求要走哪種處理模式",
+        model=get_model(model_id=get_router_model_id()),
+        instructions=[
+            "你是路由器，負責判斷是否需要簡單回覆或完整處理。",
+            "請輸出 JSON，符合 schema：",
+            '{ "mode": "simple|full", "needs_web_search": true|false, "needs_rag": true|false, "needs_vision": true|false, "reason": "簡短原因" }',
+            "僅在問候/寒暄/致謝且不需要工具時才回 simple。",
+            "凡是需要最新、新聞、即時、來源、網址、搜尋、上網查、查詢 → needs_web_search = true。",
+            "凡是需要摘要/翻譯/報告且涉及上傳文件 → needs_rag = true。",
+            "凡是提到截圖/圖片/影像/掃描件 → needs_vision = true。",
+            "不允許輸出多餘文字，只能輸出 JSON。",
+            "",
+            f"【系統當前狀態】\n{system_status}",
+        ],
+        markdown=False,
+    )
+
+
 def run_smalltalk_agent(
     message: str,
     documents: List[Document],
@@ -401,6 +438,31 @@ def run_smalltalk_agent(
     except Exception:
         # fallback to static short response
         return "你好！我是授信報告助理，可以協助摘要、翻譯、風險評估與授信報告草稿。請告訴我需要什麼協助？"
+
+
+def run_router_agent(
+    messages: List[Message],
+    documents: List[Document],
+    system_context: Optional[SystemContext],
+) -> Optional[RouteDecision]:
+    if not messages:
+        return None
+    try:
+        router = build_router_agent(documents, system_context)
+        convo = build_conversation(messages)
+        prompt = f"{convo}\n\n請判斷路由並輸出 JSON。"
+        resp = router.run(prompt, output_schema=RouteDecision)
+        content = getattr(resp, "content", None)
+        if isinstance(content, RouteDecision):
+            return content
+        if isinstance(content, dict):
+            return RouteDecision(**content)
+        text = resp.get_content_as_string()
+        if text:
+            return RouteDecision.model_validate_json(text)
+    except Exception:
+        return None
+    return None
 
 
 def extract_stream_text(event: Any) -> Optional[str]:
@@ -508,9 +570,8 @@ def build_vision_agent() -> Agent:
     )
 
 
-def build_team(doc_ids: List[str]) -> Team:
-    # Team Leader with web search enabled
-    model = get_model(enable_web_search=True)
+def build_team(doc_ids: List[str], enable_web_search: bool = False) -> Team:
+    model = get_model(enable_web_search=enable_web_search)
     rag_agent = build_rag_agent(doc_ids, get_model())
     research_agent = build_research_agent()
     vision_agent = build_vision_agent()
@@ -520,7 +581,7 @@ def build_team(doc_ids: List[str]) -> Team:
         model=model,
         instructions=TEAM_INSTRUCTIONS,
         expected_output=EXPECTED_OUTPUT,
-        tools=[WEB_SEARCH_TOOL],
+        tools=[WEB_SEARCH_TOOL] if enable_web_search else [],
         add_member_tools_to_context=True,
         add_name_to_context=True,
         add_datetime_to_context=True,
@@ -687,7 +748,8 @@ async def get_preloaded_documents():
 async def generate_artifacts(req: ArtifactRequest):
     try:
         last_user = get_last_user_message(req.messages)
-        if is_simple_greeting(last_user) or is_smalltalk(last_user):
+        route = run_router_agent(req.messages, req.documents, req.system_context)
+        if route and route.mode == "simple":
             # Return SSE format if streaming is requested
             if req.stream:
                 agent = build_smalltalk_agent(req.documents, req.system_context)
@@ -730,7 +792,10 @@ async def generate_artifacts(req: ArtifactRequest):
         # Add system status to prompt for Team
         system_status = build_system_status(req.documents, req.system_context)
         prompt = f"{convo}\n\n{system_status}\n\n{doc_context}\n\n請依規則產出 JSON。"
-        team = build_team(doc_ids)
+        use_web_search = bool(route and route.needs_web_search)
+        team = build_team(doc_ids, enable_web_search=use_web_search)
+        if use_web_search:
+            team.tool_choice = WEB_SEARCH_TOOL
 
         if req.stream:
             # True token streaming from LLM
