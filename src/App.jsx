@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect, useMemo } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import {
   ActionIcon,
   Button,
@@ -110,21 +110,6 @@ const generateCaseId = () => {
   return `${prefix}-${dateStr}-${random}`;
 };
 
-// Format relative time
-const formatRelativeTime = (timestamp) => {
-  if (!timestamp) return '尚未更新';
-  const now = Date.now();
-  const diff = now - timestamp;
-  const seconds = Math.floor(diff / 1000);
-  const minutes = Math.floor(seconds / 60);
-  const hours = Math.floor(minutes / 60);
-
-  if (seconds < 60) return '剛剛';
-  if (minutes < 60) return `${minutes} 分鐘前`;
-  if (hours < 24) return `${hours} 小時前`;
-  return new Date(timestamp).toLocaleDateString('zh-TW');
-};
-
 // Calculate SLA remaining time
 const calculateSlaRemaining = (startTime, slaDurationMinutes = 45) => {
   if (!startTime) return `${slaDurationMinutes} 分鐘`;
@@ -154,15 +139,6 @@ const artifactTabs = [
   { id: 'translation', label: '翻譯', icon: Languages },
   { id: 'memo', label: '授信報告', icon: ClipboardCheck },
 ];
-
-// tabMeta will be computed dynamically in component
-
-const previewTags = {
-  documents: '文件預覽',
-  summary: '摘要視圖',
-  translation: '雙語對照',
-  memo: '報告排版',
-};
 
 // 預設標籤分類
 const workflowTags = ['待處理', '處理中', '已完成', '需補件', '已歸檔'];
@@ -220,10 +196,8 @@ export default function App() {
   // Dynamic metadata states
   const [caseId] = useState(() => generateCaseId());
   const [caseStartTime] = useState(() => Date.now());
-  const [lastUpdateTime, setLastUpdateTime] = useState(null);
-  const [ownerName, setOwnerName] = useState('RM Desk');
   const [slaMinutes] = useState(45);
-  const [currentTime, setCurrentTime] = useState(Date.now());
+  const [ownerName, setOwnerName] = useState('RM Desk');
 
   const [artifacts, setArtifacts] = useState({
     summary: {
@@ -292,14 +266,6 @@ export default function App() {
     return () => { isMounted = false; };
   }, []);
 
-  // Update current time every minute for SLA calculation
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentTime(Date.now());
-    }, 60000);
-    return () => clearInterval(interval);
-  }, []);
-
   // Ensure activeTranslationIndex is within bounds
   useEffect(() => {
     if (artifacts.translations.length > 0 && activeTranslationIndex >= artifacts.translations.length) {
@@ -307,24 +273,13 @@ export default function App() {
     }
   }, [artifacts.translations.length, activeTranslationIndex]);
 
-  // Compute dynamic tab metadata based on documents
-  const tabMeta = useMemo(() => {
-    const summaryDocs = documents.filter((d) => d.tags.includes('摘要')).length;
-    const translationDocs = documents.filter((d) => d.tags.includes('翻譯')).length;
-    const memoDocs = documents.filter((d) => d.tags.includes('納入報告')).length || documents.length;
-
-    return {
-      documents: [`共 ${documents.length} 份文件`, '點擊查看預覽'],
-      summary: [`來源: ${summaryDocs} 份文件`, '格式: 摘要重點'],
-      translation: [`來源: ${translationDocs} 份文件`, '語言: EN'],
-      memo: [`來源: ${memoDocs} 份文件`, '委員會版本'],
-    };
-  }, [documents]);
-
   const fileInputRef = useRef(null);
 
   // Get active artifact based on tab
   const getActiveArtifact = () => {
+    if (activeTab === 'documents') {
+      return { output: '' };
+    }
     if (activeTab === 'translation') {
       const translations = artifacts.translations;
       if (translations.length === 0) {
@@ -336,6 +291,7 @@ export default function App() {
   };
 
   const activeArtifact = getActiveArtifact();
+  const hasRouting = routingSteps.length > 0;
 
   const handleUploadClick = () => {
     fileInputRef.current?.click();
@@ -482,7 +438,6 @@ export default function App() {
       memo: { output: '', sections: [], recommendation: '', conditions: '' },
     });
     setActiveTranslationIndex(0);
-    setLastUpdateTime(null);
     setErrorMessage('');
     setComposerText('');
   };
@@ -714,7 +669,6 @@ export default function App() {
       };
 
       setMessages((prev) => [...prev, assistantMessage]);
-      setLastUpdateTime(Date.now());
     } catch (error) {
       setErrorMessage(
         error instanceof Error
@@ -979,20 +933,6 @@ export default function App() {
               ))}
             </div>
 
-            <div className="artifact-meta">
-              <div className="meta-chip">更新: {formatRelativeTime(lastUpdateTime)}</div>
-              <div className="meta-chip">負責人: {ownerName}</div>
-              {(tabMeta[activeTab] || []).map((item) => (
-                <div key={item} className="meta-chip">
-                  {item}
-                </div>
-              ))}
-              <div className="meta-chip live">
-                <span className="live-dot" />
-                {isLoading ? '產生中' : '即時更新'}
-              </div>
-            </div>
-
             <div className="artifact-stack">
               <div className="preview-card">
                 <div className="card-head">
@@ -1000,216 +940,23 @@ export default function App() {
                     <Text as="h3" weight="600" className="card-title">
                       產出預覽
                     </Text>
-                    <Text type="secondary" className="card-subtitle">
-                      結構化呈現分析產出
-                    </Text>
-                  </div>
-                  <div className="preview-actions">
-                    <Tag size="small" color="cyan" variant="filled">
-                      {previewTags[activeTab]}
-                    </Tag>
                   </div>
                 </div>
 
                 <div className="preview-canvas">
-                  {activeTab === 'documents' ? (
-                    <div className="preview-documents">
-                      {(() => {
-                        const selectedDoc = documents.find((d) => d.id === selectedDocId);
-                        if (!selectedDoc) {
-                          return (
-                            <div className="documents-header">
-                              <div className="summary-kicker">文件預覽</div>
-                              <p className="live-markdown-hint">
-                                請從左側文件集選擇要預覽的文件
-                              </p>
-                            </div>
-                          );
-                        }
-                        return (
-                          <>
-                            <div className="documents-header">
-                              <div className="summary-kicker">文件預覽</div>
-                              <div className="doc-preview-header">
-                                <Icon icon={FileText} size="small" />
-                                <span className="doc-preview-name">{selectedDoc.name}</span>
-                                <Tag size="small" color="blue">{selectedDoc.type}</Tag>
-                                <span className="doc-preview-meta">{selectedDoc.pages} 頁</span>
-                              </div>
-                            </div>
-                            {selectedDoc.tags && selectedDoc.tags.length > 0 && (
-                              <div className="doc-preview-tags">
-                                {selectedDoc.tags.map((tag) => (
-                                  <Tag
-                                    key={tag}
-                                    size="small"
-                                    color={tagColors[tag] || (customTags.includes(tag) ? 'purple' : 'default')}
-                                  >
-                                    {tag}
-                                  </Tag>
-                                ))}
-                              </div>
-                            )}
-                            <div className="doc-preview-content-full">
-                              {selectedDoc.content ? (
-                                <pre className="doc-preview-text">{selectedDoc.content}</pre>
-                              ) : (
-                                <div className="no-preview-full">
-                                  <Icon icon={FileText} size="large" />
-                                  <p>無文字預覽內容</p>
-                                  <p className="no-preview-hint">
-                                    此 PDF 文件已索引，可透過 RAG 檢索內容
-                                  </p>
-                                </div>
-                              )}
-                            </div>
-                          </>
-                        );
-                      })()}
-                    </div>
-                  ) : (
-                    <div className="live-markdown">
-                      <div className="live-markdown-head">
-                        <div className="summary-kicker">Live Preview</div>
-                        <p className="live-markdown-hint">
-                          即時產生 LLM 輸出（Markdown），可直接作為委員會草稿
-                        </p>
-                      </div>
-                      {isLoading && streamingContent ? (
-                        <div className="streaming-wrapper">
-                          <div className="streaming-label">正在產生中...</div>
-                          <div className="streaming-content">
-                            <pre className="streaming-text">{streamingContent}</pre>
-                            <span className="streaming-cursor">▊</span>
-                          </div>
-                        </div>
-                      ) : (
-                        renderMarkdown(activeArtifact?.output || '')
-                      )}
-                    </div>
-                  )}
-
-                  {activeTab === 'summary' ? (
-                    <div className="preview-summary">
-                      <div className="summary-header">
-                        <div>
-                          <div className="summary-kicker">借款人概況</div>
-                          <h4>{activeArtifact.borrower?.name || '未命名'}</h4>
-                          <p>{activeArtifact.borrower?.description || '內容不足，需補充'}</p>
-                        </div>
-                        <div className="rating-pill">
-                          評等: {activeArtifact.borrower?.rating || '待補'}
+                  <div className="live-markdown">
+                    {isLoading && streamingContent ? (
+                      <div className="streaming-wrapper">
+                        <div className="streaming-label">正在產生中...</div>
+                        <div className="streaming-content">
+                          <pre className="streaming-text">{streamingContent}</pre>
+                          <span className="streaming-cursor">▊</span>
                         </div>
                       </div>
-                      <div className="summary-metrics">
-                        {(activeArtifact.metrics || []).map((metric) => (
-                          <div key={metric.id || metric.label} className="summary-metric">
-                            <div className="metric-value">{metric.value}</div>
-                            <div className="metric-label">{metric.label}</div>
-                            <div className="metric-delta">{metric.delta}</div>
-                          </div>
-                        ))}
-                      </div>
-                      <div className="summary-risks">
-                        <div className="risk-title">主要風險</div>
-                        <div className="risk-grid">
-                          {(activeArtifact.risks || []).map((risk) => {
-                            const level = normalizeRiskLevel(risk.level);
-                            return (
-                              <div key={risk.id || risk.label} className="risk-card">
-                                <span>{risk.label}</span>
-                                <span className={`risk-level risk-${level.key}`}>
-                                  {level.label}
-                                </span>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    </div>
-                  ) : null}
-
-                  {activeTab === 'translation' ? (
-                    <div className="preview-translation">
-                      <div className="translation-header">
-                        <div>
-                          <div className="summary-kicker">條款翻譯</div>
-                          <h4>翻譯校對 (EN)</h4>
-                          <p>條款關鍵句對照，方便納入授信報告。</p>
-                        </div>
-                        <Tag size="small" variant="borderless" color="gold">
-                          {(activeArtifact.clauses || []).length} 條
-                        </Tag>
-                      </div>
-
-                      {artifacts.translations.length > 1 && (
-                        <div className="translation-tabs">
-                          {artifacts.translations.map((trans, index) => (
-                            <button
-                              key={trans.id}
-                              type="button"
-                              className={`translation-tab${index === activeTranslationIndex ? ' is-active' : ''}`}
-                              onClick={() => setActiveTranslationIndex(index)}
-                            >
-                              {trans.title}
-                            </button>
-                          ))}
-                        </div>
-                      )}
-
-                      <div className="translation-list">
-                        {(activeArtifact.clauses || []).map((pair) => (
-                          <div key={pair.id || pair.section} className="translation-block">
-                            <div className="translation-label">{pair.section}</div>
-                            <div className="translation-columns">
-                              <div className="translation-col">
-                                <div className="translation-caption">原文</div>
-                                <p>{pair.source}</p>
-                              </div>
-                              <div className="translation-col">
-                                <div className="translation-caption">英文</div>
-                                <p>{pair.translated}</p>
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  ) : null}
-
-                  {activeTab === 'memo' ? (
-                    <div className="preview-memo">
-                      <div className="memo-header">
-                        <div>
-                          <div className="summary-kicker">授信報告草稿</div>
-                          <h4>擔保授信 - 委員會版本</h4>
-                          <p>已整合重點摘要、風險與條款。</p>
-                        </div>
-                        <div className="rating-pill">
-                          建議: {activeArtifact.recommendation || '待更新'}
-                        </div>
-                      </div>
-                      <div className="memo-grid">
-                        {(activeArtifact.sections || []).map((section) => (
-                          <div key={section.id || section.title} className="memo-card">
-                            <div className="memo-title">{section.title}</div>
-                            <div className="memo-text">{section.detail}</div>
-                          </div>
-                        ))}
-                      </div>
-                      <div className="memo-footer">
-                        <div>
-                          <div className="footer-title">核准條件</div>
-                          <div className="footer-text">
-                            {activeArtifact.conditions || '內容不足，需補充'}
-                          </div>
-                        </div>
-                        <button className="preview-btn dark" type="button" onClick={handleDownloadOutput}>
-                          匯出報告
-                        </button>
-                      </div>
-                    </div>
-                  ) : null}
+                    ) : (
+                      renderMarkdown(activeArtifact?.output || '')
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
@@ -1232,29 +979,35 @@ export default function App() {
               </div>
             </div>
 
-            <div className="routing-panel">
+            <div className={`routing-panel${hasRouting ? '' : ' is-empty'}`}>
               <div className="routing-header">
                 <div className="tray-title">
                   <Icon icon={ListChecks} size="small" />
                   <span>任務路由</span>
                 </div>
-                <Tag size="small" variant="borderless">
-                  自動分類
-                </Tag>
+                {hasRouting ? (
+                  <Tag size="small" variant="borderless">
+                    自動分類
+                  </Tag>
+                ) : (
+                  <span className="routing-empty">尚未啟動</span>
+                )}
               </div>
-              <div className="routing-list">
-                {routingSteps.map((step) => (
-                  <div key={step.id} className="routing-item">
-                    <span
-                      className={`status-pill ${statusMeta[step.status]?.className || ''}`}
-                    >
-                      {statusMeta[step.status]?.label || '等待中'}
-                    </span>
-                    <span className="routing-label">{step.label}</span>
-                    <span className="routing-eta">{step.eta}</span>
-                  </div>
-                ))}
-              </div>
+              {hasRouting ? (
+                <div className="routing-list">
+                  {routingSteps.map((step) => (
+                    <div key={step.id} className="routing-item">
+                      <span
+                        className={`status-pill ${statusMeta[step.status]?.className || ''}`}
+                      >
+                        {statusMeta[step.status]?.label || '等待中'}
+                      </span>
+                      <span className="routing-label">{step.label}</span>
+                      <span className="routing-eta">{step.eta}</span>
+                    </div>
+                  ))}
+                </div>
+              ) : null}
             </div>
 
             <div className="chat-stream">

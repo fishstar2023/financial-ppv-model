@@ -392,11 +392,27 @@ body {
   overflow-y: auto;
 }
 
+.routing-panel.is-empty {
+  padding: 8px 12px;
+  gap: 0;
+  max-height: none;
+  overflow: visible;
+}
+
+.routing-panel.is-empty .routing-list {
+  display: none;
+}
+
 .routing-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 10px;
+}
+
+.routing-empty {
+  font-size: 12px;
+  color: var(--muted);
 }
 
 .routing-list {
