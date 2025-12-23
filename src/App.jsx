@@ -348,28 +348,9 @@ export default function App() {
         if (doc.id !== docId) return doc;
         const tags = doc.tags || [];
         const hasTag = tags.includes(tag);
-        if (hasTag) {
-          const confirmed = window.confirm(`確定要移除標籤「${tag}」嗎？`);
-          if (!confirmed) return doc;
-        }
         return {
           ...doc,
           tags: hasTag ? tags.filter((t) => t !== tag) : [...tags, tag],
-        };
-      })
-    );
-  };
-
-  const handleRemoveTag = (docId, tag) => {
-    if (!window.confirm(`確定要從文件中移除標籤「${tag}」嗎？`)) {
-      return;
-    }
-    setDocuments((prev) =>
-      prev.map((doc) => {
-        if (doc.id !== docId) return doc;
-        return {
-          ...doc,
-          tags: (doc.tags || []).filter((t) => t !== tag),
         };
       })
     );
