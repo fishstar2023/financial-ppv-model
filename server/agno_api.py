@@ -1,6 +1,5 @@
 import json
 import os
-import re
 import uuid
 from pathlib import Path
 from typing import Any, Dict, Iterator, List, Optional, Union, Literal
@@ -40,13 +39,6 @@ TEAM_INSTRUCTIONS = [
     "2. 需要文件分析（如 摘要、翻譯、報告）→ 使用「完整模式」並委派 RAG Agent（文件檢索）",
     "3. 需要市場/即時資訊（企業、產業、新聞、股市、總經事件）→ 使用「完整模式」並委派 Web Research Agent，必須使用 web_search 工具先查後答，不可直接拒絕。",
     "4. 使用者提供截圖/照片/影像 → 委派 Vision Agent 讀圖與 OCR，並回傳重點與文字內容。",
-    "",
-    "【判斷流程（請逐步遵守）】",
-    "A. 若包含「最新/新聞/即時/今天/來源/網址/搜尋/上網查」→ 一定要用 Web Research Agent + web_search 工具。",
-    "B. 若包含文件摘要/翻譯/授信內容 → 一定要用 RAG Agent。",
-    "C. 若包含影像/截圖/照片 → 一定要用 Vision Agent。",
-    "D. 若同時符合多項，請並行委派並合併回覆（routing 必須包含每項步驟）。",
-    "E. 禁止回覆「無法上網查」這類拒絕語；若 web_search 失敗，請回覆「web_search 失敗」並要求更精確的關鍵字。",
     "",
     "【簡單模式】僅填充 assistant.content，其他欄位必須為空或空陣列：",
     '{"assistant": {"content": "你好！有什麼可以幫助你的嗎？", "bullets": []}, "summary": {"output": "", "borrower": null, "metrics": [], "risks": []}, "translation": {"output": "", "clauses": []}, "memo": {"output": "", "sections": [], "recommendation": "", "conditions": ""}, "routing": []}',
@@ -267,97 +259,6 @@ def get_last_user_message(messages: List[Message]) -> str:
     return ""
 
 
-def _contains_task_keywords(text: str) -> bool:
-    lowered = text.strip().lower()
-    task_keywords = [
-        "摘要",
-        "翻譯",
-        "翻译",
-        "分析",
-        "報告",
-        "报告",
-        "評估",
-        "风險",
-        "風險",
-        "條款",
-        "条款",
-        "翻成",
-        "上網",
-        "上網查",
-        "網路",
-        "新聞",
-        "即時",
-        "最新",
-        "查詢",
-        "搜尋",
-        "搜索",
-        "查找",
-        "網址",
-        "連結",
-        "來源",
-        "search",
-        "browse",
-        "summarize",
-        "summary",
-        "translate",
-        "translation",
-        "report",
-        "analysis",
-        "risk",
-    ]
-    return any(keyword in lowered for keyword in task_keywords)
-
-
-def is_simple_greeting(text: str) -> bool:
-    if not text:
-        return False
-    lowered = text.strip().lower()
-    if _contains_task_keywords(lowered):
-        return False
-    if len(lowered) > 20:
-        return False
-    greeting_pattern = re.compile(
-        r"^(hi|hello|hey|yo|hola|嗨|你好|哈囉|哈啰|早安|午安|晚安|在嗎|在么|在吗)[!！。,.…~\\s]*$",
-        re.IGNORECASE,
-    )
-    if greeting_pattern.match(lowered):
-        return True
-    normalized = re.sub(r"[\\s\\W_]+", "", lowered, flags=re.UNICODE)
-    greetings = {
-        "hi",
-        "hello",
-        "hey",
-        "yo",
-        "hola",
-        "嗨",
-        "你好",
-        "哈囉",
-        "哈啰",
-        "早安",
-        "午安",
-        "晚安",
-        "在嗎",
-        "在么",
-        "在吗",
-    }
-    return normalized in greetings
-
-
-def is_smalltalk(text: str) -> bool:
-    if not text:
-        return False
-    lowered = text.strip().lower()
-    if _contains_task_keywords(lowered):
-        return False
-    thanks_pattern = re.compile(r"(thanks|thank you|thx|謝謝|感謝|辛苦了)", re.IGNORECASE)
-    if thanks_pattern.search(lowered):
-        return True
-    if len(lowered) <= 24 and not re.search(r"[?？]", lowered):
-        # short messages without question marks and without task keywords → treat as smalltalk
-        return True
-    return False
-
-
 def build_empty_response(message: str) -> Dict[str, Any]:
     return {
         "assistant": {"content": message, "bullets": []},
@@ -414,9 +315,9 @@ def build_router_agent(
             "請輸出 JSON，符合 schema：",
             '{ "mode": "simple|full", "needs_web_search": true|false, "needs_rag": true|false, "needs_vision": true|false, "reason": "簡短原因" }',
             "僅在問候/寒暄/致謝且不需要工具時才回 simple。",
-            "凡是需要最新、新聞、即時、來源、網址、搜尋、上網查、查詢 → needs_web_search = true。",
-            "凡是需要摘要/翻譯/報告且涉及上傳文件 → needs_rag = true。",
-            "凡是提到截圖/圖片/影像/掃描件 → needs_vision = true。",
+            "若需要最新/外部資訊 → needs_web_search = true。",
+            "若需要讀取或摘要/翻譯使用者上傳文件 → needs_rag = true。",
+            "若需要解析影像/截圖/掃描件 → needs_vision = true。",
             "不允許輸出多餘文字，只能輸出 JSON。",
             "",
             f"【系統當前狀態】\n{system_status}",
