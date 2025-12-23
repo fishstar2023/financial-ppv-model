@@ -911,6 +911,11 @@ export default function App() {
                 </Text>
               </div>
               <div className="panel-actions">
+                {activeTab === 'memo' ? (
+                  <Button type="primary" onClick={handleDownloadOutput}>
+                    匯出報告
+                  </Button>
+                ) : null}
                 <Button icon={Wand2} variant="outlined" disabled={isLoading} onClick={handleRegenerate}>
                   重新產生
                 </Button>
