@@ -106,10 +106,21 @@ class Document(BaseModel):
     content: Optional[str] = ""
 
 
+class SystemContext(BaseModel):
+    """系統當前狀態資訊"""
+    case_id: Optional[str] = None
+    owner_name: Optional[str] = None
+    has_summary: bool = False
+    has_translation: bool = False
+    has_memo: bool = False
+    translation_count: int = 0
+
+
 class ArtifactRequest(BaseModel):
     messages: List[Message] = Field(default_factory=list)
     documents: List[Document] = Field(default_factory=list)
     stream: bool = False
+    system_context: Optional[SystemContext] = None
 
 
 def get_model_id() -> str:
@@ -121,6 +132,49 @@ def get_model() -> OpenAIChat:
     if not api_key:
         raise RuntimeError("OPENAI_API_KEY 未設定，無法呼叫模型")
     return OpenAIChat(id=get_model_id(), api_key=api_key)
+
+
+def build_system_status(
+    documents: List[Document], system_context: Optional[SystemContext]
+) -> str:
+    """構建系統當前狀態摘要，讓 LLM 了解系統中已有哪些資料"""
+    lines = []
+
+    # 案件資訊
+    if system_context:
+        if system_context.case_id:
+            lines.append(f"【案件編號】{system_context.case_id}")
+        if system_context.owner_name:
+            lines.append(f"【負責人】{system_context.owner_name}")
+
+    # 文件清單
+    if documents:
+        doc_list = []
+        for idx, doc in enumerate(documents, start=1):
+            pages = doc.pages if doc.pages not in (None, "") else "-"
+            tags = f" (標籤: {', '.join(doc.tags)})" if doc.tags else ""
+            doc_list.append(f"  {idx}. {doc.name or '未命名'} [{doc.type or 'FILE'}] - {pages}頁{tags}")
+        lines.append(f"【已上傳文件】共 {len(documents)} 份:")
+        lines.extend(doc_list)
+    else:
+        lines.append("【已上傳文件】無")
+
+    # Artifacts 狀態
+    if system_context:
+        artifact_status = []
+        if system_context.has_summary:
+            artifact_status.append("摘要")
+        if system_context.translation_count > 0:
+            artifact_status.append(f"翻譯 ({system_context.translation_count} 份)")
+        if system_context.has_memo:
+            artifact_status.append("授信報告")
+
+        if artifact_status:
+            lines.append(f"【已產生 Artifacts】{', '.join(artifact_status)}")
+        else:
+            lines.append("【已產生 Artifacts】無")
+
+    return "\n".join(lines)
 
 
 def build_doc_context(documents: List[Document]) -> str:
@@ -263,16 +317,26 @@ def build_empty_response(message: str) -> Dict[str, Any]:
     }
 
 
-def run_smalltalk_agent(message: str) -> str:
+def run_smalltalk_agent(
+    message: str,
+    documents: List[Document],
+    system_context: Optional[SystemContext],
+) -> str:
     """Use a lightweight chat agent to handle greetings/smalltalk via Agno."""
+    system_status = build_system_status(documents, system_context)
+
     agent = Agent(
         name="ChitChat",
         role="簡短且親切的 RM 助理，僅做寒暄或確認需求，不要主動生成報告。",
         model=get_model(),
         instructions=[
+            "你是授信報告助理，可以協助企業授信分析、文件摘要、翻譯等工作。",
+            "當用戶詢問「目前有哪些文件」或「系統狀態」時，請根據下方系統狀態資訊回答。",
             "保持一句或兩句的自然回應，確認需求即可。",
             "不要承諾開始產出報告或摘要；請詢問使用者需要什麼協助。",
             "語氣友善、簡潔，避免冗長。",
+            "",
+            f"【系統當前狀態】\n{system_status}",
         ],
         markdown=False,
     )
@@ -487,7 +551,9 @@ async def generate_artifacts(req: ArtifactRequest):
     try:
         last_user = get_last_user_message(req.messages)
         if is_simple_greeting(last_user) or is_smalltalk(last_user):
-            reply = run_smalltalk_agent(last_user or "你好")
+            reply = run_smalltalk_agent(
+                last_user or "你好", req.documents, req.system_context
+            )
             return build_empty_response(reply)
 
         ensure_inline_documents_indexed(req.documents)
@@ -495,7 +561,9 @@ async def generate_artifacts(req: ArtifactRequest):
         convo = build_conversation(req.messages)
         doc_ids = [doc.id for doc in req.documents if doc.id and doc.id in rag_store.docs]
 
-        prompt = f"{convo}\n\n{doc_context}\n\n請依規則產出 JSON。"
+        # Add system status to prompt for Team
+        system_status = build_system_status(req.documents, req.system_context)
+        prompt = f"{convo}\n\n{system_status}\n\n{doc_context}\n\n請依規則產出 JSON。"
         team = build_team(doc_ids)
 
         if req.stream:

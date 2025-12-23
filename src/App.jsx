@@ -14,15 +14,18 @@ import {
   ClipboardCheck,
   Copy,
   Download,
+  Edit3,
   FileText,
+  FolderOpen,
   FolderPlus,
   Landmark,
   Languages,
   ListChecks,
   Paperclip,
-  X,
+  Plus,
   Upload,
   Wand2,
+  X,
 } from 'lucide-react';
 import q2Financials from './docs/q2-financials.txt?raw';
 import termSheet from './docs/term-sheet.txt?raw';
@@ -93,8 +96,6 @@ const initialDocs = [
   },
 ];
 
-// Available tags for documents
-const availableTags = ['摘要', '翻譯', '納入報告', '風險掃描', '背景'];
 
 const initialRoutingSteps = [];
 
@@ -148,6 +149,7 @@ const initialTranslationPairs = [];
 const initialMemoSections = [];
 
 const artifactTabs = [
+  { id: 'documents', label: '文件', icon: FolderOpen },
   { id: 'summary', label: '摘要', icon: FileText },
   { id: 'translation', label: '翻譯', icon: Languages },
   { id: 'memo', label: '授信報告', icon: ClipboardCheck },
@@ -156,16 +158,29 @@ const artifactTabs = [
 // tabMeta will be computed dynamically in component
 
 const previewTags = {
+  documents: '文件預覽',
   summary: '摘要視圖',
   translation: '雙語對照',
   memo: '報告排版',
 };
 
+// 預設標籤分類
+const workflowTags = ['待處理', '處理中', '已完成', '需補件', '已歸檔'];
+const functionTags = ['摘要', '翻譯', '納入報告', '風險掃描', '背景資料'];
+
 const tagColors = {
+  // 流程標籤
+  待處理: 'orange',
+  處理中: 'blue',
+  已完成: 'green',
+  需補件: 'red',
+  已歸檔: 'default',
+  // 功能標籤
   摘要: 'gold',
   翻譯: 'cyan',
   納入報告: 'green',
   風險掃描: 'volcano',
+  背景資料: 'geekblue',
   背景: 'geekblue',
 };
 
@@ -191,6 +206,9 @@ const normalizeRiskLevel = (level = '') => {
 export default function App() {
   const [documents, setDocuments] = useState(initialDocs);
   const [selectedDocId, setSelectedDocId] = useState(initialDocs[0]?.id || '');
+  const [editingDocId, setEditingDocId] = useState(''); // For tag editing
+  const [customTags, setCustomTags] = useState([]); // User-created tags
+  const [newTagInput, setNewTagInput] = useState('');
   const [routingSteps, setRoutingSteps] = useState(initialRoutingSteps);
   const [messages, setMessages] = useState(initialMessages);
   const [composerText, setComposerText] = useState('');
@@ -296,6 +314,7 @@ export default function App() {
     const memoDocs = documents.filter((d) => d.tags.includes('納入報告')).length || documents.length;
 
     return {
+      documents: [`共 ${documents.length} 份文件`, '點擊查看預覽'],
       summary: [`來源: ${summaryDocs} 份文件`, '格式: 摘要重點'],
       translation: [`來源: ${translationDocs} 份文件`, '語言: EN'],
       memo: [`來源: ${memoDocs} 份文件`, '委員會版本'],
@@ -317,10 +336,59 @@ export default function App() {
   };
 
   const activeArtifact = getActiveArtifact();
-  const selectedDoc = documents.find((doc) => doc.id === selectedDocId);
 
   const handleUploadClick = () => {
     fileInputRef.current?.click();
+  };
+
+  // Tag management functions
+  const handleToggleTag = (docId, tag) => {
+    setDocuments((prev) =>
+      prev.map((doc) => {
+        if (doc.id !== docId) return doc;
+        const tags = doc.tags || [];
+        const hasTag = tags.includes(tag);
+        if (hasTag) {
+          const confirmed = window.confirm(`確定要移除標籤「${tag}」嗎？`);
+          if (!confirmed) return doc;
+        }
+        return {
+          ...doc,
+          tags: hasTag ? tags.filter((t) => t !== tag) : [...tags, tag],
+        };
+      })
+    );
+  };
+
+  const handleRemoveTag = (docId, tag) => {
+    if (!window.confirm(`確定要從文件中移除標籤「${tag}」嗎？`)) {
+      return;
+    }
+    setDocuments((prev) =>
+      prev.map((doc) => {
+        if (doc.id !== docId) return doc;
+        return {
+          ...doc,
+          tags: (doc.tags || []).filter((t) => t !== tag),
+        };
+      })
+    );
+  };
+
+  const handleAddCustomTag = () => {
+    const trimmed = newTagInput.trim();
+    if (!trimmed) return;
+    if (!customTags.includes(trimmed)) {
+      setCustomTags((prev) => [...prev, trimmed]);
+    }
+    if (editingDocId) {
+      handleToggleTag(editingDocId, trimmed);
+    }
+    setNewTagInput('');
+  };
+
+  const handleToggleEditTags = (docId) => {
+    setEditingDocId((prev) => (prev === docId ? '' : docId));
   };
 
   const handleUploadFiles = async (event) => {
@@ -369,38 +437,6 @@ export default function App() {
     }
   };
 
-  const handleDocContentChange = (value) => {
-    setDocuments((prev) =>
-      prev.map((doc) =>
-        doc.id === selectedDocId ? { ...doc, content: value, pages: estimatePages(value) } : doc
-      )
-    );
-  };
-
-  // Toggle tag on selected document
-  const handleToggleTag = (tag) => {
-    setDocuments((prev) =>
-      prev.map((doc) => {
-        if (doc.id !== selectedDocId) return doc;
-        const hasTag = doc.tags.includes(tag);
-        return {
-          ...doc,
-          tags: hasTag ? doc.tags.filter((t) => t !== tag) : [...doc.tags, tag],
-        };
-      })
-    );
-  };
-
-  // Delete a document
-  const handleDeleteDoc = (docId) => {
-    setDocuments((prev) => {
-      const next = prev.filter((doc) => doc.id !== docId);
-      if (selectedDocId === docId) {
-        setSelectedDocId(next[0]?.id || '');
-      }
-      return next;
-    });
-  };
 
   // Copy artifact output to clipboard
   const handleCopyOutput = async () => {
@@ -516,6 +552,16 @@ export default function App() {
     ]);
 
     try {
+      // Build system context for LLM
+      const systemContext = {
+        case_id: caseId,
+        owner_name: ownerName,
+        has_summary: Boolean(artifacts.summary.output),
+        has_translation: artifacts.translations.length > 0,
+        has_memo: Boolean(artifacts.memo.output),
+        translation_count: artifacts.translations.length,
+      };
+
       const response = await fetch(`${apiBase}/api/artifacts`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -526,6 +572,7 @@ export default function App() {
           })),
           documents,
           stream: false,
+          system_context: systemContext,
         }),
       });
 
@@ -708,105 +755,149 @@ export default function App() {
             </div>
 
             <div className="doc-tray">
-              <div className="tray-header">
-                <div className="tray-title">
-                  <Icon icon={FileText} size="small" />
-                  <span>文件列表</span>
-                </div>
-                <Tag size="small" variant="borderless">
-                  {documents.length} 份
-                </Tag>
-              </div>
               {documents.length > 0 ? (
                 <div className="doc-grid">
-                  {documents.map((doc) => (
-                    <button
-                      key={doc.id}
-                      type="button"
-                      className={`doc-card${doc.id === selectedDocId ? ' is-active' : ''}`}
-                      onClick={() => setSelectedDocId(doc.id)}
-                    >
-                      <div className="doc-title">{doc.name}</div>
-                      <div className="doc-meta">
-                        <span>{doc.type}</span>
-                        <span>{doc.pages} 頁</span>
-                        {doc.source ? <span>{doc.source === 'preloaded' ? '預載' : '上傳'}</span> : null}
-                      </div>
-                      <div className="doc-tags">
-                        {doc.tags?.length ? (
-                          doc.tags.map((tag) => (
-                            <Tag
-                              key={`${doc.id}-${tag}`}
-                              size="small"
-                              color={tagColors[tag] || 'default'}
-                            >
-                              {tag}
-                            </Tag>
-                          ))
+                  {documents.map((doc) => {
+                    const isEditing = editingDocId === doc.id;
+
+                    return (
+                      <div
+                        key={doc.id}
+                        className={`doc-card${doc.id === selectedDocId ? ' is-active' : ''}`}
+                      >
+                        <div
+                          className="doc-card-header"
+                          onClick={() => setSelectedDocId(doc.id)}
+                          style={{ cursor: 'pointer' }}
+                        >
+                          <div className="doc-title">{doc.name}</div>
+                          <ActionIcon
+                            icon={isEditing ? X : Edit3}
+                            size="small"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleToggleEditTags(doc.id);
+                            }}
+                            title={isEditing ? '關閉編輯' : '編輯標籤'}
+                          />
+                        </div>
+
+                        <div className="doc-meta">
+                          <Tag size="small" color="blue">{doc.type}</Tag>
+                          <span>{doc.pages} 頁</span>
+                          {doc.source ? <span>{doc.source === 'preloaded' ? '預載' : '上傳'}</span> : null}
+                        </div>
+
+                        {isEditing ? (
+                          <div className="tag-editor">
+                            <div className="tag-section">
+                              <div className="tag-section-title">流程狀態</div>
+                              <div className="tag-selector">
+                                {workflowTags.map((tag) => (
+                                  <button
+                                    key={tag}
+                                    type="button"
+                                    className={`tag-option${(doc.tags || []).includes(tag) ? ' is-selected' : ''}`}
+                                    onClick={() => handleToggleTag(doc.id, tag)}
+                                  >
+                                    <Tag size="small" color={tagColors[tag] || 'default'}>
+                                      {tag}
+                                    </Tag>
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+
+                            <div className="tag-section">
+                              <div className="tag-section-title">功能標籤</div>
+                              <div className="tag-selector">
+                                {functionTags.map((tag) => (
+                                  <button
+                                    key={tag}
+                                    type="button"
+                                    className={`tag-option${(doc.tags || []).includes(tag) ? ' is-selected' : ''}`}
+                                    onClick={() => handleToggleTag(doc.id, tag)}
+                                  >
+                                    <Tag size="small" color={tagColors[tag] || 'default'}>
+                                      {tag}
+                                    </Tag>
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+
+                            {customTags.length > 0 && (
+                              <div className="tag-section">
+                                <div className="tag-section-title">自定義標籤</div>
+                                <div className="tag-selector">
+                                  {customTags.map((tag) => (
+                                    <button
+                                      key={tag}
+                                      type="button"
+                                      className={`tag-option${(doc.tags || []).includes(tag) ? ' is-selected' : ''}`}
+                                      onClick={() => handleToggleTag(doc.id, tag)}
+                                    >
+                                      <Tag size="small" color="purple">
+                                        {tag}
+                                      </Tag>
+                                    </button>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+
+                            <div className="tag-add">
+                              <input
+                                type="text"
+                                className="tag-input"
+                                placeholder="新增自定義標籤..."
+                                value={newTagInput}
+                                onChange={(e) => setNewTagInput(e.target.value)}
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Enter') {
+                                    handleAddCustomTag();
+                                  }
+                                }}
+                              />
+                              <ActionIcon
+                                icon={Plus}
+                                size="small"
+                                onClick={handleAddCustomTag}
+                                disabled={!newTagInput.trim()}
+                                title="新增標籤"
+                              />
+                            </div>
+                          </div>
                         ) : (
-                          <span className="doc-empty">尚未指派標籤</span>
+                          <div className="doc-tags">
+                            {doc.tags?.length ? (
+                              doc.tags.map((tag) => (
+                                <Tag
+                                  key={`${doc.id}-${tag}`}
+                                  size="small"
+                                  color={tagColors[tag] || (customTags.includes(tag) ? 'purple' : 'default')}
+                                >
+                                  {tag}
+                                </Tag>
+                              ))
+                            ) : (
+                              <span className="doc-empty">點擊 ✏️ 編輯標籤</span>
+                            )}
+                          </div>
                         )}
+
+                        {doc.status === 'error' ? (
+                          <div className="doc-empty">解析失敗</div>
+                        ) : null}
                       </div>
-                      {doc.status === 'error' ? (
-                        <div className="doc-empty">解析失敗</div>
-                      ) : null}
-                    </button>
-                  ))}
+                    );
+                  })}
                 </div>
               ) : (
                 <div className="doc-empty">尚未上傳文件，支援 PDF / TXT</div>
               )}
             </div>
 
-            {selectedDoc ? (
-              <div className="doc-detail">
-                <div className="detail-header">
-                  <span className="detail-title">{selectedDoc.name}</span>
-                  <div className="detail-actions">
-                    <Tag size="small" variant="borderless">
-                      {selectedDoc.pages} 頁
-                    </Tag>
-                    <Tag size="small" variant="borderless">
-                      {selectedDoc.type}
-                    </Tag>
-                    <ActionIcon
-                      icon={X}
-                      size="small"
-                      variant="ghost"
-                      onClick={() => handleDeleteDoc(selectedDoc.id)}
-                      title="移除文件"
-                    />
-                  </div>
-                </div>
-
-                <div className="tag-selector">
-                  {availableTags.map((tag) => (
-                    <Tag
-                      key={tag}
-                      size="small"
-                      color={selectedDoc.tags.includes(tag) ? tagColors[tag] : 'default'}
-                      style={{ cursor: 'pointer', opacity: selectedDoc.tags.includes(tag) ? 1 : 0.5 }}
-                      onClick={() => handleToggleTag(tag)}
-                    >
-                      {tag}
-                    </Tag>
-                  ))}
-                </div>
-
-                {selectedDoc.message ? (
-                  <div className="doc-status">{selectedDoc.message}</div>
-                ) : null}
-
-                <TextArea
-                  rows={6}
-                  value={selectedDoc.content || ''}
-                  onChange={(event) => handleDocContentChange(event.target.value)}
-                  placeholder="貼上文件重點或修正解析結果..."
-                />
-              </div>
-            ) : (
-              <div className="doc-empty">選取或上傳文件以查看細節</div>
-            )}
           </section>
 
           <section className="panel artifact-panel">
@@ -875,25 +966,61 @@ export default function App() {
                 </div>
 
                 <div className="preview-canvas">
-                  <div className="live-markdown">
-                    <div className="live-markdown-head">
-                      <div className="summary-kicker">Live Preview</div>
-                      <p className="live-markdown-hint">
-                        即時產生 LLM 輸出（Markdown），可直接作為委員會草稿
-                      </p>
-                    </div>
-                    {isLoading && streamingContent ? (
-                      <div className="streaming-wrapper">
-                        <div className="streaming-label">正在產生中...</div>
-                        <div className="streaming-content">
-                          <pre className="streaming-text">{streamingContent}</pre>
-                          <span className="streaming-cursor">▊</span>
-                        </div>
+                  {activeTab === 'documents' ? (
+                    <div className="preview-documents">
+                      <div className="documents-header">
+                        <div className="summary-kicker">已上傳文件</div>
+                        <p className="live-markdown-hint">
+                          共 {documents.length} 份文件，點擊查看預覽內容
+                        </p>
                       </div>
-                    ) : (
-                      renderMarkdown(activeArtifact.output)
-                    )}
-                  </div>
+                      <div className="documents-list">
+                        {documents.map((doc) => (
+                          <div
+                            key={doc.id}
+                            className={`document-preview-card${selectedDocId === doc.id ? ' is-selected' : ''}`}
+                            onClick={() => setSelectedDocId(doc.id)}
+                          >
+                            <div className="doc-preview-header">
+                              <Icon icon={FileText} size="small" />
+                              <span className="doc-preview-name">{doc.name}</span>
+                              <Tag size="small" color="blue">{doc.type}</Tag>
+                            </div>
+                            {selectedDocId === doc.id && doc.content && (
+                              <div className="doc-preview-content">
+                                <pre>{doc.content.slice(0, 500)}{doc.content.length > 500 ? '...' : ''}</pre>
+                              </div>
+                            )}
+                            {selectedDocId === doc.id && !doc.content && (
+                              <div className="doc-preview-content">
+                                <p className="no-preview">無預覽內容（PDF 已索引，可透過 RAG 檢索）</p>
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="live-markdown">
+                      <div className="live-markdown-head">
+                        <div className="summary-kicker">Live Preview</div>
+                        <p className="live-markdown-hint">
+                          即時產生 LLM 輸出（Markdown），可直接作為委員會草稿
+                        </p>
+                      </div>
+                      {isLoading && streamingContent ? (
+                        <div className="streaming-wrapper">
+                          <div className="streaming-label">正在產生中...</div>
+                          <div className="streaming-content">
+                            <pre className="streaming-text">{streamingContent}</pre>
+                            <span className="streaming-cursor">▊</span>
+                          </div>
+                        </div>
+                      ) : (
+                        renderMarkdown(activeArtifact?.output || '')
+                      )}
+                    </div>
+                  )}
 
                   {activeTab === 'summary' ? (
                     <div className="preview-summary">
