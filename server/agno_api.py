@@ -324,40 +324,6 @@ def is_smalltalk(text: str) -> bool:
     return False
 
 
-def should_use_web_search(text: str) -> bool:
-    if not text:
-        return False
-    lowered = text.strip().lower()
-    web_keywords = [
-        "上網",
-        "上網查",
-        "網路",
-        "網上",
-        "最新",
-        "新聞",
-        "即時",
-        "快訊",
-        "今天",
-        "目前",
-        "有發生",
-        "有什麼大事",
-        "大事",
-        "網址",
-        "連結",
-        "link",
-        "source",
-        "來源",
-        "引用",
-        "引用來源",
-        "市場動態",
-        "產業動態",
-        "股市",
-        "匯率",
-        "利率",
-    ]
-    return any(keyword in lowered for keyword in web_keywords)
-
-
 def build_empty_response(message: str) -> Dict[str, Any]:
     return {
         "assistant": {"content": message, "bullets": []},
@@ -738,16 +704,8 @@ async def generate_artifacts(req: ArtifactRequest):
 
         # Add system status to prompt for Team
         system_status = build_system_status(req.documents, req.system_context)
-        use_web_search = should_use_web_search(last_user)
-        web_search_note = (
-            "\n\n【網路檢索要求】此需求必須使用 web_search_preview 工具先查後答，並提供來源。"
-            if use_web_search
-            else ""
-        )
-        prompt = f"{convo}\n\n{system_status}\n\n{doc_context}{web_search_note}\n\n請依規則產出 JSON。"
+        prompt = f"{convo}\n\n{system_status}\n\n{doc_context}\n\n請依規則產出 JSON。"
         team = build_team(doc_ids)
-        if use_web_search:
-            team.tool_choice = WEB_SEARCH_TOOL
 
         if req.stream:
             # True token streaming from LLM
