@@ -41,6 +41,13 @@ TEAM_INSTRUCTIONS = [
     "3. 需要市場/即時資訊（企業、產業、新聞、股市、總經事件）→ 使用「完整模式」並委派 Web Research Agent，必須使用 web_search 工具先查後答，不可直接拒絕。",
     "4. 使用者提供截圖/照片/影像 → 委派 Vision Agent 讀圖與 OCR，並回傳重點與文字內容。",
     "",
+    "【判斷流程（請逐步遵守）】",
+    "A. 若包含「最新/新聞/即時/今天/來源/網址/搜尋/上網查」→ 一定要用 Web Research Agent + web_search 工具。",
+    "B. 若包含文件摘要/翻譯/授信內容 → 一定要用 RAG Agent。",
+    "C. 若包含影像/截圖/照片 → 一定要用 Vision Agent。",
+    "D. 若同時符合多項，請並行委派並合併回覆（routing 必須包含每項步驟）。",
+    "E. 禁止回覆「無法上網查」這類拒絕語；若 web_search 失敗，請回覆「web_search 失敗」並要求更精確的關鍵字。",
+    "",
     "【簡單模式】僅填充 assistant.content，其他欄位必須為空或空陣列：",
     '{"assistant": {"content": "你好！有什麼可以幫助你的嗎？", "bullets": []}, "summary": {"output": "", "borrower": null, "metrics": [], "risks": []}, "translation": {"output": "", "clauses": []}, "memo": {"output": "", "sections": [], "recommendation": "", "conditions": ""}, "routing": []}',
     "",
@@ -514,6 +521,9 @@ def build_team(doc_ids: List[str]) -> Team:
         instructions=TEAM_INSTRUCTIONS,
         expected_output=EXPECTED_OUTPUT,
         tools=[WEB_SEARCH_TOOL],
+        add_member_tools_to_context=True,
+        add_name_to_context=True,
+        add_datetime_to_context=True,
         delegate_to_all_members=False,  # Team Leader decides when to delegate
         markdown=False,
     )
