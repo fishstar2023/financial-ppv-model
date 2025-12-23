@@ -36,8 +36,9 @@ TEAM_INSTRUCTIONS = [
     "",
     "【重要】根據使用者意圖選擇回覆模式：",
     "1. 問候/閒聊（如 hi, hello, 你好）→ 使用「簡單模式」",
-    "2. 需要文件分析（如 摘要、翻譯、報告）→ 使用「完整模式」並委派 RAG Agent",
-    "3. 需要市場/即時資訊（如 查詢企業、產業動態、新聞、股市、總經事件）→ 使用「完整模式」並必須啟用 web_search（呼叫時已開啟 web_search），先查後答，禁止直接拒絕。",
+    "2. 需要文件分析（如 摘要、翻譯、報告）→ 使用「完整模式」並委派 RAG Agent（文件檢索）",
+    "3. 需要市場/即時資訊（企業、產業、新聞、股市、總經事件）→ 使用「完整模式」並委派 Web Research Agent，必須啟用 web_search，先查後答，不可直接拒絕。",
+    "4. 使用者提供截圖/照片/影像 → 委派 Vision Agent 讀圖與 OCR，並回傳重點與文字內容。",
     "",
     "【簡單模式】僅填充 assistant.content，其他欄位必須為空或空陣列：",
     '{"assistant": {"content": "你好！有什麼可以幫助你的嗎？", "bullets": []}, "summary": {"output": "", "borrower": null, "metrics": [], "risks": []}, "translation": {"output": "", "clauses": []}, "memo": {"output": "", "sections": [], "recommendation": "", "conditions": ""}, "routing": []}',
@@ -127,7 +128,7 @@ def get_model_id() -> str:
     return os.getenv("OPENAI_MODEL", "gpt-4o-mini")
 
 
-def get_model(enable_web_search: bool = False) -> OpenAIChat:
+def get_model(enable_web_search: bool = False, enable_vision: bool = False) -> OpenAIChat:
     api_key = os.getenv("OPENAI_API_KEY")
     if not api_key:
         raise RuntimeError("OPENAI_API_KEY 未設定，無法呼叫模型")
@@ -137,6 +138,9 @@ def get_model(enable_web_search: bool = False) -> OpenAIChat:
     # OpenAI web search via request body (no native kwarg in current agno version)
     if enable_web_search:
         kwargs["extra_body"] = {"web_search": True}
+
+    if enable_vision:
+        kwargs["modalities"] = ["text", "image"]
 
     return OpenAIChat(**kwargs)
 
@@ -395,13 +399,45 @@ def build_rag_agent(doc_ids: List[str], model: OpenAIChat) -> Agent:
     )
 
 
+def build_research_agent() -> Agent:
+    model = get_model(enable_web_search=True)
+    return Agent(
+        name="Web Research Agent",
+        role="網路檢索與深度研究",
+        model=model,
+        instructions=[
+            "遇到需要即時新聞、市場、總經或網路資訊時，必須執行 web_search 並給出引用來源。",
+            "可進行多輪搜尋與歸納，避免主觀推測，缺資料時請說明。",
+        ],
+        search_knowledge=True,
+        add_knowledge_to_context=True,
+        markdown=False,
+    )
+
+
+def build_vision_agent() -> Agent:
+    model = get_model(enable_vision=True)
+    return Agent(
+        name="Vision Agent",
+        role="影像/截圖理解與OCR",
+        model=model,
+        instructions=[
+            "專注於解析上傳的截圖、照片或文件圖片，描述關鍵內容與文字。",
+            "若沒有影像可讀，請要求使用者提供圖片或確認格式。",
+        ],
+        markdown=False,
+    )
+
+
 def build_team(doc_ids: List[str]) -> Team:
-    # Use model with web search enabled for Team Leader
+    # Team Leader with web search enabled
     model = get_model(enable_web_search=True)
     rag_agent = build_rag_agent(doc_ids, get_model())
+    research_agent = build_research_agent()
+    vision_agent = build_vision_agent()
     return Team(
         name="授信報告助理",
-        members=[rag_agent],
+        members=[rag_agent, research_agent, vision_agent],
         model=model,
         instructions=TEAM_INSTRUCTIONS,
         expected_output=EXPECTED_OUTPUT,
