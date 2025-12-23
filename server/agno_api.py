@@ -232,9 +232,12 @@ def build_conversation(messages: List[Message]) -> str:
     if not messages:
         return "對話紀錄：無。"
     parts = []
-    for msg in messages[-8:]:
-        parts.append(f"{msg.role}: {msg.content}")
-    return "對話紀錄:\n" + "\n".join(parts)
+    for msg in messages:
+        content = (msg.content or "").strip()
+        if not content:
+            continue
+        parts.append(f"{msg.role}: {content}")
+    return "對話紀錄:\n" + "\n".join(parts) if parts else "對話紀錄：無。"
 
 
 def get_last_user_message(messages: List[Message]) -> str:
