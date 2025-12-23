@@ -14,7 +14,6 @@ from pydantic import BaseModel, Field
 from agno.agent import Agent
 from agno.team import Team
 from agno.models.openai import OpenAIChat
-from agno.tools.duckduckgo import DuckDuckGoTools
 
 from rag_store import RagStore
 
@@ -127,10 +126,18 @@ def get_model_id() -> str:
     return os.getenv("OPENAI_MODEL", "gpt-4o-mini")
 
 
-def get_model() -> OpenAIChat:
+def get_model(enable_web_search: bool = False) -> OpenAIChat:
     api_key = os.getenv("OPENAI_API_KEY")
     if not api_key:
         raise RuntimeError("OPENAI_API_KEY 未設定，無法呼叫模型")
+
+    # Enable web search via OpenAI's native capability
+    if enable_web_search:
+        return OpenAIChat(
+            id=get_model_id(),
+            api_key=api_key,
+            web_search=True,
+        )
     return OpenAIChat(id=get_model_id(), api_key=api_key)
 
 
@@ -389,15 +396,15 @@ def build_rag_agent(doc_ids: List[str], model: OpenAIChat) -> Agent:
 
 
 def build_team(doc_ids: List[str]) -> Team:
-    model = get_model()
-    rag_agent = build_rag_agent(doc_ids, model)
+    # Use model with web search enabled for Team Leader
+    model = get_model(enable_web_search=True)
+    rag_agent = build_rag_agent(doc_ids, get_model())
     return Team(
         name="授信報告助理",
         members=[rag_agent],
         model=model,
         instructions=TEAM_INSTRUCTIONS,
         expected_output=EXPECTED_OUTPUT,
-        tools=[DuckDuckGoTools()],  # Web search capability
         delegate_to_all_members=False,  # Team Leader decides when to delegate
         markdown=False,
     )
@@ -410,8 +417,12 @@ def safe_parse_json(text: str) -> Dict[str, Any]:
         start = text.find("{")
         end = text.rfind("}")
         if start != -1 and end != -1 and end > start:
-            return json.loads(text[start : end + 1])
-        raise
+            try:
+                return json.loads(text[start : end + 1])
+            except json.JSONDecodeError:
+                pass
+        # Return a fallback response if JSON parsing fails
+        return build_empty_response(f"抱歉，處理過程中發生問題。原始回應：{text[:200]}...")
 
 
 app = FastAPI(title="Agno Artifacts API", version="1.1.0")
@@ -554,7 +565,16 @@ async def generate_artifacts(req: ArtifactRequest):
             reply = run_smalltalk_agent(
                 last_user or "你好", req.documents, req.system_context
             )
-            return build_empty_response(reply)
+            response_data = build_empty_response(reply)
+
+            # Return SSE format if streaming is requested
+            if req.stream:
+                async def generate_smalltalk_sse():
+                    yield f"data: {json.dumps(response_data)}\n\n"
+                    yield f"data: {json.dumps({'done': True})}\n\n"
+                return StreamingResponse(generate_smalltalk_sse(), media_type="text/event-stream")
+
+            return response_data
 
         ensure_inline_documents_indexed(req.documents)
         doc_context = build_doc_context(req.documents)
@@ -595,9 +615,16 @@ async def generate_artifacts(req: ArtifactRequest):
                     if accumulated:
                         final_data = safe_parse_json(accumulated)
                         yield f"data: {json.dumps(final_data)}\n\n"
+                    else:
+                        # No content accumulated, send fallback response
+                        fallback = build_empty_response("抱歉，我無法完成這個請求。請稍後再試。")
+                        yield f"data: {json.dumps(fallback)}\n\n"
                     yield f"data: {json.dumps({'done': True})}\n\n"
                 except Exception as exc:
-                    yield f"data: {json.dumps({'error': str(exc)})}\n\n"
+                    # Send error as a valid response so frontend can display it
+                    error_response = build_empty_response(f"處理過程中發生錯誤：{str(exc)}")
+                    yield f"data: {json.dumps(error_response)}\n\n"
+                    yield f"data: {json.dumps({'done': True})}\n\n"
 
             return StreamingResponse(generate_sse(), media_type="text/event-stream")
         else:

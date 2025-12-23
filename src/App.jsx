@@ -552,7 +552,7 @@ export default function App() {
             content: item.content,
           })),
           documents,
-          stream: false,
+          stream: true,
           system_context: systemContext,
         }),
       });
@@ -562,8 +562,87 @@ export default function App() {
         throw new Error(errorText || 'API request failed');
       }
 
-      const data = await response.json();
+      const contentType = response.headers.get('content-type') || '';
+      let data = null;
+
+      if (!contentType.includes('text/event-stream')) {
+        // Fallback: handle JSON (e.g., error response) when SSE is not returned
+        data = await response.json().catch(() => null);
+      } else {
+        // Handle SSE streaming
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = '';
+        let accumulatedContent = '';
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split('\n');
+          buffer = lines.pop() || '';
+
+          for (const line of lines) {
+            if (!line.startsWith('data: ')) continue;
+            const jsonStr = line.slice(6).trim();
+            if (!jsonStr) continue;
+
+            try {
+              const parsed = JSON.parse(jsonStr);
+
+              // Handle streaming chunks - update routing in real-time
+              if (parsed.chunk) {
+                accumulatedContent += parsed.chunk;
+                setStreamingContent(accumulatedContent);
+
+                // Try to extract partial routing from accumulated content
+                try {
+                  const routingMatch = accumulatedContent.match(/"routing"\s*:\s*\[([\s\S]*?)\]/);
+                  if (routingMatch) {
+                    const routingJson = JSON.parse(`[${routingMatch[1]}]`);
+                    if (Array.isArray(routingJson) && routingJson.length > 0) {
+                      setRoutingSteps(
+                        routingJson.map((step) => ({
+                          id: step.id || createId(),
+                          label: step.label || '任務更新',
+                          status: step.status || 'running',
+                          eta: step.eta || '進行中',
+                        }))
+                      );
+                    }
+                  }
+                } catch {
+                  // Partial JSON, continue accumulating
+                }
+                continue;
+              }
+
+              // Handle final complete data or done signal
+              if (parsed.done) {
+                continue;
+              }
+
+              if (parsed.error) {
+                throw new Error(parsed.error);
+              }
+
+              // Final parsed response
+              if (parsed.assistant || parsed.summary || parsed.translation || parsed.memo) {
+                data = parsed;
+              }
+            } catch (parseErr) {
+              console.warn('Parse error:', parseErr);
+            }
+          }
+        }
+      }
+
       console.log('📦 Received data from API:', data);
+
+      if (!data) {
+        throw new Error('No valid response received');
+      }
 
       if (data.error) {
         throw new Error(data.error + (data.detail ? `: ${data.detail}` : ''));
@@ -717,9 +796,6 @@ export default function App() {
                 <Text as="h2" weight="600" className="panel-title">
                   文件集
                 </Text>
-                <Text type="secondary" className="panel-subtitle">
-                  上傳授信附件，指派摘要或翻譯，提供給 Agent 團隊
-                </Text>
               </div>
               <div className="panel-actions">
                 <Button icon={Upload} variant="outlined" onClick={handleUploadClick}>
@@ -745,13 +821,11 @@ export default function App() {
                       <div
                         key={doc.id}
                         className={`doc-card${doc.id === selectedDocId ? ' is-active' : ''}`}
+                        onClick={() => !isEditing && setSelectedDocId(doc.id)}
                       >
-                        <div
-                          className="doc-card-header"
-                          onClick={() => setSelectedDocId(doc.id)}
-                          style={{ cursor: 'pointer' }}
-                        >
+                        <div className="doc-card-row">
                           <div className="doc-title">{doc.name}</div>
+                          <Tag size="small" color="blue">{doc.type}</Tag>
                           <ActionIcon
                             icon={isEditing ? X : Edit3}
                             size="small"
@@ -761,12 +835,6 @@ export default function App() {
                             }}
                             title={isEditing ? '關閉編輯' : '編輯標籤'}
                           />
-                        </div>
-
-                        <div className="doc-meta">
-                          <Tag size="small" color="blue">{doc.type}</Tag>
-                          <span>{doc.pages} 頁</span>
-                          {doc.source ? <span>{doc.source === 'preloaded' ? '預載' : '上傳'}</span> : null}
                         </div>
 
                         {isEditing ? (
@@ -887,9 +955,6 @@ export default function App() {
                 <Text as="h2" weight="600" className="panel-title">
                   Artifacts
                 </Text>
-                <Text type="secondary" className="panel-subtitle">
-                  分頁呈現摘要、翻譯與授信報告草稿
-                </Text>
               </div>
               <div className="panel-actions">
                 <Button icon={Wand2} variant="outlined" disabled={isLoading} onClick={handleRegenerate}>
@@ -949,37 +1014,58 @@ export default function App() {
                 <div className="preview-canvas">
                   {activeTab === 'documents' ? (
                     <div className="preview-documents">
-                      <div className="documents-header">
-                        <div className="summary-kicker">已上傳文件</div>
-                        <p className="live-markdown-hint">
-                          共 {documents.length} 份文件，點擊查看預覽內容
-                        </p>
-                      </div>
-                      <div className="documents-list">
-                        {documents.map((doc) => (
-                          <div
-                            key={doc.id}
-                            className={`document-preview-card${selectedDocId === doc.id ? ' is-selected' : ''}`}
-                            onClick={() => setSelectedDocId(doc.id)}
-                          >
-                            <div className="doc-preview-header">
-                              <Icon icon={FileText} size="small" />
-                              <span className="doc-preview-name">{doc.name}</span>
-                              <Tag size="small" color="blue">{doc.type}</Tag>
+                      {(() => {
+                        const selectedDoc = documents.find((d) => d.id === selectedDocId);
+                        if (!selectedDoc) {
+                          return (
+                            <div className="documents-header">
+                              <div className="summary-kicker">文件預覽</div>
+                              <p className="live-markdown-hint">
+                                請從左側文件集選擇要預覽的文件
+                              </p>
                             </div>
-                            {selectedDocId === doc.id && doc.content && (
-                              <div className="doc-preview-content">
-                                <pre>{doc.content.slice(0, 500)}{doc.content.length > 500 ? '...' : ''}</pre>
+                          );
+                        }
+                        return (
+                          <>
+                            <div className="documents-header">
+                              <div className="summary-kicker">文件預覽</div>
+                              <div className="doc-preview-header">
+                                <Icon icon={FileText} size="small" />
+                                <span className="doc-preview-name">{selectedDoc.name}</span>
+                                <Tag size="small" color="blue">{selectedDoc.type}</Tag>
+                                <span className="doc-preview-meta">{selectedDoc.pages} 頁</span>
+                              </div>
+                            </div>
+                            {selectedDoc.tags && selectedDoc.tags.length > 0 && (
+                              <div className="doc-preview-tags">
+                                {selectedDoc.tags.map((tag) => (
+                                  <Tag
+                                    key={tag}
+                                    size="small"
+                                    color={tagColors[tag] || (customTags.includes(tag) ? 'purple' : 'default')}
+                                  >
+                                    {tag}
+                                  </Tag>
+                                ))}
                               </div>
                             )}
-                            {selectedDocId === doc.id && !doc.content && (
-                              <div className="doc-preview-content">
-                                <p className="no-preview">無預覽內容（PDF 已索引，可透過 RAG 檢索）</p>
-                              </div>
-                            )}
-                          </div>
-                        ))}
-                      </div>
+                            <div className="doc-preview-content-full">
+                              {selectedDoc.content ? (
+                                <pre className="doc-preview-text">{selectedDoc.content}</pre>
+                              ) : (
+                                <div className="no-preview-full">
+                                  <Icon icon={FileText} size="large" />
+                                  <p>無文字預覽內容</p>
+                                  <p className="no-preview-hint">
+                                    此 PDF 文件已索引，可透過 RAG 檢索內容
+                                  </p>
+                                </div>
+                              )}
+                            </div>
+                          </>
+                        );
+                      })()}
                     </div>
                   ) : (
                     <div className="live-markdown">
@@ -1135,9 +1221,6 @@ export default function App() {
                 <Text as="h2" weight="600" className="panel-title">
                   RM 對話
                 </Text>
-                <Text type="secondary" className="panel-subtitle">
-                  與 Agent Team 溝通，派送摘要/翻譯/查核任務
-                </Text>
               </div>
               <div className="panel-actions">
                 <Tag size="small" variant="borderless">
@@ -1162,18 +1245,13 @@ export default function App() {
               <div className="routing-list">
                 {routingSteps.map((step) => (
                   <div key={step.id} className="routing-item">
-                    <div className={`status-dot ${statusMeta[step.status]?.className || ''}`} />
-                    <div className="routing-body">
-                      <div className="routing-label">{step.label}</div>
-                      <div className="routing-meta">
-                        <span
-                          className={`status-pill ${statusMeta[step.status]?.className || ''}`}
-                        >
-                          {statusMeta[step.status]?.label || '等待中'}
-                        </span>
-                        <span className="routing-eta">{step.eta}</span>
-                      </div>
-                    </div>
+                    <span
+                      className={`status-pill ${statusMeta[step.status]?.className || ''}`}
+                    >
+                      {statusMeta[step.status]?.label || '等待中'}
+                    </span>
+                    <span className="routing-label">{step.label}</span>
+                    <span className="routing-eta">{step.eta}</span>
                   </div>
                 ))}
               </div>
