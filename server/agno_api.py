@@ -623,45 +623,30 @@ async def generate_artifacts(req: ArtifactRequest):
         team = build_team(doc_ids)
 
         if req.stream:
-            # Use streaming response
+            # Fallback streaming: run once, then chunk JSON to SSE so前端可以即時顯示
             response = team.run(
                 prompt,
                 dependencies={"doc_ids": doc_ids},
                 add_dependencies_to_context=True,
                 extra_body={"web_search": True},
-                stream=True,
             )
+            text = response.get_content_as_string()
 
             async def generate_sse():
-                accumulated = ""
                 try:
-                    for chunk in response:
-                        # Skip non-content events (RunStartedEvent, etc.)
-                        if not hasattr(chunk, 'get_content_as_string'):
-                            continue
+                    # Send partial chunks for live preview
+                    chunk_size = 600
+                    for i in range(0, len(text), chunk_size):
+                        piece = text[i : i + chunk_size]
+                        if piece:
+                            yield f"data: {json.dumps({'chunk': piece})}\n\n"
 
-                        content = chunk.get_content_as_string()
-                        if not content:  # Skip empty content
-                            continue
-
-                        accumulated += content
-                        # Send chunk to frontend
-                        yield f"data: {json.dumps({'chunk': content})}\n\n"
-
-                    # Parse and send final complete message
-                    if accumulated:
-                        final_data = safe_parse_json(accumulated)
-                        yield f"data: {json.dumps(final_data)}\n\n"
-                    else:
-                        # No content accumulated, send fallback response
-                        fallback = build_empty_response("抱歉，我無法完成這個請求。請稍後再試。")
-                        yield f"data: {json.dumps(fallback)}\n\n"
-                    yield f"data: {json.dumps({'done': True})}\n\n"
+                    final_data = safe_parse_json(text)
+                    yield f"data: {json.dumps(final_data)}\n\n"
                 except Exception as exc:
-                    # Send error as a valid response so frontend can display it
                     error_response = build_empty_response(f"處理過程中發生錯誤：{str(exc)}")
                     yield f"data: {json.dumps(error_response)}\n\n"
-                    yield f"data: {json.dumps({'done': True})}\n\n"
+                yield f"data: {json.dumps({'done': True})}\n\n"
 
             return StreamingResponse(generate_sse(), media_type="text/event-stream")
         else:
