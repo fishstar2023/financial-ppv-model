@@ -131,14 +131,13 @@ def get_model(enable_web_search: bool = False) -> OpenAIChat:
     if not api_key:
         raise RuntimeError("OPENAI_API_KEY 未設定，無法呼叫模型")
 
-    # Enable web search via OpenAI's native capability
+    kwargs: Dict[str, Any] = {"id": get_model_id(), "api_key": api_key}
+
+    # OpenAI web search via request body (no native kwarg in current agno version)
     if enable_web_search:
-        return OpenAIChat(
-            id=get_model_id(),
-            api_key=api_key,
-            web_search=True,
-        )
-    return OpenAIChat(id=get_model_id(), api_key=api_key)
+        kwargs["extra_body"] = {"web_search": True}
+
+    return OpenAIChat(**kwargs)
 
 
 def build_system_status(
