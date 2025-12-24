@@ -251,6 +251,8 @@ export default function App() {
           pages: doc.pages ?? '-',
           tags: [],
           content: doc.preview || '',
+          image: '',
+          image_mime: '',
           status: doc.status,
           message: doc.message,
           source: 'preloaded',
@@ -380,6 +382,8 @@ export default function App() {
         pages: doc.pages ?? '-',
         tags: [],
         content: doc.preview || '',
+        image: doc.image || '',
+        image_mime: doc.image_mime || '',
         status: doc.status,
         message: doc.message,
         source: 'uploaded',
@@ -795,6 +799,7 @@ export default function App() {
                   type="file"
                   multiple
                   className="file-input"
+                  accept=".pdf,.txt,.md,.csv,.png,.jpg,.jpeg,.webp,.gif"
                   onChange={handleUploadFiles}
                 />
               </div>
@@ -1013,7 +1018,13 @@ export default function App() {
                               </div>
                             )}
                             <div className="doc-preview-content-full">
-                              {selectedDoc.content ? (
+                              {selectedDoc.image ? (
+                                <img
+                                  src={selectedDoc.image}
+                                  alt={selectedDoc.name}
+                                  className="doc-preview-image"
+                                />
+                              ) : selectedDoc.content ? (
                                 <pre className="doc-preview-text">{selectedDoc.content}</pre>
                               ) : (
                                 <div className="no-preview-full">

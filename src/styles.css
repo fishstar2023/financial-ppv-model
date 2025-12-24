@@ -1450,6 +1450,16 @@ body {
   overflow-y: auto;
 }
 
+.doc-preview-image {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: contain;
+  border-radius: 10px;
+  border: 1px solid rgba(34, 49, 70, 0.08);
+  box-shadow: 0 12px 20px rgba(32, 22, 16, 0.08);
+}
+
 .doc-preview-text {
   font-family: var(--font-mono);
   font-size: 12px;

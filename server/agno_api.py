@@ -1,6 +1,8 @@
+import base64
 import json
 import os
 import uuid
+from mimetypes import guess_type
 from pathlib import Path
 from typing import Any, Dict, Iterator, List, Optional, Union, Literal
 
@@ -11,6 +13,7 @@ from fastapi.responses import JSONResponse, StreamingResponse
 from pydantic import BaseModel, Field
 
 from agno.agent import Agent
+from agno.media import Image
 from agno.team import Team
 from agno.models.openai import OpenAIChat
 from agno.models.openai.responses import OpenAIResponses
@@ -105,6 +108,8 @@ class Document(BaseModel):
     pages: Optional[Union[int, str]] = None
     tags: Optional[List[str]] = Field(default_factory=list)
     content: Optional[str] = ""
+    image: Optional[str] = None
+    image_mime: Optional[str] = None
 
 
 class SystemContext(BaseModel):
@@ -137,6 +142,7 @@ def get_model_id() -> str:
 
 
 WEB_SEARCH_TOOL = {"type": "web_search_preview"}
+IMAGE_EXTENSIONS = {".png", ".jpg", ".jpeg", ".webp", ".gif"}
 
 
 def get_model(
@@ -188,7 +194,10 @@ def build_system_status(
         for idx, doc in enumerate(documents, start=1):
             pages = doc.pages if doc.pages not in (None, "") else "-"
             tags = f" (標籤: {', '.join(doc.tags)})" if doc.tags else ""
-            doc_list.append(f"  {idx}. {doc.name or '未命名'} [{doc.type or 'FILE'}] - {pages}頁{tags}")
+            image_hint = " (影像)" if doc.image else ""
+            doc_list.append(
+                f"  {idx}. {doc.name or '未命名'} [{doc.type or 'FILE'}] - {pages}頁{tags}{image_hint}"
+            )
         lines.append(f"【已上傳文件】共 {len(documents)} 份:")
         lines.extend(doc_list)
     else:
@@ -224,7 +233,11 @@ def build_doc_context(documents: List[Document]) -> str:
         stored = rag_store.docs.get(doc.id or "") if doc.id else None
         if not content and stored and stored.preview:
             content = f"PDF 已索引（可 RAG 檢索）。預覽：{stored.preview}"
-        safe_content = content[:2000] if content else "未提供"
+        if doc.image:
+            safe_content = "影像檔，無文字摘要。"
+        else:
+            safe_content = content[:2000] if content else "未提供"
+        image_hint = "   影像: 已提供（可用 Vision Agent 解析）" if doc.image else None
         lines.append(
             "\n".join(
                 [
@@ -233,10 +246,41 @@ def build_doc_context(documents: List[Document]) -> str:
                     f"   頁數: {pages}",
                     f"   標籤: {tags}",
                     f"   內容摘要: {safe_content}",
+                    *( [image_hint] if image_hint else [] ),
                 ]
             )
         )
     return "文件清單:\n" + "\n".join(lines)
+
+
+def build_image_inputs(documents: List[Document]) -> List[Image]:
+    images: List[Image] = []
+    for doc in documents:
+        raw = (doc.image or "").strip()
+        if not raw:
+            continue
+        mime = doc.image_mime
+        payload = raw
+        if raw.startswith("data:"):
+            header, _, data_part = raw.partition(",")
+            payload = data_part or ""
+            if not mime:
+                mime = header.split(";")[0].replace("data:", "").strip() or None
+        if not payload:
+            continue
+        try:
+            content = base64.b64decode(payload)
+        except Exception:
+            continue
+        images.append(
+            Image(
+                content=content,
+                mime_type=mime,
+                id=doc.id,
+                alt_text=doc.name,
+            )
+        )
+    return images
 
 
 def build_conversation(messages: List[Message]) -> str:
@@ -481,8 +525,12 @@ def build_vision_agent() -> Agent:
     )
 
 
-def build_team(doc_ids: List[str], enable_web_search: bool = False) -> Team:
-    model = get_model(enable_web_search=enable_web_search)
+def build_team(
+    doc_ids: List[str],
+    enable_web_search: bool = False,
+    enable_vision: bool = False,
+) -> Team:
+    model = get_model(enable_web_search=enable_web_search, enable_vision=enable_vision)
     rag_agent = build_rag_agent(doc_ids, get_model())
     research_agent = build_research_agent()
     vision_agent = build_vision_agent()
@@ -597,6 +645,25 @@ async def upload_documents(files: List[UploadFile] = File(...)):
                 stored = rag_store.index_pdf_bytes(data, filename)
             elif ext in {".txt", ".md", ".csv"}:
                 stored = rag_store.index_text_bytes(data, filename)
+            elif ext in IMAGE_EXTENSIONS:
+                doc_id = str(uuid.uuid4())
+                mime_type, _ = guess_type(filename)
+                mime_type = mime_type or f"image/{ext.lstrip('.')}"
+                image_payload = base64.b64encode(data).decode("utf-8")
+                results.append(
+                    {
+                        "id": doc_id,
+                        "name": os.path.splitext(filename)[0],
+                        "type": ext.upper().lstrip("."),
+                        "pages": "-",
+                        "status": "indexed",
+                        "message": "",
+                        "preview": "",
+                        "image": f"data:{mime_type};base64,{image_payload}",
+                        "image_mime": mime_type,
+                    }
+                )
+                continue
             else:
                 stored = rag_store.register_stub(filename, ext.upper().lstrip(".") or "FILE", "尚未支援此格式")
         except Exception as exc:
@@ -700,12 +767,18 @@ async def generate_artifacts(req: ArtifactRequest):
         doc_context = build_doc_context(req.documents)
         convo = build_conversation(req.messages)
         doc_ids = [doc.id for doc in req.documents if doc.id and doc.id in rag_store.docs]
+        image_inputs = build_image_inputs(req.documents)
 
         # Add system status to prompt for Team
         system_status = build_system_status(req.documents, req.system_context)
         prompt = f"{convo}\n\n{system_status}\n\n{doc_context}\n\n請依規則產出 JSON。"
         use_web_search = bool(route and route.needs_web_search)
-        team = build_team(doc_ids, enable_web_search=use_web_search)
+        use_vision = bool(route and route.needs_vision) or bool(image_inputs)
+        team = build_team(
+            doc_ids,
+            enable_web_search=use_web_search,
+            enable_vision=use_vision,
+        )
         if use_web_search:
             team.tool_choice = WEB_SEARCH_TOOL
 
@@ -715,6 +788,7 @@ async def generate_artifacts(req: ArtifactRequest):
                 prompt,
                 dependencies={"doc_ids": doc_ids},
                 add_dependencies_to_context=True,
+                images=image_inputs if image_inputs else None,
                 stream=True,
                 stream_events=True,
             )
@@ -752,6 +826,7 @@ async def generate_artifacts(req: ArtifactRequest):
                 prompt,
                 dependencies={"doc_ids": doc_ids},
                 add_dependencies_to_context=True,
+                images=image_inputs if image_inputs else None,
             )
             text = response.get_content_as_string()
             data: Dict[str, Any] = safe_parse_json(text)
