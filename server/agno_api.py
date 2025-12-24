@@ -60,8 +60,7 @@ TEAM_INSTRUCTIONS = [
     "- summary.source_doc_id 與 translation.source_doc_id 必須填入來源文件的 id（見文件清單中的 id）",
     "- 若來源為多份文件，可使用 summary.source_doc_ids / translation.source_doc_ids 陣列",
     "- summary.risks[].level 僅能是 High、Medium、Low",
-    "- routing[].status 只能是 done（完成後才回傳）",
-    "- routing 只在使用工具時記錄，閒聊必須為 []",
+    "- routing 由系統填寫，請回傳空陣列 []",
 ]
 
 EXPECTED_OUTPUT = """
@@ -86,11 +85,7 @@ EXPECTED_OUTPUT = """
   },
   "translation": { "output": "", "clauses": [], "source_doc_id": "" },
   "memo": { "output": "", "sections": [], "recommendation": "", "conditions": "" },
-  "routing": [
-    { "label": "啟用 web_search 查詢最新資訊", "status": "done", "eta": "完成" },
-    { "label": "檢索文件", "status": "done", "eta": "完成" },
-    { "label": "產生摘要", "status": "done", "eta": "完成" }
-  ]
+  "routing": []
 }
 """.strip()
 
@@ -560,6 +555,11 @@ def run_router_agent(
 
 
 def extract_stream_text(event: Any) -> Optional[str]:
+    if isinstance(event, str):
+        return event
+    if hasattr(event, "get_content_as_string") and not hasattr(event, "event"):
+        content = event.get_content_as_string()
+        return content if content else None
     event_name = getattr(event, "event", "") or ""
     if event_name in {
         "TeamRunContent",
@@ -595,20 +595,17 @@ def build_routing_update(event: Any, routing_state: Dict[str, str]) -> Optional[
     event_name = getattr(event, "event", "") or ""
 
     if event_name in {TeamRunEvent.run_started.value, RunEvent.run_started.value}:
-        run_id = getattr(event, "run_id", "") or "main"
-        step_id = f"run-{run_id}"
+        step_id = "run-main"
         routing_state.setdefault(step_id, step_id)
         return {"id": step_id, "label": "模型生成", "status": "running", "eta": "進行中"}
 
     if event_name in {TeamRunEvent.run_completed.value, RunEvent.run_completed.value}:
-        run_id = getattr(event, "run_id", "") or "main"
-        step_id = f"run-{run_id}"
+        step_id = "run-main"
         routing_state.setdefault(step_id, step_id)
         return {"id": step_id, "label": "模型生成", "status": "done", "eta": "完成"}
 
     if event_name in {TeamRunEvent.run_error.value, RunEvent.run_error.value}:
-        run_id = getattr(event, "run_id", "") or "main"
-        step_id = f"run-{run_id}"
+        step_id = "run-main"
         routing_state.setdefault(step_id, step_id)
         return {"id": step_id, "label": "模型生成", "status": "done", "eta": "失敗"}
 
@@ -655,6 +652,20 @@ def build_routing_update(event: Any, routing_state: Dict[str, str]) -> Optional[
         }
 
     return None
+
+
+def update_routing_log(
+    routing_log: List[Dict[str, str]], update: Dict[str, str]
+) -> bool:
+    for idx, step in enumerate(routing_log):
+        if step.get("id") == update.get("id"):
+            merged = {**step, **update}
+            if merged == step:
+                return False
+            routing_log[idx] = merged
+            return True
+    routing_log.append(update)
+    return True
 
 
 def iter_stream_chunks(response: Any) -> Iterator[str]:
@@ -986,6 +997,13 @@ async def generate_artifacts(req: ArtifactRequest):
                 async def generate_smalltalk_sse():
                     accumulated = ""
                     try:
+                        routing_update = {
+                            "id": "run-main",
+                            "label": "模型生成",
+                            "status": "running",
+                            "eta": "進行中",
+                        }
+                        yield f"data: {json.dumps({'routing_update': routing_update})}\n\n"
                         for chunk in iter_stream_chunks(response):
                             accumulated += chunk
                             yield f"data: {json.dumps({'chunk': chunk})}\n\n"
@@ -994,6 +1012,14 @@ async def generate_artifacts(req: ArtifactRequest):
                             accumulated
                             or "你好！我是授信報告助理，可以協助摘要、翻譯、風險評估與授信報告草稿。"
                         )
+                        final_data["routing"] = [
+                            {
+                                "id": "run-main",
+                                "label": "模型生成",
+                                "status": "done",
+                                "eta": "完成",
+                            }
+                        ]
                         yield f"data: {json.dumps(final_data)}\n\n"
                     except Exception as exc:
                         error_response = build_empty_response(f"處理過程中發生錯誤：{str(exc)}")
@@ -1012,48 +1038,82 @@ async def generate_artifacts(req: ArtifactRequest):
             response_data = build_empty_response(reply)
             return response_data
 
-        ocr_updates = run_ocr_for_documents(req.documents)
-        ensure_inline_documents_indexed(req.documents)
-        doc_context = build_doc_context(
-            req.documents,
-            req.system_context.selected_doc_id if req.system_context else None,
-        )
         convo = build_conversation(req.messages)
-        doc_ids = [doc.id for doc in req.documents if doc.id and doc.id in rag_store.docs]
         image_inputs = build_image_inputs(req.documents)
 
         # Add system status to prompt for Team
         system_status = build_system_status(req.documents, req.system_context)
-        prompt = f"{convo}\n\n{system_status}\n\n{doc_context}\n\n請依規則產出 JSON。"
         use_web_search = bool(route and route.needs_web_search)
         use_vision = bool(route and route.needs_vision) or bool(image_inputs)
-        team = build_team(
-            doc_ids,
-            enable_web_search=use_web_search,
-            enable_vision=use_vision,
-        )
-        if use_web_search:
-            team.tool_choice = WEB_SEARCH_TOOL
-
         if req.stream:
-            # True token streaming from LLM
-            response = team.run(
-                prompt,
-                dependencies={"doc_ids": doc_ids},
-                add_dependencies_to_context=True,
-                images=image_inputs if image_inputs else None,
-                stream=True,
-                stream_events=True,
-            )
-
             async def generate_sse():
                 accumulated = ""
                 routing_state: Dict[str, str] = {}
+                routing_log: List[Dict[str, str]] = []
+                ocr_updates: List[Dict[str, Any]] = []
                 try:
+                    if image_inputs:
+                        ocr_start = {
+                            "id": "ocr",
+                            "label": "OCR 解析",
+                            "status": "running",
+                            "eta": "進行中",
+                        }
+                        if update_routing_log(routing_log, ocr_start):
+                            yield f"data: {json.dumps({'routing_update': ocr_start})}\n\n"
+                        ocr_updates = run_ocr_for_documents(req.documents)
+                        ocr_done = {
+                            "id": "ocr",
+                            "label": "OCR 解析",
+                            "status": "done",
+                            "eta": "完成",
+                        }
+                        if update_routing_log(routing_log, ocr_done):
+                            yield f"data: {json.dumps({'routing_update': ocr_done})}\n\n"
+
+                    ensure_inline_documents_indexed(req.documents)
+                    doc_ids = [
+                        doc.id
+                        for doc in req.documents
+                        if doc.id and doc.id in rag_store.docs
+                    ]
+                    team = build_team(
+                        doc_ids,
+                        enable_web_search=use_web_search,
+                        enable_vision=use_vision,
+                    )
+                    if use_web_search:
+                        team.tool_choice = WEB_SEARCH_TOOL
+
+                    doc_context = build_doc_context(
+                        req.documents,
+                        req.system_context.selected_doc_id if req.system_context else None,
+                    )
+                    prompt = f"{convo}\n\n{system_status}\n\n{doc_context}\n\n請依規則產出 JSON。"
+
+                    run_start = {
+                        "id": "run-main",
+                        "label": "模型生成",
+                        "status": "running",
+                        "eta": "進行中",
+                    }
+                    if update_routing_log(routing_log, run_start):
+                        yield f"data: {json.dumps({'routing_update': run_start})}\n\n"
+
+                    response = team.run(
+                        prompt,
+                        dependencies={"doc_ids": doc_ids},
+                        add_dependencies_to_context=True,
+                        images=image_inputs if image_inputs else None,
+                        stream=True,
+                        stream_events=True,
+                    )
+
                     for event in response:
                         routing_update = build_routing_update(event, routing_state)
                         if routing_update:
-                            yield f"data: {json.dumps({'routing_update': routing_update})}\n\n"
+                            if update_routing_log(routing_log, routing_update):
+                                yield f"data: {json.dumps({'routing_update': routing_update})}\n\n"
 
                         content = extract_stream_text(event)
                         if not content:
@@ -1061,9 +1121,20 @@ async def generate_artifacts(req: ArtifactRequest):
                         accumulated += content
                         yield f"data: {json.dumps({'chunk': content})}\n\n"
 
+                    run_done = {
+                        "id": "run-main",
+                        "label": "模型生成",
+                        "status": "done",
+                        "eta": "完成",
+                    }
+                    if update_routing_log(routing_log, run_done):
+                        yield f"data: {json.dumps({'routing_update': run_done})}\n\n"
+
                     # Parse and send final complete message
                     if accumulated:
                         final_data = safe_parse_json(accumulated)
+                        if routing_log:
+                            final_data["routing"] = routing_log
                         if ocr_updates:
                             final_data["documents_update"] = ocr_updates
                         research_doc = build_research_document(
@@ -1090,6 +1161,25 @@ async def generate_artifacts(req: ArtifactRequest):
             )
         else:
             # Non-streaming response
+            ocr_updates = run_ocr_for_documents(req.documents)
+            ensure_inline_documents_indexed(req.documents)
+            doc_ids = [
+                doc.id
+                for doc in req.documents
+                if doc.id and doc.id in rag_store.docs
+            ]
+            team = build_team(
+                doc_ids,
+                enable_web_search=use_web_search,
+                enable_vision=use_vision,
+            )
+            if use_web_search:
+                team.tool_choice = WEB_SEARCH_TOOL
+            doc_context = build_doc_context(
+                req.documents,
+                req.system_context.selected_doc_id if req.system_context else None,
+            )
+            prompt = f"{convo}\n\n{system_status}\n\n{doc_context}\n\n請依規則產出 JSON。"
             response = team.run(
                 prompt,
                 dependencies={"doc_ids": doc_ids},
