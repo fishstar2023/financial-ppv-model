@@ -133,6 +133,22 @@ const initialTranslationPairs = [];
 
 const initialMemoSections = [];
 
+const emptySummary = {
+  output: summaryOutput,
+  borrower: {
+    name: '',
+    description: '',
+    rating: '',
+  },
+  metrics: initialSummaryMetrics,
+  risks: initialRiskFlags,
+};
+
+const emptyTranslation = {
+  output: translationOutput,
+  clauses: initialTranslationPairs,
+};
+
 const artifactTabs = [
   { id: 'documents', label: '文件', icon: FolderOpen },
   { id: 'summary', label: '摘要', icon: FileText },
@@ -200,16 +216,7 @@ export default function App() {
   const [ownerName, setOwnerName] = useState('RM Desk');
 
   const [artifacts, setArtifacts] = useState({
-    summary: {
-      output: summaryOutput,
-      borrower: {
-        name: '',
-        description: '',
-        rating: '',
-      },
-      metrics: initialSummaryMetrics,
-      risks: initialRiskFlags,
-    },
+    summaries: [],
     translations: [],  // Changed to array for history
     memo: {
       output: memoOutput,
@@ -220,6 +227,14 @@ export default function App() {
   });
 
   const [activeTranslationIndex, setActiveTranslationIndex] = useState(0);
+
+  const filteredTranslations = selectedDocId
+    ? artifacts.translations.filter((item) => (item.sourceDocIds || []).includes(selectedDocId))
+    : artifacts.translations;
+
+  const filteredSummaries = selectedDocId
+    ? artifacts.summaries.filter((item) => (item.sourceDocIds || []).includes(selectedDocId))
+    : artifacts.summaries;
 
   // Load preloaded PDF documents on startup (only once)
   useEffect(() => {
@@ -266,12 +281,18 @@ export default function App() {
     return () => { isMounted = false; };
   }, []);
 
-  // Ensure activeTranslationIndex is within bounds
+  // Ensure activeTranslationIndex is within bounds for selected document
   useEffect(() => {
-    if (artifacts.translations.length > 0 && activeTranslationIndex >= artifacts.translations.length) {
-      setActiveTranslationIndex(artifacts.translations.length - 1);
+    if (filteredTranslations.length === 0) {
+      if (activeTranslationIndex !== 0) {
+        setActiveTranslationIndex(0);
+      }
+      return;
     }
-  }, [artifacts.translations.length, activeTranslationIndex]);
+    if (activeTranslationIndex >= filteredTranslations.length) {
+      setActiveTranslationIndex(filteredTranslations.length - 1);
+    }
+  }, [filteredTranslations.length, activeTranslationIndex]);
 
   const fileInputRef = useRef(null);
 
@@ -281,11 +302,16 @@ export default function App() {
       return { output: '' };
     }
     if (activeTab === 'translation') {
-      const translations = artifacts.translations;
-      if (translations.length === 0) {
-        return { output: '', clauses: [] };
+      if (filteredTranslations.length === 0) {
+        return emptyTranslation;
       }
-      return translations[activeTranslationIndex] || translations[0];
+      return filteredTranslations[activeTranslationIndex] || filteredTranslations[0];
+    }
+    if (activeTab === 'summary') {
+      if (filteredSummaries.length === 0) {
+        return emptySummary;
+      }
+      return filteredSummaries[filteredSummaries.length - 1];
     }
     return artifacts[activeTab];
   };
@@ -424,7 +450,7 @@ export default function App() {
 
   // Create new case (reset all state)
   const handleNewCase = () => {
-    const hasContent = messages.length > 0 || artifacts.summary.output || artifacts.translations.length > 0 || artifacts.memo.output;
+    const hasContent = messages.length > 0 || artifacts.summaries.length > 0 || artifacts.translations.length > 0 || artifacts.memo.output;
     if (hasContent) {
       if (!window.confirm('確定要新增案件嗎？目前的對話和產出將會清空。')) {
         return;
@@ -433,7 +459,7 @@ export default function App() {
     setMessages([]);
     setRoutingSteps([]);
     setArtifacts({
-      summary: { output: '', borrower: { name: '', description: '', rating: '' }, metrics: [], risks: [] },
+      summaries: [],
       translations: [],
       memo: { output: '', sections: [], recommendation: '', conditions: '' },
     });
@@ -447,7 +473,8 @@ export default function App() {
     const packageContent = {
       caseId,
       exportTime: new Date().toISOString(),
-      summary: artifacts.summary,
+      summary: artifacts.summaries[artifacts.summaries.length - 1] || emptySummary,
+      summaries: artifacts.summaries,
       translations: artifacts.translations,
       memo: artifacts.memo,
       documents: documents.map((d) => ({ name: d.name, type: d.type, tags: d.tags })),
@@ -492,7 +519,7 @@ export default function App() {
       const systemContext = {
         case_id: caseId,
         owner_name: ownerName,
-        has_summary: Boolean(artifacts.summary.output),
+        has_summary: artifacts.summaries.length > 0,
         has_translation: artifacts.translations.length > 0,
         has_memo: Boolean(artifacts.memo.output),
         translation_count: artifacts.translations.length,
@@ -605,18 +632,34 @@ export default function App() {
 
       // Update artifacts
       if (data.summary || data.translation || data.memo) {
+        const sourceDocIds = selectedDocId ? [selectedDocId] : [];
+
         setArtifacts((prev) => {
+          let summaries = prev.summaries;
+          const hasSummaryPayload = Boolean(
+            data.summary?.output ||
+              data.summary?.borrower?.name ||
+              data.summary?.borrower?.description ||
+              data.summary?.borrower?.rating ||
+              (data.summary?.metrics || []).length ||
+              (data.summary?.risks || []).length
+          );
+
+          if (data.summary && hasSummaryPayload) {
+            const summaryEntry = {
+              id: createId(),
+              timestamp: Date.now(),
+              sourceDocIds,
+              output: data.summary.output || '',
+              borrower: data.summary.borrower || emptySummary.borrower,
+              metrics: data.summary.metrics || [],
+              risks: data.summary.risks || [],
+            };
+            summaries = [...prev.summaries, summaryEntry];
+          }
+
           const newArtifacts = {
-            summary: {
-              ...prev.summary,
-              output: data.summary?.output || prev.summary.output,
-              borrower: {
-                ...prev.summary.borrower,
-                ...(data.summary?.borrower || {}),
-              },
-              metrics: data.summary?.metrics || prev.summary.metrics,
-              risks: data.summary?.risks || prev.summary.risks,
-            },
+            summaries,
             translations: prev.translations,
             memo: {
               ...prev.memo,
@@ -629,15 +672,19 @@ export default function App() {
 
           // Add new translation version if present
           if (data.translation && (data.translation.output || data.translation.clauses?.length > 0)) {
+            const docTranslationCount = selectedDocId
+              ? prev.translations.filter((item) => (item.sourceDocIds || []).includes(selectedDocId)).length
+              : prev.translations.length;
             const newTranslation = {
               id: createId(),
               timestamp: Date.now(),
-              title: `翻譯 #${prev.translations.length + 1}`,
+              title: `翻譯 #${docTranslationCount + 1}`,
+              sourceDocIds,
               output: data.translation.output || '',
               clauses: data.translation.clauses || [],
             };
             newArtifacts.translations = [...prev.translations, newTranslation];
-            setActiveTranslationIndex(newArtifacts.translations.length - 1);
+            setActiveTranslationIndex(docTranslationCount);
           }
 
           return newArtifacts;
@@ -1000,9 +1047,9 @@ export default function App() {
 
                   {activeTab === 'translation' ? (
                     <div className="preview-translation">
-                      {artifacts.translations.length > 1 && (
+                      {filteredTranslations.length > 1 && (
                         <div className="translation-tabs">
-                          {artifacts.translations.map((trans, index) => (
+                          {filteredTranslations.map((trans, index) => (
                             <button
                               key={trans.id}
                               type="button"
