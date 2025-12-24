@@ -161,8 +161,7 @@ def get_model(
         return OpenAIResponses(id=model_name, api_key=api_key)
 
     kwargs: Dict[str, Any] = {"id": model_name, "api_key": api_key}
-    if enable_vision:
-        kwargs["modalities"] = ["text", "image"]
+    # Vision inputs are passed via Agent.run(images=...), no extra request params needed.
 
     return OpenAIChat(**kwargs)
 
