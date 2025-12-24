@@ -1342,6 +1342,12 @@ export default function App() {
                 rows={3}
                 value={composerText}
                 onChange={(event) => setComposerText(event.target.value)}
+                onKeyDown={(event) => {
+                  if (event.key === 'Enter' && !event.shiftKey) {
+                    event.preventDefault();
+                    handleSend();
+                  }
+                }}
                 placeholder="輸入指示，例如：請翻譯條款書第 3-6 條，並更新風險摘要"
               />
               {errorMessage ? <div className="error-banner">{errorMessage}</div> : null}
