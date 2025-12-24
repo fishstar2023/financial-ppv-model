@@ -324,9 +324,17 @@ export default function App() {
   const latestRoutingStatus = latestRouting
     ? statusMeta[latestRouting.status] || null
     : null;
-  const routingSummaryText = latestRouting
-    ? `${latestRouting.label}${latestRouting.eta ? ` · ${latestRouting.eta}` : ''}`
-    : '尚未啟動';
+  const routingSummaryText = (() => {
+    if (!latestRouting) return '尚未啟動';
+    const labelText = (latestRouting.label || '').trim();
+    const etaText = (latestRouting.eta || '').trim();
+    const statusLabel = (latestRoutingStatus?.label || '').trim();
+    let text = labelText || etaText || '尚未啟動';
+    if (etaText && etaText !== labelText && etaText !== statusLabel) {
+      text = text ? `${text} · ${etaText}` : etaText;
+    }
+    return text;
+  })();
 
   const handleUploadClick = () => {
     fileInputRef.current?.click();
