@@ -120,6 +120,8 @@ class SystemContext(BaseModel):
     has_translation: bool = False
     has_memo: bool = False
     translation_count: int = 0
+    selected_doc_id: Optional[str] = None
+    selected_doc_name: Optional[str] = None
 
 
 class RouteDecision(BaseModel):
@@ -186,6 +188,10 @@ def build_system_status(
             lines.append(f"【案件編號】{system_context.case_id}")
         if system_context.owner_name:
             lines.append(f"【負責人】{system_context.owner_name}")
+        if system_context.selected_doc_name:
+            lines.append(f"【目前選取文件】{system_context.selected_doc_name}")
+        elif system_context.selected_doc_id:
+            lines.append(f"【目前選取文件】{system_context.selected_doc_id}")
 
     # 文件清單
     if documents:
@@ -220,7 +226,7 @@ def build_system_status(
     return "\n".join(lines)
 
 
-def build_doc_context(documents: List[Document]) -> str:
+def build_doc_context(documents: List[Document], selected_doc_id: Optional[str] = None) -> str:
     if not documents:
         return "文件清單: 無。"
 
@@ -237,15 +243,16 @@ def build_doc_context(documents: List[Document]) -> str:
         else:
             safe_content = content[:2000] if content else "未提供"
         image_hint = "   影像: 已提供（可用 Vision Agent 解析）" if doc.image else None
+        selected_mark = " (目前選取)" if selected_doc_id and doc.id == selected_doc_id else ""
         lines.append(
             "\n".join(
                 [
-                    f"{idx}. 名稱: {doc.name or '未命名'}",
+                    f"{idx}. 名稱: {doc.name or '未命名'}{selected_mark}",
                     f"   類型: {doc.type or '-'}",
                     f"   頁數: {pages}",
                     f"   標籤: {tags}",
                     f"   內容摘要: {safe_content}",
-                    *( [image_hint] if image_hint else [] ),
+                    *([image_hint] if image_hint else []),
                 ]
             )
         )
@@ -763,7 +770,10 @@ async def generate_artifacts(req: ArtifactRequest):
             return response_data
 
         ensure_inline_documents_indexed(req.documents)
-        doc_context = build_doc_context(req.documents)
+        doc_context = build_doc_context(
+            req.documents,
+            req.system_context.selected_doc_id if req.system_context else None,
+        )
         convo = build_conversation(req.messages)
         doc_ids = [doc.id for doc in req.documents if doc.id and doc.id in rag_store.docs]
         image_inputs = build_image_inputs(req.documents)

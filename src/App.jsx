@@ -507,6 +507,9 @@ export default function App() {
     };
 
     const outgoingMessages = [...messages, userMessage];
+    const requestDocId = selectedDocId;
+    const requestDoc = documents.find((doc) => doc.id === requestDocId);
+    const requestDocName = requestDoc?.name || '';
 
     setMessages(outgoingMessages);
     setComposerText('');
@@ -527,6 +530,8 @@ export default function App() {
         has_translation: artifacts.translations.length > 0,
         has_memo: Boolean(artifacts.memo.output),
         translation_count: artifacts.translations.length,
+        selected_doc_id: requestDocId || null,
+        selected_doc_name: requestDocName || null,
       };
 
       const response = await fetch(`${apiBase}/api/artifacts`, {
@@ -636,7 +641,7 @@ export default function App() {
 
       // Update artifacts
       if (data.summary || data.translation || data.memo) {
-        const sourceDocIds = selectedDocId ? [selectedDocId] : [];
+        const sourceDocIds = requestDocId ? [requestDocId] : [];
 
         setArtifacts((prev) => {
           let summaries = prev.summaries;
@@ -676,8 +681,8 @@ export default function App() {
 
           // Add new translation version if present
           if (data.translation && (data.translation.output || data.translation.clauses?.length > 0)) {
-            const docTranslationCount = selectedDocId
-              ? prev.translations.filter((item) => (item.sourceDocIds || []).includes(selectedDocId)).length
+            const docTranslationCount = requestDocId
+              ? prev.translations.filter((item) => (item.sourceDocIds || []).includes(requestDocId)).length
               : prev.translations.length;
             const newTranslation = {
               id: createId(),
