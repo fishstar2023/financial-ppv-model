@@ -24,7 +24,6 @@ import {
   Paperclip,
   Plus,
   Upload,
-  Wand2,
   X,
 } from 'lucide-react';
 import q2Financials from './docs/q2-financials.txt?raw';
@@ -59,6 +58,7 @@ const initialDocs = [
     name: '2024 Q2 財務報表',
     type: 'TXT',
     pages: estimatePages(q2Financials),
+    tag_key: 'doc-1',
     tags: ['摘要', '納入報告'],
     content: q2Financials,
   },
@@ -67,6 +67,7 @@ const initialDocs = [
     name: '授信條款書',
     type: 'TXT',
     pages: estimatePages(termSheet),
+    tag_key: 'doc-2',
     tags: ['翻譯', '納入報告'],
     content: termSheet,
   },
@@ -75,6 +76,7 @@ const initialDocs = [
     name: 'KYC / AML 資料包',
     type: 'TXT',
     pages: estimatePages(kycAml),
+    tag_key: 'doc-3',
     tags: ['摘要', '風險掃描'],
     content: kycAml,
   },
@@ -83,6 +85,7 @@ const initialDocs = [
     name: '擔保品估價報告',
     type: 'TXT',
     pages: estimatePages(appraisal),
+    tag_key: 'doc-4',
     tags: ['翻譯'],
     content: appraisal,
   },
@@ -91,6 +94,7 @@ const initialDocs = [
     name: '產業展望 Q2',
     type: 'TXT',
     pages: estimatePages(industryOutlook),
+    tag_key: 'doc-5',
     tags: ['背景'],
     content: industryOutlook,
   },
@@ -228,6 +232,31 @@ export default function App() {
 
   const [activeTranslationIndex, setActiveTranslationIndex] = useState(0);
 
+  const persistDocTags = async (tagKey, tags) => {
+    if (!tagKey) return;
+    try {
+      await fetch(`${apiBase || ''}/api/tags`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tag_key: tagKey, tags }),
+      });
+    } catch (error) {
+      console.warn('標籤保存失敗:', error);
+    }
+  };
+
+  const persistCustomTags = async (tags) => {
+    try {
+      await fetch(`${apiBase || ''}/api/tags`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ custom_tags: tags }),
+      });
+    } catch (error) {
+      console.warn('自定義標籤保存失敗:', error);
+    }
+  };
+
   const filteredTranslations = selectedDocId
     ? artifacts.translations.filter((item) => (item.sourceDocIds || []).includes(selectedDocId))
     : artifacts.translations;
@@ -249,7 +278,8 @@ export default function App() {
           name: doc.name,
           type: doc.type,
           pages: doc.pages ?? '-',
-          tags: [],
+          tag_key: doc.tag_key || doc.id,
+          tags: Array.isArray(doc.tags) ? doc.tags : [],
           content: doc.preview || '',
           image: '',
           image_mime: '',
@@ -280,6 +310,35 @@ export default function App() {
       }
     };
     loadPreloadedDocs();
+    return () => { isMounted = false; };
+  }, []);
+
+  useEffect(() => {
+    let isMounted = true;
+    const loadTags = async () => {
+      try {
+        const response = await fetch(`${apiBase || ''}/api/tags`);
+        if (!response.ok || !isMounted) return;
+        const data = await response.json();
+        if (Array.isArray(data.custom_tags) && isMounted) {
+          setCustomTags(data.custom_tags);
+        }
+        const docTags = data.doc_tags || {};
+        if (isMounted && docTags && typeof docTags === 'object') {
+          setDocuments((prev) =>
+            prev.map((doc) => {
+              const tagKey = doc.tag_key || doc.id;
+              const savedTags = docTags[tagKey];
+              if (!Array.isArray(savedTags)) return doc;
+              return { ...doc, tags: savedTags };
+            })
+          );
+        }
+      } catch (error) {
+        console.warn('載入標籤失敗:', error);
+      }
+    };
+    loadTags();
     return () => { isMounted = false; };
   }, []);
 
@@ -352,24 +411,34 @@ export default function App() {
 
   // Tag management functions
   const handleToggleTag = (docId, tag) => {
-    setDocuments((prev) =>
-      prev.map((doc) => {
+    setDocuments((prev) => {
+      let updatedTags = null;
+      let tagKey = '';
+      const next = prev.map((doc) => {
         if (doc.id !== docId) return doc;
         const tags = doc.tags || [];
         const hasTag = tags.includes(tag);
+        updatedTags = hasTag ? tags.filter((t) => t !== tag) : [...tags, tag];
+        tagKey = doc.tag_key || doc.id;
         return {
           ...doc,
-          tags: hasTag ? tags.filter((t) => t !== tag) : [...tags, tag],
+          tags: updatedTags,
         };
-      })
-    );
+      });
+      if (updatedTags && tagKey) {
+        persistDocTags(tagKey, updatedTags);
+      }
+      return next;
+    });
   };
 
   const handleAddCustomTag = () => {
     const trimmed = newTagInput.trim();
     if (!trimmed) return;
     if (!customTags.includes(trimmed)) {
-      setCustomTags((prev) => [...prev, trimmed]);
+      const nextTags = [...customTags, trimmed];
+      setCustomTags(nextTags);
+      persistCustomTags(nextTags);
     }
     if (editingDocId) {
       handleToggleTag(editingDocId, trimmed);
@@ -405,7 +474,8 @@ export default function App() {
         name: doc.name || '未命名',
         type: doc.type || 'FILE',
         pages: doc.pages ?? '-',
-        tags: [],
+        tag_key: doc.tag_key || doc.id,
+        tags: Array.isArray(doc.tags) ? doc.tags : [],
         content: doc.preview || '',
         image: doc.image || '',
         image_mime: doc.image_mime || '',
@@ -462,19 +532,6 @@ export default function App() {
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
-  };
-
-  // Regenerate artifacts (re-send last request)
-  const handleRegenerate = () => {
-    if (messages.length === 0) {
-      setErrorMessage('尚無對話記錄，無法重新產生');
-      return;
-    }
-    // Find last user message and resend
-    const lastUserMsg = [...messages].reverse().find((m) => m.role === 'user');
-    if (lastUserMsg) {
-      setComposerText(lastUserMsg.content);
-    }
   };
 
   // Create new case (reset all state)
@@ -538,10 +595,7 @@ export default function App() {
     setIsLoading(true);
     setErrorMessage('');
     setStreamingContent('');
-    // Show initial loading state - will be replaced by real routing data from LLM
-    setRoutingSteps([
-      { id: createId(), label: '處理請求中...', status: 'running', eta: '進行中' },
-    ]);
+    setRoutingSteps([]);
 
     try {
       // Build system context for LLM
@@ -577,6 +631,20 @@ export default function App() {
 
       const contentType = response.headers.get('content-type') || '';
       let data = null;
+      let hasRoutingUpdates = false;
+
+      const applyRoutingUpdate = (update) => {
+        if (!update || !update.id) return;
+        setRoutingSteps((prev) => {
+          const index = prev.findIndex((step) => step.id === update.id);
+          if (index >= 0) {
+            const next = [...prev];
+            next[index] = { ...next[index], ...update };
+            return next;
+          }
+          return [...prev, update];
+        });
+      };
 
       if (!contentType.includes('text/event-stream')) {
         // Fallback: handle JSON (e.g., error response) when SSE is not returned
@@ -608,26 +676,12 @@ export default function App() {
               if (parsed.chunk) {
                 accumulatedContent += parsed.chunk;
                 setStreamingContent(accumulatedContent);
+                continue;
+              }
 
-                // Try to extract partial routing from accumulated content
-                try {
-                  const routingMatch = accumulatedContent.match(/"routing"\s*:\s*\[([\s\S]*?)\]/);
-                  if (routingMatch) {
-                    const routingJson = JSON.parse(`[${routingMatch[1]}]`);
-                    if (Array.isArray(routingJson) && routingJson.length > 0) {
-                      setRoutingSteps(
-                        routingJson.map((step) => ({
-                          id: step.id || createId(),
-                          label: step.label || '任務更新',
-                          status: step.status || 'running',
-                          eta: step.eta || '進行中',
-                        }))
-                      );
-                    }
-                  }
-                } catch {
-                  // Partial JSON, continue accumulating
-                }
+              if (parsed.routing_update) {
+                hasRoutingUpdates = true;
+                applyRoutingUpdate(parsed.routing_update);
                 continue;
               }
 
@@ -661,6 +715,24 @@ export default function App() {
         throw new Error(data.error + (data.detail ? `: ${data.detail}` : ''));
       }
 
+      if (Array.isArray(data.documents_update) && data.documents_update.length > 0) {
+        setDocuments((prev) =>
+          prev.map((doc) => {
+            const update = data.documents_update.find((item) => item.id === doc.id);
+            if (!update) return doc;
+            return {
+              ...doc,
+              content: update.content || doc.content,
+              pages: update.pages ?? doc.pages,
+              status: update.status || doc.status,
+              message: update.message || doc.message,
+              tags: Array.isArray(update.tags) ? update.tags : doc.tags,
+              tag_key: update.tag_key || doc.tag_key,
+            };
+          })
+        );
+      }
+
       if (Array.isArray(data.documents_append) && data.documents_append.length > 0) {
         const appendedDocs = data.documents_append.map((doc) => ({
           id: doc.id || createId(),
@@ -671,6 +743,7 @@ export default function App() {
           content: doc.content || doc.preview || '',
           image: doc.image || '',
           image_mime: doc.image_mime || '',
+          tag_key: doc.tag_key || doc.id,
           status: doc.status || 'indexed',
           message: doc.message || '',
           source: doc.source || 'research',
@@ -792,7 +865,7 @@ export default function App() {
       }
 
       // Update routing
-      if (Array.isArray(data.routing)) {
+      if (!hasRoutingUpdates && Array.isArray(data.routing)) {
         setRoutingSteps(
           data.routing.map((step) => ({
             id: step.id || createId(),
@@ -801,7 +874,7 @@ export default function App() {
             eta: step.eta || '完成',
           }))
         );
-      } else {
+      } else if (!hasRoutingUpdates) {
         setRoutingSteps([]);
       }
 
@@ -1052,9 +1125,6 @@ export default function App() {
                     匯出報告
                   </Button>
                 ) : null}
-                <Button icon={Wand2} variant="outlined" disabled={isLoading} onClick={handleRegenerate}>
-                  重新產生
-                </Button>
                 <ActionIcon icon={Copy} variant="outlined" onClick={handleCopyOutput} title="複製內容" />
                 <ActionIcon icon={Download} variant="outlined" onClick={handleDownloadOutput} title="下載 Markdown" />
               </div>

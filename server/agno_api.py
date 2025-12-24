@@ -1,4 +1,5 @@
 import base64
+import hashlib
 import json
 import os
 import uuid
@@ -14,11 +15,14 @@ from pydantic import BaseModel, Field
 
 from agno.agent import Agent
 from agno.media import Image
+from agno.run.agent import RunEvent
+from agno.run.team import TeamRunEvent
 from agno.team import Team
 from agno.models.openai import OpenAIChat
 from agno.models.openai.responses import OpenAIResponses
 
 from rag_store import RagStore
+from tag_store import get_doc_tags, load_tag_store, set_custom_tags, set_doc_tags
 
 
 # Robust .env loader to avoid parser crashes on some environments.
@@ -42,6 +46,7 @@ TEAM_INSTRUCTIONS = [
     "2. 需要文件分析（如 摘要、翻譯、報告）→ 使用「完整模式」並委派 RAG Agent（文件檢索）",
     "3. 需要市場/即時資訊（企業、產業、新聞、股市、總經事件）→ 使用「完整模式」並委派 Web Research Agent，必須使用 web_search 工具先查後答，不可直接拒絕。",
     "4. 使用者提供截圖/照片/影像 → 委派 Vision Agent 讀圖與 OCR，並回傳重點與文字內容。",
+    "若本次任務包含 OCR 文字，請在 summary.output 產出該文件的摘要。",
     "",
     "【簡單模式】僅填充 assistant.content，其他欄位必須為空或空陣列：",
     '{"assistant": {"content": "你好！有什麼可以幫助你的嗎？", "bullets": []}, "summary": {"output": "", "borrower": null, "metrics": [], "risks": []}, "translation": {"output": "", "clauses": []}, "memo": {"output": "", "sections": [], "recommendation": "", "conditions": ""}, "routing": []}',
@@ -113,6 +118,7 @@ class Document(BaseModel):
     content: Optional[str] = ""
     image: Optional[str] = None
     image_mime: Optional[str] = None
+    tag_key: Optional[str] = None
 
 
 class SystemContext(BaseModel):
@@ -140,6 +146,12 @@ class ArtifactRequest(BaseModel):
     documents: List[Document] = Field(default_factory=list)
     stream: bool = False
     system_context: Optional[SystemContext] = None
+
+
+class TagUpdateRequest(BaseModel):
+    tag_key: Optional[str] = None
+    tags: Optional[List[str]] = None
+    custom_tags: Optional[List[str]] = None
 
 
 def get_model_id() -> str:
@@ -293,6 +305,61 @@ def build_image_inputs(documents: List[Document]) -> List[Image]:
     return images
 
 
+def run_ocr_for_documents(documents: List[Document]) -> List[Dict[str, Any]]:
+    updates: List[Dict[str, Any]] = []
+    if not documents:
+        return updates
+
+    agent = build_vision_agent()
+    for doc in documents:
+        content = (doc.content or "").strip()
+        if content or not doc.image:
+            continue
+        if not doc.id:
+            doc.id = str(uuid.uuid4())
+        images = build_image_inputs([doc])
+        if not images:
+            continue
+        try:
+            prompt = "請針對這張圖片做 OCR，輸出純文字內容，不要加入多餘說明。"
+            resp = agent.run(prompt, images=images)
+            text = (resp.get_content_as_string() or "").strip()
+            if not text:
+                continue
+            doc.content = text
+            rag_store.index_inline_text(doc.id, doc.name or doc.id, text, doc.type or "IMAGE")
+            updates.append(
+                {
+                    "id": doc.id,
+                    "name": doc.name or "未命名",
+                    "type": doc.type or "IMAGE",
+                    "pages": estimate_pages(text),
+                    "content": text,
+                    "preview": text[:400],
+                    "status": "indexed",
+                    "message": "",
+                    "tag_key": doc.tag_key,
+                    "tags": doc.tags or [],
+                }
+            )
+        except Exception as exc:
+            updates.append(
+                {
+                    "id": doc.id,
+                    "name": doc.name or "未命名",
+                    "type": doc.type or "IMAGE",
+                    "pages": doc.pages or "-",
+                    "content": doc.content or "",
+                    "preview": doc.content[:400] if doc.content else "",
+                    "status": "error",
+                    "message": str(exc),
+                    "tag_key": doc.tag_key,
+                    "tags": doc.tags or [],
+                }
+            )
+    return updates
+
+
 def build_conversation(messages: List[Message]) -> str:
     if not messages:
         return "對話紀錄：無。"
@@ -333,6 +400,10 @@ def build_empty_response(message: str) -> Dict[str, Any]:
         },
         "routing": [],
     }
+
+
+def compute_tag_key(data: bytes) -> str:
+    return hashlib.md5(data).hexdigest()
 
 
 def estimate_pages(content: str) -> int:
@@ -508,6 +579,84 @@ def extract_stream_text(event: Any) -> Optional[str]:
     return None
 
 
+def format_tool_label(tool_name: Optional[str]) -> str:
+    if not tool_name:
+        return "工具呼叫"
+    normalized = tool_name.strip()
+    lower = normalized.lower()
+    if "web_search" in lower:
+        return "網路查詢"
+    if "search_knowledge" in lower or "knowledge" in lower:
+        return "文件檢索"
+    return normalized.replace("_", " ")
+
+
+def build_routing_update(event: Any, routing_state: Dict[str, str]) -> Optional[Dict[str, str]]:
+    event_name = getattr(event, "event", "") or ""
+
+    if event_name in {TeamRunEvent.run_started.value, RunEvent.run_started.value}:
+        run_id = getattr(event, "run_id", "") or "main"
+        step_id = f"run-{run_id}"
+        routing_state.setdefault(step_id, step_id)
+        return {"id": step_id, "label": "模型生成", "status": "running", "eta": "進行中"}
+
+    if event_name in {TeamRunEvent.run_completed.value, RunEvent.run_completed.value}:
+        run_id = getattr(event, "run_id", "") or "main"
+        step_id = f"run-{run_id}"
+        routing_state.setdefault(step_id, step_id)
+        return {"id": step_id, "label": "模型生成", "status": "done", "eta": "完成"}
+
+    if event_name in {TeamRunEvent.run_error.value, RunEvent.run_error.value}:
+        run_id = getattr(event, "run_id", "") or "main"
+        step_id = f"run-{run_id}"
+        routing_state.setdefault(step_id, step_id)
+        return {"id": step_id, "label": "模型生成", "status": "done", "eta": "失敗"}
+
+    if event_name in {TeamRunEvent.tool_call_started.value, RunEvent.tool_call_started.value}:
+        tool = getattr(event, "tool", None)
+        tool_key = getattr(tool, "tool_call_id", None)
+        if not tool_key:
+            tool_name = getattr(tool, "tool_name", None) or "tool"
+            tool_key = f"{tool_name}-{getattr(tool, 'created_at', '')}"
+        routing_state.setdefault(tool_key, tool_key)
+        return {
+            "id": routing_state[tool_key],
+            "label": format_tool_label(getattr(tool, "tool_name", None)),
+            "status": "running",
+            "eta": "進行中",
+        }
+
+    if event_name in {TeamRunEvent.tool_call_completed.value, RunEvent.tool_call_completed.value}:
+        tool = getattr(event, "tool", None)
+        tool_key = getattr(tool, "tool_call_id", None)
+        if not tool_key:
+            tool_name = getattr(tool, "tool_name", None) or "tool"
+            tool_key = f"{tool_name}-{getattr(tool, 'created_at', '')}"
+        routing_state.setdefault(tool_key, tool_key)
+        return {
+            "id": routing_state[tool_key],
+            "label": format_tool_label(getattr(tool, "tool_name", None)),
+            "status": "done",
+            "eta": "完成",
+        }
+
+    if event_name in {TeamRunEvent.tool_call_error.value, RunEvent.tool_call_error.value}:
+        tool = getattr(event, "tool", None)
+        tool_key = getattr(tool, "tool_call_id", None)
+        if not tool_key:
+            tool_name = getattr(tool, "tool_name", None) or "tool"
+            tool_key = f"{tool_name}-{getattr(tool, 'created_at', '')}"
+        routing_state.setdefault(tool_key, tool_key)
+        return {
+            "id": routing_state[tool_key],
+            "label": format_tool_label(getattr(tool, "tool_name", None)),
+            "status": "done",
+            "eta": "失敗",
+        }
+
+    return None
+
+
 def iter_stream_chunks(response: Any) -> Iterator[str]:
     saw_delta = False
     for event in response:
@@ -678,17 +827,38 @@ async def health():
     return {"ok": True}
 
 
+@app.get("/api/tags")
+async def get_tags():
+    store = load_tag_store()
+    return {
+        "custom_tags": store.get("custom_tags", []),
+        "doc_tags": store.get("docs", {}),
+    }
+
+
+@app.post("/api/tags")
+async def update_tags(req: TagUpdateRequest):
+    if req.tag_key and req.tags is not None:
+        set_doc_tags(req.tag_key, req.tags)
+    if req.custom_tags is not None:
+        set_custom_tags(req.custom_tags)
+    return {"ok": True}
+
+
 @app.get("/api/documents/preloaded")
 async def get_preloaded_documents():
     """獲取預加載的文檔列表"""
     documents = []
     for doc_id, stored in rag_store.docs.items():
+        tag_key = stored.content_hash or stored.id
         documents.append(
             {
                 "id": stored.id,
                 "name": stored.name,
                 "type": stored.type,
                 "pages": stored.pages or "-",
+                "tags": get_doc_tags(tag_key),
+                "tag_key": tag_key,
                 "status": stored.status,
                 "message": stored.message,
                 "preview": stored.preview,
@@ -707,6 +877,8 @@ async def upload_documents(files: List[UploadFile] = File(...)):
         filename = file.filename or f"upload-{uuid.uuid4()}"
         ext = os.path.splitext(filename)[1].lower()
         data = await file.read()
+        tag_key = compute_tag_key(data)
+        stored_tags = get_doc_tags(tag_key)
 
         try:
             if ext == ".pdf":
@@ -724,6 +896,8 @@ async def upload_documents(files: List[UploadFile] = File(...)):
                         "name": os.path.splitext(filename)[0],
                         "type": ext.upper().lstrip("."),
                         "pages": "-",
+                        "tags": stored_tags,
+                        "tag_key": tag_key,
                         "status": "indexed",
                         "message": "",
                         "preview": "",
@@ -743,6 +917,8 @@ async def upload_documents(files: List[UploadFile] = File(...)):
                 "name": stored.name,
                 "type": stored.type,
                 "pages": stored.pages or "-",
+                "tags": stored_tags,
+                "tag_key": tag_key,
                 "status": stored.status,
                 "message": stored.message,
                 "preview": stored.preview,
@@ -762,6 +938,7 @@ async def get_preloaded_documents():
     for file_path in docs_dir.glob("*.pdf"):
         try:
             data = file_path.read_bytes()
+            tag_key = compute_tag_key(data)
             stored = rag_store.index_pdf_bytes(data, file_path.name)
             results.append(
                 {
@@ -769,6 +946,8 @@ async def get_preloaded_documents():
                     "name": stored.name,
                     "type": stored.type,
                     "pages": stored.pages or "-",
+                    "tags": get_doc_tags(tag_key),
+                    "tag_key": tag_key,
                     "status": stored.status,
                     "message": stored.message,
                     "preview": stored.preview,
@@ -781,6 +960,8 @@ async def get_preloaded_documents():
                     "name": file_path.stem,
                     "type": "PDF",
                     "pages": "-",
+                    "tags": [],
+                    "tag_key": "",
                     "status": "failed",
                     "message": str(exc),
                     "preview": "",
@@ -831,6 +1012,7 @@ async def generate_artifacts(req: ArtifactRequest):
             response_data = build_empty_response(reply)
             return response_data
 
+        ocr_updates = run_ocr_for_documents(req.documents)
         ensure_inline_documents_indexed(req.documents)
         doc_context = build_doc_context(
             req.documents,
@@ -866,9 +1048,15 @@ async def generate_artifacts(req: ArtifactRequest):
 
             async def generate_sse():
                 accumulated = ""
+                routing_state: Dict[str, str] = {}
                 try:
-                    for content in iter_stream_chunks(response):
-                        if not content:  # Skip empty content
+                    for event in response:
+                        routing_update = build_routing_update(event, routing_state)
+                        if routing_update:
+                            yield f"data: {json.dumps({'routing_update': routing_update})}\n\n"
+
+                        content = extract_stream_text(event)
+                        if not content:
                             continue
                         accumulated += content
                         yield f"data: {json.dumps({'chunk': content})}\n\n"
@@ -876,6 +1064,8 @@ async def generate_artifacts(req: ArtifactRequest):
                     # Parse and send final complete message
                     if accumulated:
                         final_data = safe_parse_json(accumulated)
+                        if ocr_updates:
+                            final_data["documents_update"] = ocr_updates
                         research_doc = build_research_document(
                             final_data,
                             last_user,
@@ -908,6 +1098,8 @@ async def generate_artifacts(req: ArtifactRequest):
             )
             text = response.get_content_as_string()
             data: Dict[str, Any] = safe_parse_json(text)
+            if ocr_updates:
+                data["documents_update"] = ocr_updates
             research_doc = build_research_document(data, last_user, use_web_search)
             if research_doc:
                 data["documents_append"] = [research_doc]
