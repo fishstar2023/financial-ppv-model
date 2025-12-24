@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState, useEffect, useMemo } from 'react';
 import {
   ActionIcon,
   Button,
@@ -186,6 +186,10 @@ const statusMeta = {
   done: { label: '完成', className: 'is-done' },
 };
 
+const TRACE_MAX_EVENTS = 400;
+const TRACE_COLLAPSED_LEN = 220;
+const TRACE_EXPANDED_LEN = 2000;
+
 const normalizeRiskLevel = (level = '') => {
   const raw = level.toString();
   const lowered = raw.toLowerCase();
@@ -209,6 +213,10 @@ export default function App() {
   const [messages, setMessages] = useState(initialMessages);
   const [composerText, setComposerText] = useState('');
   const [activeTab, setActiveTab] = useState('summary');
+  const [routingTab, setRoutingTab] = useState('routing');
+  const [traceEvents, setTraceEvents] = useState([]);
+  const [showTrace, setShowTrace] = useState(true);
+  const [collapseToolResults, setCollapseToolResults] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [streamingContent, setStreamingContent] = useState('');
@@ -231,6 +239,17 @@ export default function App() {
   });
 
   const [activeTranslationIndex, setActiveTranslationIndex] = useState(0);
+
+  const appendTraceEvent = (event) => {
+    if (!event) return;
+    setTraceEvents((prev) => {
+      const next = [...prev, event];
+      if (next.length > TRACE_MAX_EVENTS) {
+        return next.slice(next.length - TRACE_MAX_EVENTS);
+      }
+      return next;
+    });
+  };
 
   const persistDocTags = async (tagKey, tags) => {
     if (!tagKey) return;
@@ -405,6 +424,82 @@ export default function App() {
     return text || '—';
   })();
 
+  const traceGroups = useMemo(() => {
+    const groups = [];
+    traceEvents.forEach((evt) => {
+      const runId = evt.run_id || 'main';
+      const last = groups[groups.length - 1];
+      if (!last || last.runId !== runId) {
+        groups.push({ runId, events: [evt] });
+      } else {
+        last.events.push(evt);
+      }
+    });
+    return groups;
+  }, [traceEvents]);
+
+  const formatTraceTime = (ts) => {
+    if (!ts) return '';
+    const numeric = Number(ts);
+    if (!Number.isFinite(numeric)) return '';
+    const millis = numeric > 1e12 ? numeric : numeric * 1000;
+    return new Date(millis).toLocaleTimeString('zh-TW', {
+      hour12: false,
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+    });
+  };
+
+  const renderTraceBadge = (type) => {
+    const labelMap = {
+      reasoning_step: 'Reasoning',
+      tool_start: 'Tool',
+      tool_done: 'Tool',
+      content: 'Content',
+      status: 'Status',
+      error: 'Error',
+    };
+    return <span className={`trace-badge trace-${type}`}>{labelMap[type] || 'Trace'}</span>;
+  };
+
+  const truncateTraceText = (text, maxLen) => {
+    if (!text) return '';
+    return text.length > maxLen ? `${text.slice(0, maxLen)}...` : text;
+  };
+
+  const renderTraceDetail = (evt) => {
+    const data = evt.data || {};
+    if (evt.type === 'tool_start') {
+      const argsText = data.args || '';
+      const shownArgs = collapseToolResults
+        ? truncateTraceText(argsText, TRACE_COLLAPSED_LEN)
+        : truncateTraceText(argsText, TRACE_EXPANDED_LEN);
+      return (
+        <>
+          <div className="trace-title">{data.tool || '工具呼叫'}</div>
+          {shownArgs ? <pre className="trace-code">{shownArgs}</pre> : null}
+        </>
+      );
+    }
+    if (evt.type === 'tool_done') {
+      const resultText = data.result || '';
+      const shownResult = collapseToolResults
+        ? truncateTraceText(resultText, TRACE_COLLAPSED_LEN)
+        : truncateTraceText(resultText, TRACE_EXPANDED_LEN);
+      return (
+        <>
+          <div className="trace-title">{data.tool || '工具完成'}</div>
+          {shownResult ? <pre className="trace-code">{shownResult}</pre> : null}
+        </>
+      );
+    }
+    if (evt.type === 'error') {
+      return <div className="trace-text">{data.text || '發生錯誤'}</div>;
+    }
+    return <div className="trace-text">{data.text || ''}</div>;
+  };
+
   const handleUploadClick = () => {
     fileInputRef.current?.click();
   };
@@ -544,6 +639,7 @@ export default function App() {
     }
     setMessages([]);
     setRoutingSteps([]);
+    setTraceEvents([]);
     setArtifacts({
       summaries: [],
       translations: [],
@@ -596,6 +692,7 @@ export default function App() {
     setErrorMessage('');
     setStreamingContent('');
     setRoutingSteps([]);
+    setTraceEvents([]);
 
     try {
       // Build system context for LLM
@@ -682,6 +779,11 @@ export default function App() {
               if (parsed.routing_update) {
                 hasRoutingUpdates = true;
                 applyRoutingUpdate(parsed.routing_update);
+                continue;
+              }
+
+              if (parsed.trace_event) {
+                appendTraceEvent(parsed.trace_event);
                 continue;
               }
 
@@ -1326,15 +1428,87 @@ export default function App() {
                   <Icon icon={ListChecks} size="small" />
                   <span>任務路由</span>
                 </div>
+                <div className="routing-tabs">
+                  <button
+                    type="button"
+                    className={`routing-tab${routingTab === 'routing' ? ' is-active' : ''}`}
+                    onClick={() => setRoutingTab('routing')}
+                  >
+                    路由
+                  </button>
+                  <button
+                    type="button"
+                    className={`routing-tab${routingTab === 'trace' ? ' is-active' : ''}`}
+                    onClick={() => setRoutingTab('trace')}
+                  >
+                    Reasoning / Trace
+                  </button>
+                </div>
               </div>
-              <div className="routing-summary">
-                {latestRoutingStatus ? (
-                  <span className={`status-pill ${latestRoutingStatus.className || ''}`}>
-                    {latestRoutingStatus.label || '等待中'}
-                  </span>
-                ) : null}
-                <span className="routing-summary-text">{routingSummaryText}</span>
-              </div>
+              {routingTab === 'routing' ? (
+                <div className="routing-summary">
+                  {latestRoutingStatus ? (
+                    <span className={`status-pill ${latestRoutingStatus.className || ''}`}>
+                      {latestRoutingStatus.label || '等待中'}
+                    </span>
+                  ) : null}
+                  <span className="routing-summary-text">{routingSummaryText}</span>
+                </div>
+              ) : (
+                <div className="trace-panel">
+                  <div className="trace-controls">
+                    <label className="trace-toggle">
+                      <input
+                        type="checkbox"
+                        checked={showTrace}
+                        onChange={(e) => setShowTrace(e.target.checked)}
+                      />
+                      <span>Show Trace</span>
+                    </label>
+                    <label className="trace-toggle">
+                      <input
+                        type="checkbox"
+                        checked={collapseToolResults}
+                        onChange={(e) => setCollapseToolResults(e.target.checked)}
+                      />
+                      <span>Collapse Tool Results</span>
+                    </label>
+                  </div>
+
+                  {!showTrace ? (
+                    <div className="trace-empty">Trace 已隱藏</div>
+                  ) : traceGroups.length === 0 ? (
+                    <div className="trace-empty">尚無 Trace 事件</div>
+                  ) : (
+                    <div className="trace-stream">
+                      {traceGroups.map((group) => (
+                        <div key={group.runId} className="trace-group">
+                          <div className="trace-group-head">
+                            <span>Run {group.runId}</span>
+                            <span className="trace-group-count">
+                              {group.events.length} events
+                            </span>
+                          </div>
+                          {group.events.map((evt, index) => (
+                            <div key={`${group.runId}-${index}`} className="trace-item">
+                              <div className="trace-meta">
+                                {renderTraceBadge(evt.type)}
+                                {evt.agent_name ? (
+                                  <span className="trace-agent">{evt.agent_name}</span>
+                                ) : null}
+                                {evt.ts ? (
+                                  <span className="trace-time">{formatTraceTime(evt.ts)}</span>
+                                ) : null}
+                              </div>
+                              <div className="trace-detail">{renderTraceDetail(evt)}</div>
+                            </div>
+                          ))}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
 
             <div className="chat-composer">

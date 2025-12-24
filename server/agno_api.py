@@ -3,6 +3,7 @@ import hashlib
 import json
 import os
 import uuid
+import time
 from mimetypes import guess_type
 from pathlib import Path
 from typing import Any, Dict, Iterator, List, Optional, Union, Literal
@@ -155,6 +156,9 @@ def get_model_id() -> str:
 
 WEB_SEARCH_TOOL = {"type": "web_search_preview"}
 IMAGE_EXTENSIONS = {".png", ".jpg", ".jpeg", ".webp", ".gif"}
+TRACE_MAX_LEN = int(os.getenv("AGNO_TRACE_MAX_LEN", "2000"))
+TRACE_ARGS_MAX_LEN = int(os.getenv("AGNO_TRACE_ARGS_MAX_LEN", "1000"))
+STORE_EVENTS = os.getenv("AGNO_STORE_EVENTS", "").lower() in {"1", "true", "yes", "on"}
 
 
 def get_model(
@@ -466,6 +470,7 @@ def build_smalltalk_agent(
         name="ChitChat",
         role="簡短且親切的 RM 助理，僅做寒暄或確認需求，不要主動生成報告。",
         model=get_model(),
+        store_events=STORE_EVENTS,
         instructions=[
             "你是授信報告助理，可以協助企業授信分析、文件摘要、翻譯等工作。",
             "請參考對話紀錄延續脈絡，避免忽略先前內容。",
@@ -668,6 +673,138 @@ def update_routing_log(
     return True
 
 
+def truncate_text(value: Any, max_len: int) -> str:
+    if value is None:
+        return ""
+    if isinstance(value, str):
+        text = value.strip()
+    else:
+        try:
+            text = json.dumps(value, ensure_ascii=False)
+        except TypeError:
+            text = str(value)
+    if len(text) <= max_len:
+        return text
+    return text[:max_len] + "..."
+
+
+def should_emit_trace_content(text: str) -> bool:
+    stripped = text.strip()
+    if not stripped:
+        return False
+    if stripped.startswith("{") or stripped.startswith("["):
+        return False
+    return True
+
+
+def format_reasoning_steps(steps: Any) -> str:
+    if not steps:
+        return ""
+    lines = []
+    for idx, step in enumerate(steps, start=1):
+        title = getattr(step, "title", None) if not isinstance(step, dict) else step.get("title")
+        action = getattr(step, "action", None) if not isinstance(step, dict) else step.get("action")
+        result = getattr(step, "result", None) if not isinstance(step, dict) else step.get("result")
+        parts = [part for part in (title, action, result) if part]
+        if not parts:
+            continue
+        lines.append(f"{idx}. " + " | ".join(parts))
+    return "\n".join(lines)
+
+
+def map_event_to_trace_event(event: Any) -> Optional[Dict[str, Any]]:
+    if event is None or isinstance(event, str):
+        return None
+
+    event_name = getattr(event, "event", "") or ""
+    run_id = getattr(event, "run_id", None) or "main"
+    session_id = getattr(event, "session_id", None)
+    agent_name = getattr(event, "agent_name", None) or getattr(event, "team_name", None) or "Team"
+    ts = getattr(event, "created_at", None) or int(time.time())
+
+    def build_trace(trace_type: str, data: Dict[str, Any]) -> Dict[str, Any]:
+        data["raw_event"] = event_name
+        return {
+            "ts": ts,
+            "run_id": run_id,
+            "session_id": session_id,
+            "agent_name": agent_name,
+            "type": trace_type,
+            "data": data,
+        }
+
+    if event_name in {TeamRunEvent.run_started.value, RunEvent.run_started.value}:
+        return build_trace("status", {"text": "開始執行"})
+    if event_name in {TeamRunEvent.run_completed.value, RunEvent.run_completed.value}:
+        return build_trace("status", {"text": "執行完成"})
+    if event_name in {TeamRunEvent.run_error.value, RunEvent.run_error.value}:
+        error_text = getattr(event, "content", None) or getattr(event, "error", None) or "執行失敗"
+        return build_trace("error", {"text": truncate_text(error_text, TRACE_MAX_LEN)})
+
+    if event_name in {TeamRunEvent.reasoning_started.value, RunEvent.reasoning_started.value}:
+        return build_trace("status", {"text": "推理開始"})
+    if event_name in {
+        TeamRunEvent.reasoning_step.value,
+        RunEvent.reasoning_step.value,
+        TeamRunEvent.reasoning_content_delta.value,
+        RunEvent.reasoning_content_delta.value,
+    }:
+        reasoning_content = getattr(event, "reasoning_content", None) or getattr(event, "content", None)
+        steps_text = format_reasoning_steps(getattr(event, "reasoning_steps", None))
+        text = reasoning_content or steps_text
+        if text:
+            return build_trace("reasoning_step", {"text": truncate_text(text, TRACE_MAX_LEN)})
+        return None
+    if event_name in {TeamRunEvent.reasoning_completed.value, RunEvent.reasoning_completed.value}:
+        return build_trace("status", {"text": "推理完成"})
+
+    if event_name in {TeamRunEvent.tool_call_started.value, RunEvent.tool_call_started.value}:
+        tool = getattr(event, "tool", None)
+        tool_name = getattr(tool, "tool_name", None) or "tool"
+        tool_args = truncate_text(getattr(tool, "tool_args", None), TRACE_ARGS_MAX_LEN)
+        return build_trace(
+            "tool_start",
+            {
+                "tool": tool_name,
+                "args": tool_args,
+            },
+        )
+    if event_name in {TeamRunEvent.tool_call_completed.value, RunEvent.tool_call_completed.value}:
+        tool = getattr(event, "tool", None)
+        tool_name = getattr(tool, "tool_name", None) or "tool"
+        result = getattr(tool, "result", None) or getattr(event, "content", None)
+        return build_trace(
+            "tool_done",
+            {
+                "tool": tool_name,
+                "result": truncate_text(result, TRACE_MAX_LEN),
+            },
+        )
+    if event_name in {TeamRunEvent.tool_call_error.value, RunEvent.tool_call_error.value}:
+        tool = getattr(event, "tool", None)
+        tool_name = getattr(tool, "tool_name", None) or "tool"
+        error_text = getattr(event, "error", None) or getattr(tool, "result", None) or "工具執行失敗"
+        return build_trace(
+            "error",
+            {
+                "tool": tool_name,
+                "text": truncate_text(error_text, TRACE_MAX_LEN),
+            },
+        )
+
+    if event_name in {
+        TeamRunEvent.run_content.value,
+        RunEvent.run_content.value,
+        TeamRunEvent.run_intermediate_content.value,
+        RunEvent.run_intermediate_content.value,
+    }:
+        content = getattr(event, "content", None)
+        if isinstance(content, str) and should_emit_trace_content(content):
+            return build_trace("content", {"text": truncate_text(content, TRACE_MAX_LEN)})
+
+    return None
+
+
 def iter_stream_chunks(response: Any) -> Iterator[str]:
     saw_delta = False
     for event in response:
@@ -773,6 +910,7 @@ def build_team(
         add_name_to_context=True,
         add_datetime_to_context=True,
         delegate_to_all_members=False,  # Team Leader decides when to delegate
+        store_events=STORE_EVENTS,
         markdown=False,
     )
 
@@ -1004,9 +1142,16 @@ async def generate_artifacts(req: ArtifactRequest):
                             "eta": "進行中",
                         }
                         yield f"data: {json.dumps({'routing_update': routing_update})}\n\n"
-                        for chunk in iter_stream_chunks(response):
-                            accumulated += chunk
-                            yield f"data: {json.dumps({'chunk': chunk})}\n\n"
+                        for event in response:
+                            trace_event = map_event_to_trace_event(event)
+                            if trace_event:
+                                yield f"data: {json.dumps({'trace_event': trace_event})}\n\n"
+
+                            content = extract_stream_text(event)
+                            if not content:
+                                continue
+                            accumulated += content
+                            yield f"data: {json.dumps({'chunk': content})}\n\n"
 
                         final_data = build_empty_response(
                             accumulated
@@ -1114,6 +1259,10 @@ async def generate_artifacts(req: ArtifactRequest):
                         if routing_update:
                             if update_routing_log(routing_log, routing_update):
                                 yield f"data: {json.dumps({'routing_update': routing_update})}\n\n"
+
+                        trace_event = map_event_to_trace_event(event)
+                        if trace_event:
+                            yield f"data: {json.dumps({'trace_event': trace_event})}\n\n"
 
                         content = extract_stream_text(event)
                         if not content:
