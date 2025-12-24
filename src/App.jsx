@@ -507,9 +507,6 @@ export default function App() {
     };
 
     const outgoingMessages = [...messages, userMessage];
-    const requestDocId = selectedDocId;
-    const requestDoc = documents.find((doc) => doc.id === requestDocId);
-    const requestDocName = requestDoc?.name || '';
 
     setMessages(outgoingMessages);
     setComposerText('');
@@ -530,8 +527,8 @@ export default function App() {
         has_translation: artifacts.translations.length > 0,
         has_memo: Boolean(artifacts.memo.output),
         translation_count: artifacts.translations.length,
-        selected_doc_id: requestDocId || null,
-        selected_doc_name: requestDocName || null,
+        selected_doc_id: selectedDocId || null,
+        selected_doc_name: documents.find((doc) => doc.id === selectedDocId)?.name || null,
       };
 
       const response = await fetch(`${apiBase}/api/artifacts`, {
@@ -641,7 +638,48 @@ export default function App() {
 
       // Update artifacts
       if (data.summary || data.translation || data.memo) {
-        const sourceDocIds = requestDocId ? [requestDocId] : [];
+        const resolveSourceDocIds = (payload) => {
+          const ids = Array.isArray(payload?.source_doc_ids)
+            ? payload.source_doc_ids
+            : payload?.source_doc_id
+              ? [payload.source_doc_id]
+              : [];
+          const names = Array.isArray(payload?.source_doc_names)
+            ? payload.source_doc_names
+            : payload?.source_doc_name
+              ? [payload.source_doc_name]
+              : [];
+
+          const resolvedIds = ids
+            .map((id) => documents.find((doc) => doc.id === id)?.id)
+            .filter(Boolean);
+
+          if (resolvedIds.length > 0) {
+            return resolvedIds;
+          }
+
+          if (names.length === 0) {
+            return [];
+          }
+
+          const normalizedNames = names
+            .map((name) => (name || '').trim())
+            .filter(Boolean);
+          if (normalizedNames.length === 0) {
+            return [];
+          }
+
+          return documents
+            .filter((doc) =>
+              normalizedNames.some(
+                (name) => name.toLowerCase() === (doc.name || '').toLowerCase()
+              )
+            )
+            .map((doc) => doc.id);
+        };
+
+        const summaryDocIds = resolveSourceDocIds(data.summary);
+        const translationDocIds = resolveSourceDocIds(data.translation);
 
         setArtifacts((prev) => {
           let summaries = prev.summaries;
@@ -658,7 +696,7 @@ export default function App() {
             const summaryEntry = {
               id: createId(),
               timestamp: Date.now(),
-              sourceDocIds,
+              sourceDocIds: summaryDocIds,
               output: data.summary.output || '',
               borrower: data.summary.borrower || emptySummary.borrower,
               metrics: data.summary.metrics || [],
@@ -681,19 +719,25 @@ export default function App() {
 
           // Add new translation version if present
           if (data.translation && (data.translation.output || data.translation.clauses?.length > 0)) {
-            const docTranslationCount = requestDocId
-              ? prev.translations.filter((item) => (item.sourceDocIds || []).includes(requestDocId)).length
+            const primaryTranslationDocId =
+              translationDocIds.length === 1 ? translationDocIds[0] : null;
+            const docTranslationCount = primaryTranslationDocId
+              ? prev.translations.filter((item) =>
+                (item.sourceDocIds || []).includes(primaryTranslationDocId)
+              ).length
               : prev.translations.length;
             const newTranslation = {
               id: createId(),
               timestamp: Date.now(),
               title: `翻譯 #${docTranslationCount + 1}`,
-              sourceDocIds,
+              sourceDocIds: translationDocIds,
               output: data.translation.output || '',
               clauses: data.translation.clauses || [],
             };
             newArtifacts.translations = [...prev.translations, newTranslation];
-            setActiveTranslationIndex(docTranslationCount);
+            setActiveTranslationIndex(
+              primaryTranslationDocId ? docTranslationCount : newArtifacts.translations.length - 1
+            );
           }
 
           return newArtifacts;

@@ -52,6 +52,8 @@ TEAM_INSTRUCTIONS = [
     "- 回覆必須是嚴格 JSON，不可輸出 Markdown code fence 或多餘說明",
     "- summary.output 與 memo.output 用繁體中文",
     "- translation.output 與 translation.clauses[].translated 用英文",
+    "- summary.source_doc_id 與 translation.source_doc_id 必須填入來源文件的 id（見文件清單中的 id）",
+    "- 若來源為多份文件，可使用 summary.source_doc_ids / translation.source_doc_ids 陣列",
     "- summary.risks[].level 僅能是 High、Medium、Low",
     "- routing[].status 只能是 done（完成後才回傳）",
     "- routing 只在使用工具時記錄，閒聊必須為 []",
@@ -61,8 +63,8 @@ EXPECTED_OUTPUT = """
 簡單模式範例（問候/閒聊）：
 {
   "assistant": { "content": "你好！我是授信報告助理，可以協助您進行企業授信分析、文件摘要、翻譯等工作。有什麼我能幫忙的嗎？", "bullets": [] },
-  "summary": { "output": "", "borrower": null, "metrics": [], "risks": [] },
-  "translation": { "output": "", "clauses": [] },
+  "summary": { "output": "", "borrower": null, "metrics": [], "risks": [], "source_doc_id": "" },
+  "translation": { "output": "", "clauses": [], "source_doc_id": "" },
   "memo": { "output": "", "sections": [], "recommendation": "", "conditions": "" },
   "routing": []
 }
@@ -72,11 +74,12 @@ EXPECTED_OUTPUT = """
   "assistant": { "content": "已完成文件摘要分析", "bullets": ["識別借款人資訊", "分析財務指標", "評估風險等級"] },
   "summary": {
     "output": "## 摘要內容...",
+    "source_doc_id": "doc-1",
     "borrower": { "name": "公司名稱", "description": "簡介", "rating": "A+" },
     "metrics": [{ "label": "營收", "value": "100M", "delta": "+10%" }],
     "risks": [{ "label": "市場風險", "level": "Medium" }]
   },
-  "translation": { "output": "", "clauses": [] },
+  "translation": { "output": "", "clauses": [], "source_doc_id": "" },
   "memo": { "output": "", "sections": [], "recommendation": "", "conditions": "" },
   "routing": [
     { "label": "啟用 web_search 查詢最新資訊", "status": "done", "eta": "完成" },
@@ -248,6 +251,7 @@ def build_doc_context(documents: List[Document], selected_doc_id: Optional[str] 
             "\n".join(
                 [
                     f"{idx}. 名稱: {doc.name or '未命名'}{selected_mark}",
+                    f"   id: {doc.id or '-'}",
                     f"   類型: {doc.type or '-'}",
                     f"   頁數: {pages}",
                     f"   標籤: {tags}",
@@ -317,8 +321,10 @@ def build_empty_response(message: str) -> Dict[str, Any]:
             "borrower": {"name": "", "description": "", "rating": ""},
             "metrics": [],
             "risks": [],
+            "source_doc_id": "",
+            "source_doc_ids": [],
         },
-        "translation": {"output": "", "clauses": []},
+        "translation": {"output": "", "clauses": [], "source_doc_id": "", "source_doc_ids": []},
         "memo": {
             "output": "",
             "sections": [],
