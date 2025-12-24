@@ -324,16 +324,26 @@ export default function App() {
   const latestRoutingStatus = latestRouting
     ? statusMeta[latestRouting.status] || null
     : null;
+  const isStatusLike = (value, statusLabel) => {
+    if (!value) return false;
+    const normalized = value.trim();
+    if (!normalized) return false;
+    const statusWords = ['進行中', '正在進行中', '等待中', '完成', '已完成'];
+    if (statusLabel && normalized === statusLabel.trim()) return true;
+    return statusWords.some((word) => normalized.includes(word));
+  };
   const routingSummaryText = (() => {
     if (!latestRouting) return '尚未啟動';
     const labelText = (latestRouting.label || '').trim();
     const etaText = (latestRouting.eta || '').trim();
     const statusLabel = (latestRoutingStatus?.label || '').trim();
-    let text = labelText || etaText || '尚未啟動';
-    if (etaText && etaText !== labelText && etaText !== statusLabel) {
+    const labelIsStatus = isStatusLike(labelText, statusLabel);
+    const etaIsStatus = isStatusLike(etaText, statusLabel);
+    let text = labelIsStatus ? '' : labelText;
+    if (etaText && !etaIsStatus && etaText !== labelText) {
       text = text ? `${text} · ${etaText}` : etaText;
     }
-    return text;
+    return text || '—';
   })();
 
   const handleUploadClick = () => {
@@ -1246,14 +1256,14 @@ export default function App() {
                   <Icon icon={ListChecks} size="small" />
                   <span>任務路由</span>
                 </div>
-                <div className="routing-summary">
-                  {latestRoutingStatus ? (
-                    <span className={`status-pill ${latestRoutingStatus.className || ''}`}>
-                      {latestRoutingStatus.label || '等待中'}
-                    </span>
-                  ) : null}
-                  <span className="routing-summary-text">{routingSummaryText}</span>
-                </div>
+              </div>
+              <div className="routing-summary">
+                {latestRoutingStatus ? (
+                  <span className={`status-pill ${latestRoutingStatus.className || ''}`}>
+                    {latestRoutingStatus.label || '等待中'}
+                  </span>
+                ) : null}
+                <span className="routing-summary-text">{routingSummaryText}</span>
               </div>
             </div>
 
