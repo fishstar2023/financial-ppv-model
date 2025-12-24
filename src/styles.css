@@ -382,25 +382,17 @@ body {
 .routing-panel {
   background: rgba(255, 255, 255, 0.65);
   border-radius: 18px;
-  padding: 12px;
+  padding: 8px 12px;
   border: 1px solid rgba(34, 49, 70, 0.08);
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 0;
   flex-shrink: 0;
-  max-height: 150px;
-  overflow-y: auto;
+  overflow: hidden;
 }
 
 .routing-panel.is-empty {
-  padding: 8px 12px;
-  gap: 0;
-  max-height: none;
-  overflow: visible;
-}
-
-.routing-panel.is-empty .routing-list {
-  display: none;
+  opacity: 0.8;
 }
 
 .routing-header {
@@ -410,39 +402,13 @@ body {
   gap: 10px;
 }
 
-.routing-empty {
-  font-size: 12px;
-  color: var(--muted);
-}
-
-.routing-list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.routing-item {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-  padding: 6px 0;
-  border-bottom: 1px solid rgba(34, 49, 70, 0.06);
-}
-
-.routing-item:last-child {
-  border-bottom: none;
-}
-
-.routing-label {
-  font-size: 13px;
-  font-weight: 600;
-  flex: 1;
-}
-
-.routing-meta {
+.routing-summary {
   display: flex;
   align-items: center;
+  justify-content: flex-end;
   gap: 8px;
+  min-width: 0;
+  flex: 1;
 }
 
 .status-pill {
@@ -469,6 +435,16 @@ body {
   color: #1f7a4b;
   border-color: rgba(31, 122, 75, 0.3);
   background: rgba(31, 122, 75, 0.12);
+}
+
+.routing-summary-text {
+  font-size: 12px;
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+  max-width: 220px;
 }
 
 .routing-eta {

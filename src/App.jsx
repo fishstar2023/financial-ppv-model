@@ -320,6 +320,13 @@ export default function App() {
 
   const activeArtifact = getActiveArtifact();
   const hasRouting = routingSteps.length > 0;
+  const latestRouting = hasRouting ? routingSteps[routingSteps.length - 1] : null;
+  const latestRoutingStatus = latestRouting
+    ? statusMeta[latestRouting.status] || null
+    : null;
+  const routingSummaryText = latestRouting
+    ? `${latestRouting.label}${latestRouting.eta ? ` · ${latestRouting.eta}` : ''}`
+    : '尚未啟動';
 
   const handleUploadClick = () => {
     fileInputRef.current?.click();
@@ -1231,29 +1238,15 @@ export default function App() {
                   <Icon icon={ListChecks} size="small" />
                   <span>任務路由</span>
                 </div>
-                {hasRouting ? (
-                  <Tag size="small" variant="borderless">
-                    自動分類
-                  </Tag>
-                ) : (
-                  <span className="routing-empty">尚未啟動</span>
-                )}
-              </div>
-              {hasRouting ? (
-                <div className="routing-list">
-                  {routingSteps.map((step) => (
-                    <div key={step.id} className="routing-item">
-                      <span
-                        className={`status-pill ${statusMeta[step.status]?.className || ''}`}
-                      >
-                        {statusMeta[step.status]?.label || '等待中'}
-                      </span>
-                      <span className="routing-label">{step.label}</span>
-                      <span className="routing-eta">{step.eta}</span>
-                    </div>
-                  ))}
+                <div className="routing-summary">
+                  {latestRoutingStatus ? (
+                    <span className={`status-pill ${latestRoutingStatus.className || ''}`}>
+                      {latestRoutingStatus.label || '等待中'}
+                    </span>
+                  ) : null}
+                  <span className="routing-summary-text">{routingSummaryText}</span>
                 </div>
-              ) : null}
+              </div>
             </div>
 
             <div className="chat-composer">
