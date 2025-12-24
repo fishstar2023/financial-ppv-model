@@ -335,6 +335,62 @@ def build_empty_response(message: str) -> Dict[str, Any]:
     }
 
 
+def estimate_pages(content: str) -> int:
+    if not content:
+        return 1
+    return max(1, (len(content) + 2999) // 3000)
+
+
+def build_research_document(
+    data: Dict[str, Any],
+    last_user: str,
+    use_web_search: bool,
+) -> Optional[Dict[str, Any]]:
+    if not use_web_search:
+        return None
+
+    content_parts: List[str] = []
+    assistant_content = (data.get("assistant") or {}).get("content") or ""
+    summary_output = (data.get("summary") or {}).get("output") or ""
+    memo_output = (data.get("memo") or {}).get("output") or ""
+    translation_output = (data.get("translation") or {}).get("output") or ""
+
+    if assistant_content:
+        content_parts.append(f"## 回覆重點\n{assistant_content}")
+    if summary_output:
+        content_parts.append(f"## 摘要\n{summary_output}")
+    if memo_output:
+        content_parts.append(f"## Credit Memo\n{memo_output}")
+    if translation_output:
+        content_parts.append(f"## 翻譯\n{translation_output}")
+
+    if not content_parts:
+        return None
+
+    combined = "\n\n".join(content_parts).strip()
+    if not combined:
+        return None
+
+    title_hint = (last_user or "Research").strip().replace("\n", " ")
+    title_hint = title_hint[:28] + "..." if len(title_hint) > 28 else title_hint
+    name = f"Deep Research - {title_hint or 'Research'}"
+    doc_id = str(uuid.uuid4())
+
+    rag_store.index_inline_text(doc_id, name, combined, "RESEARCH")
+
+    return {
+        "id": doc_id,
+        "name": name,
+        "type": "RESEARCH",
+        "pages": estimate_pages(combined),
+        "status": "indexed",
+        "message": "",
+        "preview": combined[:400],
+        "content": combined,
+        "source": "research",
+    }
+
+
 def build_smalltalk_agent(
     documents: List[Document],
     system_context: Optional[SystemContext],
@@ -820,6 +876,13 @@ async def generate_artifacts(req: ArtifactRequest):
                     # Parse and send final complete message
                     if accumulated:
                         final_data = safe_parse_json(accumulated)
+                        research_doc = build_research_document(
+                            final_data,
+                            last_user,
+                            use_web_search,
+                        )
+                        if research_doc:
+                            final_data["documents_append"] = [research_doc]
                         yield f"data: {json.dumps(final_data)}\n\n"
                     else:
                         # No content accumulated, send fallback response
@@ -845,6 +908,9 @@ async def generate_artifacts(req: ArtifactRequest):
             )
             text = response.get_content_as_string()
             data: Dict[str, Any] = safe_parse_json(text)
+            research_doc = build_research_document(data, last_user, use_web_search)
+            if research_doc:
+                data["documents_append"] = [research_doc]
             return data
     except Exception as exc:  # noqa: BLE001
         return {

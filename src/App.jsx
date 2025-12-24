@@ -636,6 +636,28 @@ export default function App() {
         throw new Error(data.error + (data.detail ? `: ${data.detail}` : ''));
       }
 
+      if (Array.isArray(data.documents_append) && data.documents_append.length > 0) {
+        const appendedDocs = data.documents_append.map((doc) => ({
+          id: doc.id || createId(),
+          name: doc.name || '未命名',
+          type: doc.type || 'RESEARCH',
+          pages: doc.pages ?? '-',
+          tags: Array.isArray(doc.tags) ? doc.tags : [],
+          content: doc.content || doc.preview || '',
+          image: doc.image || '',
+          image_mime: doc.image_mime || '',
+          status: doc.status || 'indexed',
+          message: doc.message || '',
+          source: doc.source || 'research',
+        }));
+
+        setDocuments((prev) => {
+          const existingIds = new Set(prev.map((doc) => doc.id));
+          const uniqueDocs = appendedDocs.filter((doc) => !existingIds.has(doc.id));
+          return uniqueDocs.length > 0 ? [...uniqueDocs, ...prev] : prev;
+        });
+      }
+
       // Update artifacts
       if (data.summary || data.translation || data.memo) {
         const resolveSourceDocIds = (payload) => {
