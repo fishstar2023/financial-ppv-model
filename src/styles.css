@@ -138,6 +138,8 @@ body {
   gap: 16px;
   align-items: start;
   flex: 1;
+  min-height: 0;
+  height: calc(100vh - 180px);
 }
 
 .panel {
@@ -179,6 +181,14 @@ body {
 
 .chat-panel {
   flex: 1;
+}
+
+.docs-panel,
+.artifact-panel,
+.chat-panel {
+  height: 100%;
+  min-height: 0;
+  overflow-y: auto;
 }
 
 .file-input {
