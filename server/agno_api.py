@@ -159,6 +159,10 @@ IMAGE_EXTENSIONS = {".png", ".jpg", ".jpeg", ".webp", ".gif"}
 TRACE_MAX_LEN = int(os.getenv("AGNO_TRACE_MAX_LEN", "2000"))
 TRACE_ARGS_MAX_LEN = int(os.getenv("AGNO_TRACE_ARGS_MAX_LEN", "1000"))
 STORE_EVENTS = os.getenv("AGNO_STORE_EVENTS", "").lower() in {"1", "true", "yes", "on"}
+DEFAULT_REASONING_EFFORT = os.getenv("OPENAI_REASONING_EFFORT", "medium")
+# Org may be unverified for reasoning summary; default to disabled unless explicitly set
+DEFAULT_REASONING_SUMMARY = os.getenv("OPENAI_REASONING_SUMMARY", "").strip()
+USE_RESPONSES_MODEL = os.getenv("OPENAI_USE_RESPONSES", "1").lower() in {"1", "true", "yes", "on"}
 
 
 def get_model(
@@ -172,11 +176,28 @@ def get_model(
 
     model_name = model_id or get_model_id()
 
-    # Use Responses API when web search is required
-    if enable_web_search:
-        return OpenAIResponses(id=model_name, api_key=api_key)
+    reasoning_opts: Dict[str, Any] = {}
+    if DEFAULT_REASONING_SUMMARY:
+        reasoning_opts["summary"] = DEFAULT_REASONING_SUMMARY
+    if DEFAULT_REASONING_EFFORT:
+        reasoning_opts["effort"] = DEFAULT_REASONING_EFFORT
 
-    kwargs: Dict[str, Any] = {"id": model_name, "api_key": api_key}
+    # Prefer Responses API to surface reasoning summary (needed for routing display)
+    use_responses = enable_web_search or USE_RESPONSES_MODEL
+    if use_responses:
+        return OpenAIResponses(
+            id=model_name,
+            api_key=api_key,
+            reasoning=reasoning_opts or None,
+            reasoning_effort=DEFAULT_REASONING_EFFORT or None,
+            reasoning_summary=DEFAULT_REASONING_SUMMARY or None,
+        )
+
+    kwargs: Dict[str, Any] = {
+        "id": model_name,
+        "api_key": api_key,
+        "reasoning_effort": DEFAULT_REASONING_EFFORT,
+    }
     # Vision inputs are passed via Agent.run(images=...), no extra request params needed.
 
     return OpenAIChat(**kwargs)
@@ -584,6 +605,39 @@ def extract_stream_text(event: Any) -> Optional[str]:
     return None
 
 
+def extract_reasoning_text(event: Any) -> Optional[str]:
+    if event is None:
+        return None
+    event_name = getattr(event, "event", "") or ""
+    if event_name in {
+        TeamRunEvent.reasoning_started.value,
+        RunEvent.reasoning_started.value,
+        TeamRunEvent.reasoning_step.value,
+        RunEvent.reasoning_step.value,
+        TeamRunEvent.reasoning_content_delta.value,
+        RunEvent.reasoning_content_delta.value,
+        TeamRunEvent.reasoning_completed.value,
+        RunEvent.reasoning_completed.value,
+    }:
+        reasoning_content = getattr(event, "reasoning_content", None) or getattr(event, "content", None)
+        steps_text = format_reasoning_steps(getattr(event, "reasoning_steps", None))
+        text = reasoning_content or steps_text
+        if text:
+            return truncate_text(text, TRACE_MAX_LEN)
+    summary_text = getattr(event, "reasoning_summary", None)
+    if summary_text:
+        return truncate_text(summary_text, TRACE_MAX_LEN)
+    return None
+
+
+def build_reasoning_summary(chunks: List[str]) -> str:
+    for text in reversed(chunks):
+        clean = (text or "").strip()
+        if clean:
+            return truncate_text(clean, TRACE_MAX_LEN)
+    return ""
+
+
 def format_tool_label(tool_name: Optional[str]) -> str:
     if not tool_name:
         return "工具呼叫"
@@ -713,95 +767,7 @@ def format_reasoning_steps(steps: Any) -> str:
 
 
 def map_event_to_trace_event(event: Any) -> Optional[Dict[str, Any]]:
-    if event is None or isinstance(event, str):
-        return None
-
-    event_name = getattr(event, "event", "") or ""
-    run_id = getattr(event, "run_id", None) or "main"
-    session_id = getattr(event, "session_id", None)
-    agent_name = getattr(event, "agent_name", None) or getattr(event, "team_name", None) or "Team"
-    ts = getattr(event, "created_at", None) or int(time.time())
-
-    def build_trace(trace_type: str, data: Dict[str, Any]) -> Dict[str, Any]:
-        data["raw_event"] = event_name
-        return {
-            "ts": ts,
-            "run_id": run_id,
-            "session_id": session_id,
-            "agent_name": agent_name,
-            "type": trace_type,
-            "data": data,
-        }
-
-    if event_name in {TeamRunEvent.run_started.value, RunEvent.run_started.value}:
-        return build_trace("status", {"text": "開始執行"})
-    if event_name in {TeamRunEvent.run_completed.value, RunEvent.run_completed.value}:
-        return build_trace("status", {"text": "執行完成"})
-    if event_name in {TeamRunEvent.run_error.value, RunEvent.run_error.value}:
-        error_text = getattr(event, "content", None) or getattr(event, "error", None) or "執行失敗"
-        return build_trace("error", {"text": truncate_text(error_text, TRACE_MAX_LEN)})
-
-    if event_name in {TeamRunEvent.reasoning_started.value, RunEvent.reasoning_started.value}:
-        return build_trace("status", {"text": "推理開始"})
-    if event_name in {
-        TeamRunEvent.reasoning_step.value,
-        RunEvent.reasoning_step.value,
-        TeamRunEvent.reasoning_content_delta.value,
-        RunEvent.reasoning_content_delta.value,
-    }:
-        reasoning_content = getattr(event, "reasoning_content", None) or getattr(event, "content", None)
-        steps_text = format_reasoning_steps(getattr(event, "reasoning_steps", None))
-        text = reasoning_content or steps_text
-        if text:
-            return build_trace("reasoning_step", {"text": truncate_text(text, TRACE_MAX_LEN)})
-        return None
-    if event_name in {TeamRunEvent.reasoning_completed.value, RunEvent.reasoning_completed.value}:
-        return build_trace("status", {"text": "推理完成"})
-
-    if event_name in {TeamRunEvent.tool_call_started.value, RunEvent.tool_call_started.value}:
-        tool = getattr(event, "tool", None)
-        tool_name = getattr(tool, "tool_name", None) or "tool"
-        tool_args = truncate_text(getattr(tool, "tool_args", None), TRACE_ARGS_MAX_LEN)
-        return build_trace(
-            "tool_start",
-            {
-                "tool": tool_name,
-                "args": tool_args,
-            },
-        )
-    if event_name in {TeamRunEvent.tool_call_completed.value, RunEvent.tool_call_completed.value}:
-        tool = getattr(event, "tool", None)
-        tool_name = getattr(tool, "tool_name", None) or "tool"
-        result = getattr(tool, "result", None) or getattr(event, "content", None)
-        return build_trace(
-            "tool_done",
-            {
-                "tool": tool_name,
-                "result": truncate_text(result, TRACE_MAX_LEN),
-            },
-        )
-    if event_name in {TeamRunEvent.tool_call_error.value, RunEvent.tool_call_error.value}:
-        tool = getattr(event, "tool", None)
-        tool_name = getattr(tool, "tool_name", None) or "tool"
-        error_text = getattr(event, "error", None) or getattr(tool, "result", None) or "工具執行失敗"
-        return build_trace(
-            "error",
-            {
-                "tool": tool_name,
-                "text": truncate_text(error_text, TRACE_MAX_LEN),
-            },
-        )
-
-    if event_name in {
-        TeamRunEvent.run_content.value,
-        RunEvent.run_content.value,
-        TeamRunEvent.run_intermediate_content.value,
-        RunEvent.run_intermediate_content.value,
-    }:
-        content = getattr(event, "content", None)
-        if isinstance(content, str) and should_emit_trace_content(content):
-            return build_trace("content", {"text": truncate_text(content, TRACE_MAX_LEN)})
-
+    # Trace streaming disabled
     return None
 
 
@@ -1134,6 +1100,7 @@ async def generate_artifacts(req: ArtifactRequest):
 
                 async def generate_smalltalk_sse():
                     accumulated = ""
+                    reasoning_fragments: List[str] = []
                     try:
                         routing_update = {
                             "id": "run-main",
@@ -1146,6 +1113,10 @@ async def generate_artifacts(req: ArtifactRequest):
                             trace_event = map_event_to_trace_event(event)
                             if trace_event:
                                 yield f"data: {json.dumps({'trace_event': trace_event})}\n\n"
+
+                            reasoning_text = extract_reasoning_text(event)
+                            if reasoning_text:
+                                reasoning_fragments.append(reasoning_text)
 
                             content = extract_stream_text(event)
                             if not content:
@@ -1165,6 +1136,8 @@ async def generate_artifacts(req: ArtifactRequest):
                                 "eta": "完成",
                             }
                         ]
+                        if reasoning_fragments:
+                            final_data["reasoning_summary"] = build_reasoning_summary(reasoning_fragments)
                         yield f"data: {json.dumps(final_data)}\n\n"
                     except Exception as exc:
                         error_response = build_empty_response(f"處理過程中發生錯誤：{str(exc)}")
@@ -1196,6 +1169,7 @@ async def generate_artifacts(req: ArtifactRequest):
                 routing_state: Dict[str, str] = {}
                 routing_log: List[Dict[str, str]] = []
                 ocr_updates: List[Dict[str, Any]] = []
+                reasoning_fragments: List[str] = []
                 try:
                     if image_inputs:
                         ocr_start = {
@@ -1260,6 +1234,10 @@ async def generate_artifacts(req: ArtifactRequest):
                             if update_routing_log(routing_log, routing_update):
                                 yield f"data: {json.dumps({'routing_update': routing_update})}\n\n"
 
+                        reasoning_text = extract_reasoning_text(event)
+                        if reasoning_text:
+                            reasoning_fragments.append(reasoning_text)
+
                         trace_event = map_event_to_trace_event(event)
                         if trace_event:
                             yield f"data: {json.dumps({'trace_event': trace_event})}\n\n"
@@ -1286,6 +1264,9 @@ async def generate_artifacts(req: ArtifactRequest):
                             final_data["routing"] = routing_log
                         if ocr_updates:
                             final_data["documents_update"] = ocr_updates
+                        reasoning_summary = build_reasoning_summary(reasoning_fragments)
+                        if reasoning_summary:
+                            final_data["reasoning_summary"] = reasoning_summary
                         research_doc = build_research_document(
                             final_data,
                             last_user,
@@ -1337,6 +1318,16 @@ async def generate_artifacts(req: ArtifactRequest):
             )
             text = response.get_content_as_string()
             data: Dict[str, Any] = safe_parse_json(text)
+            # Attach reasoning summary if available on the response object
+            reasoning_payload = getattr(response, "reasoning", None)
+            reasoning_summary = ""
+            if isinstance(reasoning_payload, dict):
+                reasoning_summary = reasoning_payload.get("summary") or reasoning_payload.get("text") or ""
+            if not reasoning_summary:
+                reasoning_summary = getattr(response, "reasoning_summary", "") or getattr(response, "reasoning_content", "")
+            reasoning_summary = (reasoning_summary or "").strip()
+            if reasoning_summary:
+                data["reasoning_summary"] = truncate_text(reasoning_summary, TRACE_MAX_LEN)
             if ocr_updates:
                 data["documents_update"] = ocr_updates
             research_doc = build_research_document(data, last_user, use_web_search)

@@ -474,6 +474,32 @@ body {
   flex: 1;
 }
 
+.routing-reasoning {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 10px;
+  border: 1px dashed rgba(34, 49, 70, 0.15);
+  background: rgba(255, 255, 255, 0.75);
+  color: var(--ink);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.routing-reasoning-label {
+  font-weight: 600;
+  color: #2f3a46;
+  white-space: nowrap;
+}
+
+.routing-reasoning-text {
+  flex: 1;
+  color: var(--muted);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
 .trace-panel {
   display: flex;
   flex-direction: column;
