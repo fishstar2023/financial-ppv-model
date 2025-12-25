@@ -182,10 +182,17 @@ body {
 }
 
 .docs-panel,
-.artifact-panel,
-.chat-panel {
+.artifact-panel {
   max-height: calc(100vh - 220px);
   overflow-y: auto;
+}
+
+.chat-panel {
+  height: calc(100vh - 200px);
+  max-height: calc(100vh - 200px);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 .file-input {
