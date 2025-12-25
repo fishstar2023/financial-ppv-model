@@ -1111,7 +1111,7 @@ export default function App() {
             <div className="panel-header">
               <div>
                 <Text as="h2" weight="600" className="panel-title">
-                  Artifacts
+                  生成成果
                 </Text>
               </div>
               <div className="panel-actions">
@@ -1143,7 +1143,7 @@ export default function App() {
                 <div className="card-head">
                   <div>
                     <Text as="h3" weight="600" className="card-title">
-                      產出預覽
+                      成果預覽
                     </Text>
                   </div>
                 </div>
