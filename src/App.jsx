@@ -1143,7 +1143,7 @@ export default function App() {
                 <div className="card-head">
                   <div>
                     <Text as="h3" weight="600" className="card-title">
-                      產出預覽
+                      文件內容
                     </Text>
                   </div>
                 </div>
