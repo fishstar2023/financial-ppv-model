@@ -138,8 +138,6 @@ body {
   gap: 16px;
   align-items: start;
   flex: 1;
-  min-height: 0;
-  height: calc(100vh - 180px);
 }
 
 .panel {
@@ -186,8 +184,7 @@ body {
 .docs-panel,
 .artifact-panel,
 .chat-panel {
-  height: 100%;
-  min-height: 0;
+  max-height: calc(100vh - 220px);
   overflow-y: auto;
 }
 
