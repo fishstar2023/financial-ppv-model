@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "dev:api": "PYTHONPATH=server .venv/bin/uvicorn server.agno_api:app --reload --reload-exclude 'node_modules/*' --host 0.0.0.0 --port 8787",
+    "dev:api": "PYTHONPATH=server .venv/bin/uvicorn server.agno_api:app --reload --reload-exclude 'node_modules/*' --reload-exclude '.venv/*' --host 0.0.0.0 --port 8787",
     "build": "vite build",
     "preview": "vite preview"
   },
