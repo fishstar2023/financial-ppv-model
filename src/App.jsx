@@ -22,6 +22,7 @@ import {
   ListChecks,
   Paperclip,
   Plus,
+  Trash,
   Upload,
   X,
 } from 'lucide-react';
@@ -450,6 +451,24 @@ export default function App() {
     setEditingDocId((prev) => (prev === docId ? '' : docId));
   };
 
+  const handleDeleteDoc = (docId) => {
+    if (!docId) return;
+    const docName = documents.find((doc) => doc.id === docId)?.name || '文件';
+    if (!window.confirm(`確定要刪除「${docName}」嗎？`)) return;
+
+    setDocuments((prev) => {
+      const next = prev.filter((doc) => doc.id !== docId);
+      // Update selection if the current one was removed
+      if (selectedDocId === docId) {
+        setSelectedDocId(next[0]?.id || '');
+      }
+      if (editingDocId === docId) {
+        setEditingDocId('');
+      }
+      return next;
+    });
+  };
+
   const handleUploadFiles = async (event) => {
     const files = Array.from(event.target.files || []);
     if (!files.length) return;
@@ -711,6 +730,11 @@ export default function App() {
           prev.map((doc) => {
             const update = data.documents_update.find((item) => item.id === doc.id);
             if (!update) return doc;
+            const isImageDoc = Boolean(doc.image || update.image || (doc.type || '').toLowerCase().match(/png|jpg|jpeg|webp|gif/));
+            // Only apply OCR updates to image-based documents to avoid overwriting text docs
+            if (!isImageDoc) {
+              return doc;
+            }
             return {
               ...doc,
               content: update.content || doc.content,
@@ -992,6 +1016,16 @@ export default function App() {
                               handleToggleEditTags(doc.id);
                             }}
                             title={isEditing ? '關閉編輯' : '編輯標籤'}
+                          />
+                          <ActionIcon
+                            icon={Trash}
+                            size="small"
+                            variant="outlined"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDeleteDoc(doc.id);
+                            }}
+                            title="刪除文件"
                           />
                         </div>
 
