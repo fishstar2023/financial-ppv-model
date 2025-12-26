@@ -1343,6 +1343,9 @@ export default function App() {
                 value={composerText}
                 onChange={(event) => setComposerText(event.target.value)}
                 onKeyDown={(event) => {
+                  const isComposing =
+                    event.isComposing || (event.nativeEvent && event.nativeEvent.isComposing);
+                  if (isComposing) return;
                   if (event.key === 'Enter' && !event.shiftKey) {
                     event.preventDefault();
                     handleSend();
