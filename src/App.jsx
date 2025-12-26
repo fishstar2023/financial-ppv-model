@@ -208,7 +208,7 @@ export default function App() {
   const [routingSteps, setRoutingSteps] = useState(initialRoutingSteps);
   const [messages, setMessages] = useState(initialMessages);
   const [composerText, setComposerText] = useState('');
-  const [activeTab, setActiveTab] = useState('summary');
+  const [activeTab, setActiveTab] = useState('documents');
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [streamingContent, setStreamingContent] = useState('');
