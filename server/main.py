@@ -2,6 +2,7 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
+from generator_agent import generate_diverse_personas
 
 # 匯入您剛寫好的兩個 Agent
 from extraction_agent import extract_ppv
@@ -10,6 +11,24 @@ from ppv_schema import PPVInstance
 
 app = FastAPI()
 
+# 定義前端傳來的請求格式
+class GenerateRequest(BaseModel):
+    hint: str = "General public"
+    count: int = 3
+# --- API 4: 生成多元虛擬客戶 (New) ---
+@app.post("/api/generate_personas")
+def api_generate_personas(req: GenerateRequest):
+    """
+    前端傳來：「我要 5 個喜歡喝咖啡的人」
+    後端回傳：[PPV1, PPV2, PPV3, PPV4, PPV5] (包含不同個性)
+    """
+    results = generate_diverse_personas(req.hint, req.count)
+    
+    if not results:
+        # 如果生成失敗，回傳空陣列或錯誤訊息
+        raise HTTPException(status_code=500, detail="生成失敗，請檢查後端 Log")
+        
+    return results
 # --- 設定 CORS (允許前端連線) ---
 # 這很重要，不然您的 React 前端會被瀏覽器擋住，連不進來
 app.add_middleware(
