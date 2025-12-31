@@ -1,5 +1,10 @@
 from pydantic import BaseModel, Field
-from typing import Optional, List, Dict
+from typing import List, Dict, Optional
+
+class InterviewRecord(BaseModel):
+    question: str
+    answer: str
+    timestamp: Optional[str] = None
 
 # 為了符合 OpenAI Strict Mode，我們將 Dict 改為明確的 Class 定義
 class SourceSummary(BaseModel):
@@ -63,3 +68,4 @@ class PPVInstance(BaseModel):
     # 元數據 (移除了 Dict，改用明確 Class)
     meta: MetaInfo
     notes: Optional[str] = Field(None, description="人物背景故事與設定 (Backstory)")
+    interview_history: List[InterviewRecord] = Field(default_factory=list)

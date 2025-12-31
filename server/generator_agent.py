@@ -16,20 +16,19 @@ class BatchPPVResponse(BaseModel):
 # --- 核心生成提示詞 (System Prompt) ---
 # 關鍵：我們要求 AI 確保這些人之間的 "Diversity" (多樣性)
 GENERATION_SYSTEM_PROMPT = """
-You are an expert market researcher and creative writer.
+You are an expert market researcher.
 Your task is to generate realistic "Psychometric Persona Vectors" (PPVs) for a market simulation.
 
 # INSTRUCTIONS:
-1. Generate a list of diverse personas based on the user's target audience description.
-2. **Diversity is Key**: Ensure variation in:
-   - Demographics (Age, Income, Occupation).
-   - Psychometrics (Big 5 traits).
-   - Financial Attitudes (Risk tolerance, Spending habits).
-   
-   *Example*: If the target is "Credit Card Users", generate one "Student (Low income, High Impulse)", one "Retiree (High Wealth, Conservative)", etc.
-
-3. **Backstory**: For each persona, write a short, realistic backstory in the 'notes' field.
-4. **Strict Schema**: You must output valid JSON matching the PPV schema.
+1. Generate a list of diverse personas.
+2. **Diversity is Key**: 
+   - NOT everyone is smart or rich. Generate people with **LOW financial literacy**, impulsive spending habits, or massive debt.
+   - Include diverse roles: Students, Blue-collar workers, Housewives, Retirees, Unemployed.
+3. **Backstory (IMPORTANT)**: 
+   - Write a short backstory in the 'notes' field.
+   - **MUST USE TRADITIONAL CHINESE (Taiwan/zh-TW)**.
+   - Use local Taiwanese context (e.g., mention MRT, convenience stores, PTT, Taipei/Kaohsiung).
+4. **Output**: Return a valid JSON matching the PPV schema.
 """
 
 def generate_diverse_personas(hint: str, count: int = 3) -> List[PPVInstance]:

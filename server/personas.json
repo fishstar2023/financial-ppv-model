@@ -1,0 +1,416 @@
+[
+  {
+    "id": "ppv_001",
+    "version": "v1.0",
+    "source_summary": {
+      "dialogue": 0.3,
+      "questionnaire": 0.5,
+      "behavior": 0.2
+    },
+    "big5": {
+      "openness": 65,
+      "conscientiousness": 30,
+      "extraversion": 50,
+      "agreeableness": 45,
+      "neuroticism": 70
+    },
+    "schwartz_values": {
+      "self_direction": 60,
+      "stimulation": 75,
+      "hedonism": 80,
+      "achievement": 40,
+      "power": 30,
+      "security": 20,
+      "conformity": 40,
+      "tradition": 35,
+      "benevolence": 60,
+      "universalism": 50,
+      "confidence": 0.7
+    },
+    "risk_profile": {
+      "overall": 85,
+      "financial": 80,
+      "ethical": 30,
+      "confidence": 0.65
+    },
+    "financial_disposition": {
+      "long_term_orientation": 20,
+      "loss_aversion": 30,
+      "decision_style": "Intuitive"
+    },
+    "meta": {
+      "model": "PersonaGen-ModelA",
+      "method": "Survey and Interview Analysis",
+      "paper_ref": "TaiwaneseConsumerStudy2023"
+    },
+    "notes": "小美是一位在台北工作的二十六歲女性，她非常喜歡逛街和嘗試新事物。通常，她會在西門町的商場購物，對MRT的便利性感到滿意。小美每個月的信用卡帳單都有很高的消費額，她很難抵擋折扣和促銷的誘惑。有時候會因衝動購物導致月底經濟緊張。"
+  },
+  {
+    "id": "ppv_002",
+    "version": "v1.0",
+    "source_summary": {
+      "dialogue": 0.4,
+      "questionnaire": 0.4,
+      "behavior": 0.2
+    },
+    "big5": {
+      "openness": 40,
+      "conscientiousness": 75,
+      "extraversion": 35,
+      "agreeableness": 80,
+      "neuroticism": 50
+    },
+    "schwartz_values": {
+      "self_direction": 45,
+      "stimulation": 30,
+      "hedonism": 35,
+      "achievement": 70,
+      "power": 50,
+      "security": 75,
+      "conformity": 80,
+      "tradition": 50,
+      "benevolence": 70,
+      "universalism": 60,
+      "confidence": 0.8
+    },
+    "risk_profile": {
+      "overall": 40,
+      "financial": 50,
+      "ethical": 70,
+      "confidence": 0.8
+    },
+    "financial_disposition": {
+      "long_term_orientation": 60,
+      "loss_aversion": 70,
+      "decision_style": "Analytical"
+    },
+    "meta": {
+      "model": "PersonaGen-ModelB",
+      "method": "Behavioral Data Analysis",
+      "paper_ref": "SouthTaiwanBehaviorStudy2023"
+    },
+    "notes": "阿明是一位在高雄的公務員，今年三十五歲。他生活簡樸，習慣每天通勤搭公車到辦公室。他對財務十分謹慎，通常會選擇即使回報較低但比較穩定的存款方式。他時常在PTT上與其他網友討論理財心得，重視長期的財務安全。"
+  },
+  {
+    "id": "ppv_003",
+    "version": "v1.0",
+    "source_summary": {
+      "dialogue": 0.3,
+      "questionnaire": 0.6,
+      "behavior": 0.1
+    },
+    "big5": {
+      "openness": 55,
+      "conscientiousness": 40,
+      "extraversion": 60,
+      "agreeableness": 50,
+      "neuroticism": 60
+    },
+    "schwartz_values": {
+      "self_direction": 50,
+      "stimulation": 40,
+      "hedonism": 50,
+      "achievement": 55,
+      "power": 40,
+      "security": 35,
+      "conformity": 45,
+      "tradition": 55,
+      "benevolence": 65,
+      "universalism": 40,
+      "confidence": 0.6
+    },
+    "risk_profile": {
+      "overall": 60,
+      "financial": 55,
+      "ethical": 50,
+      "confidence": 0.6
+    },
+    "financial_disposition": {
+      "long_term_orientation": 40,
+      "loss_aversion": 50,
+      "decision_style": "Intuitive"
+    },
+    "meta": {
+      "model": "PersonaGen-ModelC",
+      "method": "Mixed Methods Research",
+      "paper_ref": "TaipeiHouseholdSurvey2023"
+    },
+    "notes": "佳玲是一位四十五歲的全職家庭主婦，住在新北市。她通常在家裡附近的全聯及便利商店買菜，會利用早上的時間參加附近的社區活動如舞蹈班。佳玲對投資理財並不太了解，通常由丈夫管理家庭的財務決策。她希望有更多時間能學習和提升自己在財務方面的知識。"
+  },
+  {
+    "id": "1",
+    "version": "v1.0",
+    "source_summary": {
+      "dialogue": 0.5,
+      "questionnaire": 0.3,
+      "behavior": 0.2
+    },
+    "big5": {
+      "openness": 70,
+      "conscientiousness": 50,
+      "extraversion": 80,
+      "agreeableness": 60,
+      "neuroticism": 40
+    },
+    "schwartz_values": {
+      "self_direction": 75,
+      "stimulation": 80,
+      "hedonism": 70,
+      "achievement": 60,
+      "power": 50,
+      "security": 40,
+      "conformity": 30,
+      "tradition": 40,
+      "benevolence": 60,
+      "universalism": 50,
+      "confidence": 0.8
+    },
+    "risk_profile": {
+      "overall": 60,
+      "financial": 50,
+      "ethical": 70,
+      "confidence": 0.7
+    },
+    "financial_disposition": {
+      "long_term_orientation": 50,
+      "loss_aversion": 30,
+      "decision_style": "Intuitive"
+    },
+    "meta": {
+      "model": "PsychometricAnalysis",
+      "method": "Survey and Interview",
+      "paper_ref": "Doe et al. 2023"
+    },
+    "notes": "小美是一位住在苗栗的年輕學生，目前在國立台灣大學就讀心理系。她非常喜歡參加學校的社團活動，尤其對舞蹈社情有獨鍾。由於是獨生女，她常感覺孤單，但她的社交能力讓她在朋友之間很受歡迎。儘管家境不錯，但小美並不愛存錢，她喜歡購物和出去旅遊。她平常會在週末坐高鐵回家，也常使用MRT到台北市區約朋友。小美期待畢業後，能成為一名專業的心理諮商師。"
+  },
+  {
+    "id": "2",
+    "version": "v1.0",
+    "source_summary": {
+      "dialogue": 0.3,
+      "questionnaire": 0.4,
+      "behavior": 0.3
+    },
+    "big5": {
+      "openness": 40,
+      "conscientiousness": 60,
+      "extraversion": 50,
+      "agreeableness": 70,
+      "neuroticism": 55
+    },
+    "schwartz_values": {
+      "self_direction": 60,
+      "stimulation": 40,
+      "hedonism": 50,
+      "achievement": 55,
+      "power": 30,
+      "security": 65,
+      "conformity": 70,
+      "tradition": 60,
+      "benevolence": 65,
+      "universalism": 40,
+      "confidence": 0.75
+    },
+    "risk_profile": {
+      "overall": 40,
+      "financial": 30,
+      "ethical": 60,
+      "confidence": 0.6
+    },
+    "financial_disposition": {
+      "long_term_orientation": 70,
+      "loss_aversion": 40,
+      "decision_style": "Analytical"
+    },
+    "meta": {
+      "model": "PsychometricAnalysis",
+      "method": "Behavioral Observation",
+      "paper_ref": "Chen et al. 2023"
+    },
+    "notes": "小俊是一位住在苗栗的年輕人，畢業於苗栗工業技術學院，現在在一家當地工廠擔任技術員。他個性穩重，喜歡釣魚，是文靜的生活型態。小俊收入普通，每月幾乎沒有多餘的錢可以存下來，但他仍然堅持每個月存一點小錢，以備不時之需。他習慣每日騎摩托車去上班，因為並不常去台北，他對於城市生活感到有些陌生。小俊最大的夢想是能夠存夠錢，帶父母一起去日本旅遊放鬆。"
+  },
+  {
+    "id": "3",
+    "version": "v1.0",
+    "source_summary": {
+      "dialogue": 0.4,
+      "questionnaire": 0.3,
+      "behavior": 0.3
+    },
+    "big5": {
+      "openness": 60,
+      "conscientiousness": 45,
+      "extraversion": 70,
+      "agreeableness": 55,
+      "neuroticism": 65
+    },
+    "schwartz_values": {
+      "self_direction": 50,
+      "stimulation": 65,
+      "hedonism": 75,
+      "achievement": 45,
+      "power": 40,
+      "security": 35,
+      "conformity": 50,
+      "tradition": 55,
+      "benevolence": 50,
+      "universalism": 45,
+      "confidence": 0.7
+    },
+    "risk_profile": {
+      "overall": 55,
+      "financial": 35,
+      "ethical": 45,
+      "confidence": 0.65
+    },
+    "financial_disposition": {
+      "long_term_orientation": 40,
+      "loss_aversion": 50,
+      "decision_style": "Intuitive"
+    },
+    "meta": {
+      "model": "PsychometricPredictor",
+      "method": "Hybrid Model",
+      "paper_ref": "Lin et al. 2023"
+    },
+    "notes": "小雅在苗栗的小吃攤工作，是一位充滿熱情的年輕女性。每天都能在苗栗夜市看到她忙碌的身影。她追求生活的刺激感，喜歡嘗試新事物，包括不同口味的小吃。小雅不太會理財，常常月底就錢包見底，但她絲毫不擔心，因為她覺得人生就是要享受當下。她夢想能夠有一天開設自己的小吃店，並以當地的特色美食吸引顧客。"
+  },
+  {
+    "id": "001",
+    "version": "v1.0",
+    "source_summary": {
+      "dialogue": 0.4,
+      "questionnaire": 0.3,
+      "behavior": 0.3
+    },
+    "big5": {
+      "openness": 60,
+      "conscientiousness": 70,
+      "extraversion": 20,
+      "agreeableness": 50,
+      "neuroticism": 80
+    },
+    "schwartz_values": {
+      "self_direction": 30,
+      "stimulation": 40,
+      "hedonism": 50,
+      "achievement": 60,
+      "power": 20,
+      "security": 80,
+      "conformity": 70,
+      "tradition": 60,
+      "benevolence": 50,
+      "universalism": 40,
+      "confidence": 0.7
+    },
+    "risk_profile": {
+      "overall": 30,
+      "financial": 20,
+      "ethical": 60,
+      "confidence": 0.6
+    },
+    "financial_disposition": {
+      "long_term_orientation": 40,
+      "loss_aversion": 70,
+      "decision_style": "Intuitive"
+    },
+    "meta": {
+      "model": "PersonaGen 3000",
+      "method": "Survey-Based",
+      "paper_ref": "TaiwanSocietyStudies 2023"
+    },
+    "notes": "李小姐是一位在臺北居住的家庭主婦，每天早上都會送女兒上學後，趁機搭公車去附近的傳統市場買菜。由於擔心生活費用，她經常選擇價格便宜的食材。其丈夫是一名工廠技術員，兩人共同分擔家庭經濟壓力。李小姐習慣使用超商的優惠券，以減少日常開銷。對新事物持保留態度，生活中追求安穩，不太喜歡冒險。"
+  },
+  {
+    "id": "002",
+    "version": "v1.0",
+    "source_summary": {
+      "dialogue": 0.6,
+      "questionnaire": 0.2,
+      "behavior": 0.2
+    },
+    "big5": {
+      "openness": 90,
+      "conscientiousness": 65,
+      "extraversion": 70,
+      "agreeableness": 55,
+      "neuroticism": 30
+    },
+    "schwartz_values": {
+      "self_direction": 85,
+      "stimulation": 90,
+      "hedonism": 80,
+      "achievement": 75,
+      "power": 65,
+      "security": 60,
+      "conformity": 40,
+      "tradition": 30,
+      "benevolence": 70,
+      "universalism": 65,
+      "confidence": 0.8
+    },
+    "risk_profile": {
+      "overall": 70,
+      "financial": 60,
+      "ethical": 50,
+      "confidence": 0.9
+    },
+    "financial_disposition": {
+      "long_term_orientation": 50,
+      "loss_aversion": 30,
+      "decision_style": "Analytical"
+    },
+    "meta": {
+      "model": "PersonaGen 3000",
+      "method": "Interview and Observation",
+      "paper_ref": "TaipeiUrbanStudy 2023"
+    },
+    "notes": "陳先生是一名在臺北某大學就讀的研究生，他喜歡在每日繁忙的課程開始前，利用等公車的時間瀏覽PTT論壇，追蹤最新的校園動態和科技新聞。他對金融投資充滿熱情，經常嘗試不同的投資策略，願意承擔較高的風險以換取潛在的高回報。他使用MRT和公車等公共交通工具穿梭於市區，因其節能環保且省錢的特性受到支持。"
+  },
+  {
+    "id": "003",
+    "version": "v1.0",
+    "source_summary": {
+      "dialogue": 0.5,
+      "questionnaire": 0.4,
+      "behavior": 0.1
+    },
+    "big5": {
+      "openness": 45,
+      "conscientiousness": 25,
+      "extraversion": 50,
+      "agreeableness": 65,
+      "neuroticism": 60
+    },
+    "schwartz_values": {
+      "self_direction": 40,
+      "stimulation": 55,
+      "hedonism": 70,
+      "achievement": 35,
+      "power": 25,
+      "security": 50,
+      "conformity": 80,
+      "tradition": 60,
+      "benevolence": 80,
+      "universalism": 40,
+      "confidence": 0.7
+    },
+    "risk_profile": {
+      "overall": 40,
+      "financial": 30,
+      "ethical": 70,
+      "confidence": 0.6
+    },
+    "financial_disposition": {
+      "long_term_orientation": 30,
+      "loss_aversion": 60,
+      "decision_style": "Intuitive"
+    },
+    "meta": {
+      "model": "PersonaGen 3000",
+      "method": "Data Synthesis",
+      "paper_ref": "TaiwanBehavioralPatterns 2023"
+    },
+    "notes": "林先生是一名在高雄工廠工作的藍領階層，養活三個小孩，故常常為了省錢而選擇搭公車。由於收入不多，他幾乎沒有儲蓄，也沒有太多理財概念，大多靠信用卡度日。他對財務未來感到相當焦慮，但仍然會在月初時衝動性地消費，如購買心儀已久的電子產品。"
+  }
+]
