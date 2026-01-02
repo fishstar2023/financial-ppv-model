@@ -86,6 +86,7 @@ class ExtractRequest(BaseModel):
 class ChatRequest(BaseModel):
     ppv_profile: PPVInstance
     user_query: str
+    context_data: Optional[str] = None
 
 class GenerateRequest(BaseModel):
     hint: str = "General public"
@@ -105,17 +106,22 @@ def api_extract_ppv(request: ExtractRequest):
 def api_update_persona(persona: PPVInstance):
     save_db([persona]) # 呼叫存檔函式
     return {"status": "updated", "id": persona.id}
+
 # --- API 2: 數位孿生對話 (Phase 3) ---
 @app.post("/api/chat_with_twin")
 def api_chat_with_twin(request: ChatRequest):
-    # print(f"收到對話請求: {request.user_query}") 
     try:
-        response_text = chat_with_digital_twin(request.ppv_profile, request.user_query)
+        # 呼叫我們剛升級的 Agent
+        response_text = chat_with_digital_twin(
+            request.ppv_profile, 
+            request.user_query, 
+            request.context_data # ✅ 把資料傳進去
+        )
         return {"response": response_text}
     except Exception as e:
         print(f"對話錯誤: {e}")
         raise HTTPException(status_code=500, detail=str(e))
-
+    
 # --- API 3: 生成多元虛擬客戶 (Phase 4 Generation) ---
 @app.post("/api/generate_personas")
 def api_generate_personas(req: GenerateRequest):

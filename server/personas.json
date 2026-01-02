@@ -43,7 +43,8 @@
       "method": "Survey and Interview Analysis",
       "paper_ref": "TaiwaneseConsumerStudy2023"
     },
-    "notes": "小美是一位在台北工作的二十六歲女性，她非常喜歡逛街和嘗試新事物。通常，她會在西門町的商場購物，對MRT的便利性感到滿意。小美每個月的信用卡帳單都有很高的消費額，她很難抵擋折扣和促銷的誘惑。有時候會因衝動購物導致月底經濟緊張。"
+    "notes": "小美是一位在台北工作的二十六歲女性，她非常喜歡逛街和嘗試新事物。通常，她會在西門町的商場購物，對MRT的便利性感到滿意。小美每個月的信用卡帳單都有很高的消費額，她很難抵擋折扣和促銷的誘惑。有時候會因衝動購物導致月底經濟緊張。",
+    "interview_history": []
   },
   {
     "id": "ppv_002",
@@ -89,7 +90,8 @@
       "method": "Behavioral Data Analysis",
       "paper_ref": "SouthTaiwanBehaviorStudy2023"
     },
-    "notes": "阿明是一位在高雄的公務員，今年三十五歲。他生活簡樸，習慣每天通勤搭公車到辦公室。他對財務十分謹慎，通常會選擇即使回報較低但比較穩定的存款方式。他時常在PTT上與其他網友討論理財心得，重視長期的財務安全。"
+    "notes": "阿明是一位在高雄的公務員，今年三十五歲。他生活簡樸，習慣每天通勤搭公車到辦公室。他對財務十分謹慎，通常會選擇即使回報較低但比較穩定的存款方式。他時常在PTT上與其他網友討論理財心得，重視長期的財務安全。",
+    "interview_history": []
   },
   {
     "id": "ppv_003",
@@ -135,7 +137,8 @@
       "method": "Mixed Methods Research",
       "paper_ref": "TaipeiHouseholdSurvey2023"
     },
-    "notes": "佳玲是一位四十五歲的全職家庭主婦，住在新北市。她通常在家裡附近的全聯及便利商店買菜，會利用早上的時間參加附近的社區活動如舞蹈班。佳玲對投資理財並不太了解，通常由丈夫管理家庭的財務決策。她希望有更多時間能學習和提升自己在財務方面的知識。"
+    "notes": "佳玲是一位四十五歲的全職家庭主婦，住在新北市。她通常在家裡附近的全聯及便利商店買菜，會利用早上的時間參加附近的社區活動如舞蹈班。佳玲對投資理財並不太了解，通常由丈夫管理家庭的財務決策。她希望有更多時間能學習和提升自己在財務方面的知識。",
+    "interview_history": []
   },
   {
     "id": "1",
@@ -181,7 +184,8 @@
       "method": "Survey and Interview",
       "paper_ref": "Doe et al. 2023"
     },
-    "notes": "小美是一位住在苗栗的年輕學生，目前在國立台灣大學就讀心理系。她非常喜歡參加學校的社團活動，尤其對舞蹈社情有獨鍾。由於是獨生女，她常感覺孤單，但她的社交能力讓她在朋友之間很受歡迎。儘管家境不錯，但小美並不愛存錢，她喜歡購物和出去旅遊。她平常會在週末坐高鐵回家，也常使用MRT到台北市區約朋友。小美期待畢業後，能成為一名專業的心理諮商師。"
+    "notes": "小美是一位住在苗栗的年輕學生，目前在國立台灣大學就讀心理系。她非常喜歡參加學校的社團活動，尤其對舞蹈社情有獨鍾。由於是獨生女，她常感覺孤單，但她的社交能力讓她在朋友之間很受歡迎。儘管家境不錯，但小美並不愛存錢，她喜歡購物和出去旅遊。她平常會在週末坐高鐵回家，也常使用MRT到台北市區約朋友。小美期待畢業後，能成為一名專業的心理諮商師。",
+    "interview_history": []
   },
   {
     "id": "2",
@@ -227,7 +231,8 @@
       "method": "Behavioral Observation",
       "paper_ref": "Chen et al. 2023"
     },
-    "notes": "小俊是一位住在苗栗的年輕人，畢業於苗栗工業技術學院，現在在一家當地工廠擔任技術員。他個性穩重，喜歡釣魚，是文靜的生活型態。小俊收入普通，每月幾乎沒有多餘的錢可以存下來，但他仍然堅持每個月存一點小錢，以備不時之需。他習慣每日騎摩托車去上班，因為並不常去台北，他對於城市生活感到有些陌生。小俊最大的夢想是能夠存夠錢，帶父母一起去日本旅遊放鬆。"
+    "notes": "小俊是一位住在苗栗的年輕人，畢業於苗栗工業技術學院，現在在一家當地工廠擔任技術員。他個性穩重，喜歡釣魚，是文靜的生活型態。小俊收入普通，每月幾乎沒有多餘的錢可以存下來，但他仍然堅持每個月存一點小錢，以備不時之需。他習慣每日騎摩托車去上班，因為並不常去台北，他對於城市生活感到有些陌生。小俊最大的夢想是能夠存夠錢，帶父母一起去日本旅遊放鬆。",
+    "interview_history": []
   },
   {
     "id": "3",
@@ -273,7 +278,8 @@
       "method": "Hybrid Model",
       "paper_ref": "Lin et al. 2023"
     },
-    "notes": "小雅在苗栗的小吃攤工作，是一位充滿熱情的年輕女性。每天都能在苗栗夜市看到她忙碌的身影。她追求生活的刺激感，喜歡嘗試新事物，包括不同口味的小吃。小雅不太會理財，常常月底就錢包見底，但她絲毫不擔心，因為她覺得人生就是要享受當下。她夢想能夠有一天開設自己的小吃店，並以當地的特色美食吸引顧客。"
+    "notes": "小雅在苗栗的小吃攤工作，是一位充滿熱情的年輕女性。每天都能在苗栗夜市看到她忙碌的身影。她追求生活的刺激感，喜歡嘗試新事物，包括不同口味的小吃。小雅不太會理財，常常月底就錢包見底，但她絲毫不擔心，因為她覺得人生就是要享受當下。她夢想能夠有一天開設自己的小吃店，並以當地的特色美食吸引顧客。",
+    "interview_history": []
   },
   {
     "id": "001",
@@ -319,7 +325,8 @@
       "method": "Survey-Based",
       "paper_ref": "TaiwanSocietyStudies 2023"
     },
-    "notes": "李小姐是一位在臺北居住的家庭主婦，每天早上都會送女兒上學後，趁機搭公車去附近的傳統市場買菜。由於擔心生活費用，她經常選擇價格便宜的食材。其丈夫是一名工廠技術員，兩人共同分擔家庭經濟壓力。李小姐習慣使用超商的優惠券，以減少日常開銷。對新事物持保留態度，生活中追求安穩，不太喜歡冒險。"
+    "notes": "李小姐是一位在臺北居住的家庭主婦，每天早上都會送女兒上學後，趁機搭公車去附近的傳統市場買菜。由於擔心生活費用，她經常選擇價格便宜的食材。其丈夫是一名工廠技術員，兩人共同分擔家庭經濟壓力。李小姐習慣使用超商的優惠券，以減少日常開銷。對新事物持保留態度，生活中追求安穩，不太喜歡冒險。",
+    "interview_history": []
   },
   {
     "id": "002",
@@ -365,7 +372,8 @@
       "method": "Interview and Observation",
       "paper_ref": "TaipeiUrbanStudy 2023"
     },
-    "notes": "陳先生是一名在臺北某大學就讀的研究生，他喜歡在每日繁忙的課程開始前，利用等公車的時間瀏覽PTT論壇，追蹤最新的校園動態和科技新聞。他對金融投資充滿熱情，經常嘗試不同的投資策略，願意承擔較高的風險以換取潛在的高回報。他使用MRT和公車等公共交通工具穿梭於市區，因其節能環保且省錢的特性受到支持。"
+    "notes": "陳先生是一名在臺北某大學就讀的研究生，他喜歡在每日繁忙的課程開始前，利用等公車的時間瀏覽PTT論壇，追蹤最新的校園動態和科技新聞。他對金融投資充滿熱情，經常嘗試不同的投資策略，願意承擔較高的風險以換取潛在的高回報。他使用MRT和公車等公共交通工具穿梭於市區，因其節能環保且省錢的特性受到支持。",
+    "interview_history": []
   },
   {
     "id": "003",
@@ -411,6 +419,166 @@
       "method": "Data Synthesis",
       "paper_ref": "TaiwanBehavioralPatterns 2023"
     },
-    "notes": "林先生是一名在高雄工廠工作的藍領階層，養活三個小孩，故常常為了省錢而選擇搭公車。由於收入不多，他幾乎沒有儲蓄，也沒有太多理財概念，大多靠信用卡度日。他對財務未來感到相當焦慮，但仍然會在月初時衝動性地消費，如購買心儀已久的電子產品。"
+    "notes": "林先生是一名在高雄工廠工作的藍領階層，養活三個小孩，故常常為了省錢而選擇搭公車。由於收入不多，他幾乎沒有儲蓄，也沒有太多理財概念，大多靠信用卡度日。他對財務未來感到相當焦慮，但仍然會在月初時衝動性地消費，如購買心儀已久的電子產品。",
+    "interview_history": []
+  },
+  {
+    "id": "persona_vn_001",
+    "version": "v1.0",
+    "source_summary": {
+      "dialogue": 0.4,
+      "questionnaire": 0.3,
+      "behavior": 0.3
+    },
+    "big5": {
+      "openness": 67,
+      "conscientiousness": 78,
+      "extraversion": 54,
+      "agreeableness": 80,
+      "neuroticism": 60
+    },
+    "schwartz_values": {
+      "self_direction": 70,
+      "stimulation": 55,
+      "hedonism": 50,
+      "achievement": 60,
+      "power": 40,
+      "security": 75,
+      "conformity": 65,
+      "tradition": 85,
+      "benevolence": 90,
+      "universalism": 72,
+      "confidence": 0.9
+    },
+    "risk_profile": {
+      "overall": 60,
+      "financial": 50,
+      "ethical": 70,
+      "confidence": 0.85
+    },
+    "financial_disposition": {
+      "long_term_orientation": 60,
+      "loss_aversion": 65,
+      "decision_style": "Analytical"
+    },
+    "meta": {
+      "model": "viet_life_2023",
+      "method": "survey_analysis",
+      "paper_ref": "Nguyen, T. (2022) Study on Vietnamese Psychometric Personas."
+    },
+    "notes": "阿嬤在台南出生，但是父母當時來越南打工，他從小就隨著父母在胡志明市成長。",
+    "interview_history": [
+      {
+        "question": "What do you value most?",
+        "answer": "Family and community are the most important to me.",
+        "timestamp": "2023-11-01T10:45:00.000Z"
+      }
+    ]
+  },
+  {
+    "id": "persona_vn_002",
+    "version": "v1.0",
+    "source_summary": {
+      "dialogue": 0.5,
+      "questionnaire": 0.4,
+      "behavior": 0.1
+    },
+    "big5": {
+      "openness": 45,
+      "conscientiousness": 38,
+      "extraversion": 60,
+      "agreeableness": 75,
+      "neuroticism": 45
+    },
+    "schwartz_values": {
+      "self_direction": 50,
+      "stimulation": 60,
+      "hedonism": 80,
+      "achievement": 55,
+      "power": 50,
+      "security": 40,
+      "conformity": 50,
+      "tradition": 60,
+      "benevolence": 85,
+      "universalism": 45,
+      "confidence": 0.8
+    },
+    "risk_profile": {
+      "overall": 45,
+      "financial": 35,
+      "ethical": 65,
+      "confidence": 0.75
+    },
+    "financial_disposition": {
+      "long_term_orientation": 30,
+      "loss_aversion": 40,
+      "decision_style": "Intuitive"
+    },
+    "meta": {
+      "model": "viet_youth_2023",
+      "method": "field_survey",
+      "paper_ref": "Tran, L. & Pham, Q. (2023) Understanding Youth Spending Habits in Vietnam."
+    },
+    "notes": "小春是一名在越南的自由工作者，平常喜歡逛胡志明市的夜市與路邊咖啡店，不喜歡被約束，樂於交朋友。",
+    "interview_history": [
+      {
+        "question": "How do you usually make financial decisions?",
+        "answer": "I follow my gut feeling most of the time.",
+        "timestamp": "2023-11-02T09:30:00.000Z"
+      }
+    ]
+  },
+  {
+    "id": "persona_vn_003",
+    "version": "v1.0",
+    "source_summary": {
+      "dialogue": 0.3,
+      "questionnaire": 0.5,
+      "behavior": 0.2
+    },
+    "big5": {
+      "openness": 35,
+      "conscientiousness": 80,
+      "extraversion": 30,
+      "agreeableness": 60,
+      "neuroticism": 50
+    },
+    "schwartz_values": {
+      "self_direction": 40,
+      "stimulation": 55,
+      "hedonism": 45,
+      "achievement": 70,
+      "power": 30,
+      "security": 80,
+      "conformity": 80,
+      "tradition": 85,
+      "benevolence": 70,
+      "universalism": 50,
+      "confidence": 0.88
+    },
+    "risk_profile": {
+      "overall": 35,
+      "financial": 40,
+      "ethical": 80,
+      "confidence": 0.82
+    },
+    "financial_disposition": {
+      "long_term_orientation": 75,
+      "loss_aversion": 70,
+      "decision_style": "Analytical"
+    },
+    "meta": {
+      "model": "viet_tradition_2023",
+      "method": "demographic_research",
+      "paper_ref": "Le, D. (2023) The Influence of Tradition in Modern Vietnam."
+    },
+    "notes": "小安是一位家庭主婦，住在越南河內，丈夫在工廠工作，注重孩子的教育和家庭的未來，習慣每天到傳統市場買菜。",
+    "interview_history": [
+      {
+        "question": "What is your biggest concern financially?",
+        "answer": "I always worry about making sure we have enough savings for the children’s future.",
+        "timestamp": "2023-11-01T08:45:00.000Z"
+      }
+    ]
   }
 ]

@@ -1,70 +1,64 @@
 import os
-from openai import OpenAI
-from ppv_schema import PPVInstance  # 匯入第一步建立的 Schema
-import json
 from dotenv import load_dotenv
-from ppv_schema import MetaInfo
+from agno.agent import Agent
+from agno.models.openai import OpenAIChat
+from ppv_schema import PPVInstance, MetaInfo
 
-# 載入 .env 檔案裡的設定
+# 載入 .env
 load_dotenv()
 
-# 設定您的 API Key
-# 建議將 Key 放在 .env 檔中，這裡先讀取環境變數
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-
-# --- 核心提示詞 (System Prompt) ---
-# 根據論文描述，AI 需扮演心理測量專家，從對話推論特質 
-EXTRACTION_SYSTEM_PROMPT = """
-You are an expert psychometrician and data analyst specializing in "Psychometric Persona Vectors" (PPV).
-Your task is to analyze the provided casual conversation logs of a user and infer their psychometric profile.
-
-You must fill out the PPV Schema strictly based on the evidence in the text.
-- **Big Five**: Infer Openness, Conscientiousness, Extraversion, Agreeableness, Neuroticism (0-100).
-- **Schwartz Values**: Infer values like Power, Security, Tradition, etc. based on what the user prioritizes in conversation.
-- **Risk Profile**: Assess their attitude towards risk, especially financial and ethical risk.
-- **Financial Disposition**: Analyze their long-term investment orientation and decision style (Analytical vs Intuitive).
-
-**Rules:**
-1. Use a scale of 0-100 for numeric scores (0 = very low, 100 = very high).
-2. If evidence is weak for a specific trait, use a moderate score (e.g., 50) and lower the 'confidence' score for that module.
-3. Do NOT make up facts. Rely on the tone, word choice, topics, and opinions expressed in the chat logs.
-4. Output MUST be a valid JSON object matching the defined schema.
-"""
+# --- 定義 Agno Agent (取代原本的 System Prompt 字串) ---
+extraction_agent = Agent(
+    model=OpenAIChat(id="gpt-4o-2024-08-06"), # 指定支援結構化輸出的模型
+    description="You are an expert psychometrician and data analyst specializing in 'Psychometric Persona Vectors' (PPV).",
+    response_model=PPVInstance, # 關鍵：直接告訴 Agent 我們要什麼格式 (Pydantic Schema)
+    structured_outputs=True,    # 啟用強制結構化模式
+    instructions=[
+        "Your task is to analyze the provided casual conversation logs of a user and infer their psychometric profile.",
+        "You must fill out the PPV Schema strictly based on the evidence in the text.",
+        "---",
+        "**Big Five**: Infer Openness, Conscientiousness, Extraversion, Agreeableness, Neuroticism (0-100).",
+        "**Schwartz Values**: Infer values like Power, Security, Tradition based on what the user prioritizes.",
+        "**Risk Profile**: Assess their attitude towards risk, especially financial and ethical risk.",
+        "**Financial Disposition**: Analyze their long-term investment orientation and decision style (Analytical vs Intuitive).",
+        "---",
+        "**Rules:**",
+        "1. Use a scale of 0-100 for numeric scores (0 = very low, 100 = very high).",
+        "2. If evidence is weak for a specific trait, use a moderate score (e.g., 50) and lower the 'confidence' score.",
+        "3. Do NOT make up facts. Rely on the tone, word choice, and opinions in the chat logs.",
+        "4. Output MUST be a valid JSON object matching the defined schema."
+    ],
+    markdown=False, # 我們只需要資料物件，不需要 Markdown 文字
+)
 
 def extract_ppv(chat_log: str, user_id: str = "user_001") -> PPVInstance:
     """
-    將對話紀錄轉換為 PPV 人格向量
+    使用 Agno Agent 將對話紀錄轉換為 PPV 人格向量
     """
-    print(f"正在分析用戶 {user_id} 的對話紀錄...")
+    print(f"🧠 [Agno] 正在分析用戶 {user_id} 的對話紀錄...")
 
     try:
-        completion = client.beta.chat.completions.parse(
-            model="gpt-4o-2024-08-06",  # 建議使用支援 Structured Output 的最新模型
-            messages=[
-                {"role": "system", "content": EXTRACTION_SYSTEM_PROMPT},
-                {"role": "user", "content": f"Here is the conversation log:\n\n{chat_log}"},
-            ],
-            response_format=PPVInstance,  # 這裡直接指定第一步定義的 Class
-        )
+        # Agno 的呼叫方式：直接 run，它會自動處理 JSON 解析
+        response = extraction_agent.run(f"Here is the conversation log:\n\n{chat_log}")
 
-        # 取得解析後的物件
-        ppv_result = completion.choices[0].message.parsed
+        # response.content 就已經是轉換好的 PPVInstance 物件了
+        ppv_result = response.content
         
-        # 自動填入 ID 和 Meta 資訊 (論文建議紀錄提取設定 )
+        # 自動填入 ID 和 Meta 資訊 (維持原本的邏輯)
         ppv_result.id = f"ppv-{user_id}"
         ppv_result.meta = MetaInfo(
             model="gpt-4o-2024-08-06",
-            method="dialogue-extraction",
+            method="agno-extraction",
             paper_ref="From Individuals to Populations (2026)"
         )
 
         return ppv_result
 
     except Exception as e:
-        print(f"提取失敗: {e}")
+        print(f"❌ 提取失敗: {e}")
         return None
 
-# --- 測試區 (如果您直接執行此檔案會跑這段) ---
+# --- 測試區 ---
 if __name__ == "__main__":
     # 模擬一段簡單的對話紀錄
     dummy_chat_log = """

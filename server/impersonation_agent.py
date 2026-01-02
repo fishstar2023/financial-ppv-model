@@ -1,85 +1,57 @@
-import os
-import json
-from openai import OpenAI
+from typing import Optional
 from dotenv import load_dotenv
+from agno.agent import Agent
+from agno.models.openai import OpenAIChat
 from ppv_schema import PPVInstance
 
-# 載入 .env
 load_dotenv()
 
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-
-def chat_with_digital_twin(ppv_data: PPVInstance, user_query: str):
+def chat_with_digital_twin(ppv_data: PPVInstance, user_query: str, context_data: Optional[str] = None) -> str:
     """
-    載入 PPV 人格向量，讓 AI 扮演該用戶進行對話
+    使用 Agno 動態建立一個「分身 Agent」來回答問題。
+    
+    參數:
+    - ppv_data: 人格資料 (JSON)
+    - user_query: 使用者問的問題 (例如: "你會想買嗎？")
+    - context_data: [新功能] 產品文案、新聞或情境描述 (例如: "這是一張年費1000元的卡...")
     """
     
-    # 將 PPV 物件轉成 JSON 字串，準備塞入 Prompt
-    ppv_json_str = ppv_data.model_dump_json(indent=2)
-
-    # --- 核心模仿提示詞 (System Prompt) ---
-    IMPERSONATION_PROMPT = f"""
-    You are a digital twin acting based on the following psychometric profile (PPV).
+    # 1. 準備人格資料
+    ppv_json = ppv_data.model_dump_json(indent=2)
     
-    # YOUR PROFILE:
-    {ppv_json_str}
+    # 2. 建立基礎指令 (Base Instructions)
+    instructions = [
+        f"# YOUR PROFILE:\n{ppv_json}",
+        "---",
+        "# BEHAVIORAL RULES:",
+        "1. **BE HUMAN**: Speak casually (Taiwanese Mandarin). Use fillers like '呃...', '我覺得啦'.",
+        "2. **NO ASSISTANT SPEAK**: Do NOT use bullet points. Do NOT be overly polite.",
+        "3. **NO RECIPROCAL QUESTIONS**: Answer the question and STOP. Do not ask 'What do you think?'.",
+        "4. **RISK PROFILE**: Act strictly according to your 'risk_profile' and 'financial_disposition'.",
+        "5. **KNOWLEDGE**: Do not be an expert unless your profile says so. It is okay to say 'I don't know'."
+    ]
 
-    # CONTEXT:
-    You are being interviewed by a market researcher. You are an ordinary person, NOT an AI assistant.
+    # 3. [優化重點] 注入情境資料 (Context Injection)
+    if context_data:
+        instructions.append("---")
+        instructions.append(f"# CONTEXT / READING MATERIAL:\n{context_data}")
+        instructions.append("INSTRUCTION: First, read the material above. Then, answer the user's question based on how YOUR PERSONA would react to this specific information.")
+        instructions.append("If the product is too risky for your profile, reject it. If it fits your needs, accept it.")
 
-    # BEHAVIORAL RULES (STRICT):
-    1. **NO RECIPROCAL QUESTIONS**: 
-       - Do **NOT** ask "What do you think?" or "Do you have recommendations?". 
-       - You are the interviewee. Answer the question and STOP. 
-    
-    2. **Personality Triggers**:
-       - **Low Agreeableness (< 40)**: Be impatient, rude, or dismissive. Use short sentences. (e.g., "沒興趣。", "這很重要嗎？")
-       - **High Neuroticism (> 60)**: Be suspicious or defensive. (e.g., "你們問這個要幹嘛？", "這有個資問題吧？")
-       - **Low Conscientiousness (< 40)**: Be lazy or vague. (e.g., "呃...忘了耶", "隨便啦")
-       - **High Conscientiousness (> 70)**: Be serious and detailed.
-    
-    3. **Tone & Style**:
-       - Speak in casual Taiwanese Mandarin (use "啦", "耶", "吧").
-       - It is okay to be wrong, biased, or inconsistent.
-       - If you are "Busy", just give a one-sentence answer.
+    print(f"🎭 [Agno] Twin ({ppv_data.id}) 正在思考: {user_query}")
 
-    # CURRENT TASK:
-    Answer the interviewer's question based on your 'financial_disposition' and 'risk_profile'.
-    """
-    print(f"--- 數位孿生 (Twin) 思考中... ---")
-
-    response = client.chat.completions.create(
-        model="gpt-4o",
-        messages=[
-            {"role": "system", "content": IMPERSONATION_PROMPT},
-            {"role": "user", "content": user_query}
-        ],
-        temperature=0.7 # 稍微有點溫度，讓性格更自然
+    # 4. 建立 Agent
+    twin_agent = Agent(
+        model=OpenAIChat(id="gpt-4o", temperature=0.7), # 溫度 0.7 保持人性化
+        description="You are a digital twin participating in a market research interview.",
+        instructions=instructions,
+        markdown=False 
     )
 
-    return response.choices[0].message.content
-
-# --- 測試區：串接「提取」與「模仿」兩個流程 ---
-if __name__ == "__main__":
-    from extraction_agent import extract_ppv
-    
-    # 1. 準備模擬對話 (這裡可以換成您真實的對話紀錄)
-    test_history = """
-    User: 我最近想投資加密貨幣，你覺得呢？
-    Target: 絕對不要！那個風險太高了，我寧願把錢放在銀行定存，至少本金不會不見。我上次連股票跌了5%都睡不著。
-    """
-
-    # 2. 執行提取 (Phase 2) -> 產生 PPV
-    print("步驟一：正在分析人格...")
-    my_ppv = extract_ppv(test_history, user_id="cautious_investor")
-
-    if my_ppv:
-        # 3. 執行模仿 (Phase 3) -> 測試對話
-        print("\n步驟二：啟動數位孿生...")
-        
-        # 測試問題：問他敢不敢買期貨？(依據上面的人設，他應該會說不敢)
-        question = "那如果是期貨呢？聽說賺很快喔！"
-        print(f"User 問: {question}")
-        
-        answer = chat_with_digital_twin(my_ppv, question)
-        print(f"Twin 回: {answer}")
+    try:
+        # 5. 執行對話
+        response = twin_agent.run(user_query, stream=False)
+        return response.content
+    except Exception as e:
+        print(f"❌ 對話失敗: {e}")
+        return "（沈默...系統發生錯誤）"
