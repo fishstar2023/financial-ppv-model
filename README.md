@@ -1,117 +1,362 @@
+# 🎯 Market Research Simulator
 
+**AI-Powered Synthetic Persona Interview Platform**
 
-# 🧠 Financial PPV Lab: Synthetic Market Research Platform
-
-## 📖 專案簡介 (Introduction)
-
-**Financial PPV Lab** 是一個結合 **心理測量人格向量 (Psychometric Persona Vectors, PPV)** 與 **生成式 AI** 的金融市場模擬平台。本專案旨在解決傳統金融市調中「個資隱私疑慮」與「樣本獲取高成本」的痛點。
-
-[cite_start]透過將使用者的心理特質（如大五人格、風險偏好、財務價值觀）參數化，我們能建立高保真的「數位孿生 (Digital Twins)」，並進一步生成大規模的「合成客群 (Synthetic Populations)」，進行虛擬的產品訪談與壓力測試 [cite: 1540, 1541]。
+A comprehensive market research tool that generates diverse synthetic personas and conducts automated interviews to gather consumer insights without privacy concerns or high sampling costs.
 
 ---
 
-## ✨ 核心功能 (Key Features)
+## ✨ Key Features
 
-本平台分為兩大實驗模組：
+### 🧬 Persona Generation
+- **Cultural Adaptation**: Generate personas matching specific geographic and cultural contexts (Taiwan, Vietnam, etc.)
+- **Psychometric Diversity**: Each persona has unique Big Five personality traits, risk profiles, and decision-making styles
+- **Realistic Backgrounds**: 2-sentence backstories focusing on age, occupation, location, and key personality traits
+- **Example**: "阿南是27歲的工廠工人，在台中工作。他經常憂心未來，不願意嘗試新的投資方式。"
 
-### 1. 🧬 個體數位孿生 (Individual Extraction)
-*針對單一使用者的深度分析*
-* [cite_start]**對話提取 (Extraction):** 讀取去識別化的對話紀錄，自動分析使用者的 **Big Five (大五人格)** [cite: 410][cite_start]、**Schwartz 價值觀** [cite: 424] [cite_start]與 **金融風險屬性 (Risk Profile)** [cite: 428]。
-* [cite_start]**PPV 建模:** 生成標準化的 JSON 人格檔案，包含信心分數與來源權重 [cite: 397, 581]。
-* **孿生對話:** 使用者可與提取出的數位分身對話，驗證其決策風格是否一致。
+### 💬 Batch Interviews
+- **Contextual Questioning**: Provide product descriptions or scenarios before asking questions
+- **Natural Responses**: AI-powered personas respond in colloquial language based on their personality traits
+- **Interview History**: All Q&A sessions are preserved and accessible
+- **Parallel Processing**: Interview multiple personas simultaneously
 
-### 2. 📊 合成市場模擬 (Market Simulation) [New!]
-*針對特定客群的批量調查*
-* **隨機客群生成 (Generation):** 透過輸入目標描述（例如：「25-30歲，居住在台北，有信用卡使用習慣的小資族」），系統利用 LLM 生成具備**多樣性 (Diversity)** 的虛擬受訪者列表。
-* **批量訪談 (Batch Interview):** 設計金融訪談問卷（例如：「你會考慮申辦這張年費 5000 元的哩程卡嗎？」），系統自動對所有生成的虛擬客戶進行提問。
-* **決策分析:** 收集並比較不同風險屬性（如：保守型 vs. 冒險型）的客戶對同一產品的反應差異。
-
----
-
-## 🛠️ 系統架構 (Architecture)
-
-本專案採用前後端分離架構：
-
-### Backend (Python / FastAPI)
-* **`server/main.py`**: API 入口點，處理前端請求。
-* **`server/generator_agent.py`**: **(核心)** 負責基於目標客群描述，生成多樣化的虛擬人格 PPV。
-* **`server/extraction_agent.py`**: 負責從文本提取 PPV。
-* [cite_start]**`server/impersonation_agent.py`**: 負責扮演特定人格進行對話與問卷回答 [cite: 771]。
-* [cite_start]**`server/ppv_schema.py`**: 定義嚴謹的 Pydantic 資料結構 (Schema) [cite: 375]。
-
-### Frontend (React / TypeScript)
-* **`src/features/PPVAnalyzer`**: 單人提取模式的 UI 元件。
-* **`src/features/MarketSimulator`**: **(核心)** 市場模擬實驗室，包含客群生成與批量訪談介面。
-* **`src/services/ppv.ts`**: 統一管理 API 呼叫。
+### 📊 Analytics Dashboard
+- **Purchase Willingness Analysis**: Automatic sentiment detection (High/Medium/Low)
+- **Response Distribution**: Visual charts showing decision patterns
+- **Individual Insights**: Detailed breakdown of each persona's responses
+- **Question Comparison**: Track different questions and their results
 
 ---
 
-## 🚀 快速開始 (Quick Start)
+## 🏗️ Architecture
 
-### 1. 環境設定 (Environment Setup)
-請確保您已安裝 Python 3.9+ 與 Node.js。
+### Backend (Python + FastAPI + Agno)
+```
+server/
+├── agno_api.py              # FastAPI server with PPV endpoints
+├── generator_agent.py       # Persona generation with diversity prompt
+├── impersonation_agent.py   # Dynamic personality-driven chat agent
+├── extraction_agent.py      # PPV extraction from conversation logs
+├── ppv_schema.py           # Pydantic schemas (Big5, Risk, Values)
+└── personas.json           # Persistent persona database
+```
 
-在專案根目錄建立 `.env` 檔案，並填入您的 OpenAI API Key：
+**Key Technologies**:
+- **Agno**: Agent framework for structured AI interactions
+- **OpenAI GPT-4o**: LLM for persona generation and interviews (temperature: 0.9 for diversity)
+- **Pydantic**: Strict schema validation for PPV instances
+
+### Frontend (React 19 + TypeScript + Vite)
+```
+src/
+├── App.jsx                          # Application shell
+├── features/
+│   └── MarketSimulator/
+│       └── index.tsx                # Main simulator component
+├── types/
+│   └── ppv.ts                       # TypeScript interfaces
+└── styles.css                       # Morandi blue-yellow color palette
+```
+
+**Design System**:
+- **Color Palette**: Deepened Morandi blue-yellow tones (#6b8aa3 primary, #2d3e4d text)
+- **Typography**: Enhanced font sizes (15px-40px) for readability
+- **UI Components**: Glass morphism effects, hover transitions, responsive grid
+
+---
+
+## 🚀 Quick Start
+
+### 1. Prerequisites
+- **Python 3.9+** with pip
+- **Node.js 18+** with npm
+- **OpenAI API Key**
+
+### 2. Environment Setup
+
+Create `.env` file in the project root:
 ```bash
 OPENAI_API_KEY=sk-your-api-key-here
-
+OPENAI_MODEL=gpt-4o
+PORT=8787
 ```
 
-### 2. 啟動後端 (Backend)
+### 3. Install Dependencies
 
+**Backend**:
 ```bash
-# 安裝 Python 依賴
-pip install fastapi uvicorn openai python-dotenv pydantic
+# Create virtual environment
+python3 -m venv .venv
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
 
-# 啟動 FastAPI 伺服器
-python3 server/main.py
-
+# Install packages
+pip install -r server/requirements.txt
 ```
 
-*Server 將運行於: `http://localhost:8000*`
-
-### 3. 啟動前端 (Frontend)
-
-開啟一個新的終端機視窗：
-
+**Frontend**:
 ```bash
-# 安裝前端依賴
 npm install
-
-# 啟動開發伺服器
-npm run dev
-
 ```
 
-*開啟瀏覽器訪問: `http://localhost:3000*` (或終端機顯示的網址)
+### 4. Run the Application
+
+**Terminal 1 - Start Backend**:
+```bash
+npm run dev:api
+# Server runs at http://localhost:8787
+```
+
+**Terminal 2 - Start Frontend**:
+```bash
+npm run dev
+# App runs at http://127.0.0.1:5176
+```
+
+### 5. Access the Platform
+
+Open your browser and navigate to: **http://127.0.0.1:5176**
 
 ---
 
-## 📂 專案結構 (Project Structure)
+## 📖 Usage Guide
 
-```text
-financial-ppv-model/
-├── server/
-│   ├── main.py              # API Server
-│   ├── ppv_schema.py        # Data Models (Big5, Risk)
-│   ├── generator_agent.py   # Persona Generator
-│   ├── extraction_agent.py  # Persona Extractor
-│   └── impersonation_agent.py # Digital Twin Logic
-├── src/
-│   ├── App.jsx              # Main Layout & Navigation
-│   ├── features/
-│   │   ├── PPVAnalyzer/     # Phase 1-3 UI
-│   │   └── MarketSimulator/ # Phase 4 UI (Batch Sim)
-│   ├── services/            # API Client
-│   └── types/               # TS Interfaces
-└── README.md
+### Generate Personas
+
+1. Navigate to **Current Interviews** tab
+2. Enter target audience description:
+   - Example (Taiwan): `25-35歲的台北上班族`
+   - Example (Vietnam): `在越南本土出生的年輕人`
+3. Click **Generate** - system creates 5 diverse personas
+
+### Conduct Interviews
+
+1. (Optional) Add **Product Context** to provide background information
+2. Enter your **Interview Question** in the text area
+3. Click **Send** - all personas respond based on their personality traits
+4. View responses in each persona card
+
+### Analyze Results
+
+1. Switch to **Analytics** tab
+2. View aggregate metrics:
+   - Total Personas
+   - Total Interviews
+   - Average Interviews per Person
+3. Expand questions to see:
+   - Purchase Willingness Distribution (High/Medium/Low)
+   - Average Willingness Score
+   - Individual response details
+
+### Manage Data
+
+- **Archive**: View all historical personas in the **Archive** tab
+- **Delete Individual**: Click × button on any persona card
+- **Clear All**: Use "Clear All Data" button to reset
 
 ---
 
-## ⚠️ 免責聲明 (Disclaimer)
+## 🎨 Design Philosophy
 
-本系統生成的 PPV 與訪談結果僅供市場研究模擬參考，不應視為真實個人的行為預測或財務建議。系統設計遵循資料最小化原則 (Data Minimization)，不儲存任何真實用戶的敏感識別資料 。
+### Prompt Engineering Principles
+
+1. **No Template Bias**: Removed all concrete examples from prompts to prevent AI from copying patterns
+2. **Cultural Adaptation**: Dynamic language and location matching based on target audience
+3. **Personality-Driven Instructions**: Agent behavior changes based on Big Five scores and risk profile
+4. **Varied Phrasing**: Explicit instructions to avoid repetitive responses
+
+### UI/UX Improvements
+
+- **Enhanced Readability**: Deepened color palette with higher contrast ratios
+- **Larger Typography**: Progressive font scaling (15px → 40px) for accessibility
+- **Simplified Backstories**: Concise 2-sentence format focusing on demographics + key traits
+- **Responsive Design**: Adaptive grid layout (min 320px cards)
 
 ---
 
-Copyright © 2025 Financial PPV Lab. All Rights Reserved.
+## 📊 Data Schema
+
+### PPVInstance Structure
+
+```typescript
+interface PPVInstance {
+  id: string;                    // Culturally-appropriate nickname
+  version: string;               // Schema version
+  source_summary: {              // Data source weights
+    dialogue: number;
+    questionnaire: number;
+    behavior: number;
+  };
+  big5: {                        // Big Five personality traits
+    openness: number;            // 0-100
+    conscientiousness: number;
+    extraversion: number;
+    agreeableness: number;
+    neuroticism: number;
+  };
+  schwartz_values: {...} | null; // Schwartz Value Survey (optional)
+  risk_profile: {                // Financial risk tolerance
+    overall: number;             // 0-100
+    financial: number;
+    ethical: number;
+    confidence: number;          // 0-1
+  };
+  financial_disposition: {
+    long_term_orientation: number;
+    loss_aversion: number;
+    decision_style: "Intuitive" | "Analytical";
+  };
+  meta: {
+    model: string;
+    method: string;
+    paper_ref: string;
+  };
+  notes: string;                 // Backstory (2 sentences)
+  interview_history: Array<{
+    question: string;
+    answer: string;
+    timestamp: string;
+  }>;
+}
+```
+
+---
+
+## 🔧 API Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/personas` | GET | Retrieve all personas |
+| `/api/personas` | DELETE | Clear all personas |
+| `/api/personas/{id}` | DELETE | Delete specific persona |
+| `/api/generate_personas` | POST | Generate new personas |
+| `/api/chat_with_twin` | POST | Interview a persona |
+| `/api/update_persona` | POST | Save interview responses |
+| `/api/extract_ppv` | POST | Extract PPV from conversation |
+
+---
+
+## 🛠️ Development
+
+### Project Scripts
+
+```bash
+npm run dev          # Start frontend dev server
+npm run dev:api      # Start backend API server
+npm run build        # Build for production
+npm run preview      # Preview production build
+```
+
+### File Modifications
+
+**Recent Changes**:
+- ✅ Enhanced color palette for better contrast
+- ✅ Increased font sizes across all components
+- ✅ Simplified backstory generation (2 sentences)
+- ✅ Removed example bias from prompts
+- ✅ Added geographic/cultural adaptation
+- ✅ Dynamic personality-driven agent instructions
+
+---
+
+## 📝 Configuration
+
+### Generator Prompt Customization
+
+Edit `server/generator_agent.py` (line 18-80) to customize:
+- Persona diversity requirements
+- Backstory format and language
+- Personality trait distributions
+- Risk profile variations
+
+### UI Theme Customization
+
+Edit `src/features/MarketSimulator/index.tsx` (line 4-34):
+```typescript
+const colors = {
+  primary: '#6b8aa3',      // Main brand color
+  textPrimary: '#2d3e4d',  // Primary text
+  bgPrimary: 'rgba(255, 255, 255, 0.9)', // Card backgrounds
+  // ... more colors
+};
+```
+
+---
+
+## ⚠️ Important Notes
+
+### Persona Generation Quality
+
+- **Temperature**: Set to 0.9 for maximum response diversity
+- **Cultural Context**: System adapts names, locations, and language based on target audience
+- **Diversity Enforcement**: Prompts explicitly require varied personality traits and decision patterns
+
+### Interview Response Behavior
+
+- **Short & Natural**: Responses limited to 1-2 sentences in colloquial language
+- **Personality-Driven**: Reactions change based on Big Five scores and risk tolerance
+- **Context-Aware**: Personas react to product information with natural surprise/curiosity
+
+### Data Persistence
+
+- All personas stored in `server/personas.json`
+- Interview history preserved with timestamps
+- Automatic de-duplication by persona ID
+
+---
+
+## 🔒 Privacy & Ethics
+
+- **Synthetic Data Only**: All personas are AI-generated, not real people
+- **No PII**: System does not collect or store personally identifiable information
+- **Research Purpose**: Results are for market simulation only, not behavioral prediction
+
+---
+
+## 🐛 Troubleshooting
+
+### Backend fails to start
+- Check `.env` file has valid `OPENAI_API_KEY`
+- Ensure port 8787 is not in use
+- Verify Python dependencies: `pip install -r server/requirements.txt`
+
+### Frontend connection error
+- Confirm backend is running at `http://localhost:8787`
+- Check CORS settings in `server/agno_api.py`
+- Clear browser cache and reload
+
+### Personas not generating
+- Verify OpenAI API key has sufficient credits
+- Check backend console for error messages
+- Ensure target audience description is clear and specific
+
+---
+
+## 📚 References
+
+- **Big Five Personality Traits**: OCEAN model (Openness, Conscientiousness, Extraversion, Agreeableness, Neuroticism)
+- **Schwartz Values**: Human values theory (10 value types)
+- **Agno Framework**: AI agent orchestration toolkit
+
+---
+
+## 📄 License
+
+Copyright © 2025 Market Research Simulator. All Rights Reserved.
+
+This project is for research and educational purposes only.
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! Please follow these guidelines:
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+---
+
+**Built with ❤️ using React, FastAPI, and OpenAI GPT-4o**
