@@ -11,8 +11,6 @@ load_dotenv()
 extraction_agent = Agent(
     model=OpenAIChat(id="gpt-4o-2024-08-06"), # 指定支援結構化輸出的模型
     description="You are an expert psychometrician and data analyst specializing in 'Psychometric Persona Vectors' (PPV).",
-    response_model=PPVInstance, # 關鍵：直接告訴 Agent 我們要什麼格式 (Pydantic Schema)
-    structured_outputs=True,    # 啟用強制結構化模式
     instructions=[
         "Your task is to analyze the provided casual conversation logs of a user and infer their psychometric profile.",
         "You must fill out the PPV Schema strictly based on the evidence in the text.",
@@ -38,12 +36,17 @@ def extract_ppv(chat_log: str, user_id: str = "user_001") -> PPVInstance:
     print(f"🧠 [Agno] 正在分析用戶 {user_id} 的對話紀錄...")
 
     try:
-        # Agno 的呼叫方式：直接 run，它會自動處理 JSON 解析
-        response = extraction_agent.run(f"Here is the conversation log:\n\n{chat_log}")
+        # Agno 的呼叫方式：使用 output_schema 強制輸出結構
+        response = extraction_agent.run(
+            f"Here is the conversation log:\n\n{chat_log}",
+            output_schema=PPVInstance
+        )
 
-        # response.content 就已經是轉換好的 PPVInstance 物件了
+        # response.content 應該是 PPVInstance 物件或 dict
         ppv_result = response.content
-        
+        if isinstance(ppv_result, dict):
+            ppv_result = PPVInstance(**ppv_result)
+
         # 自動填入 ID 和 Meta 資訊 (維持原本的邏輯)
         ppv_result.id = f"ppv-{user_id}"
         ppv_result.meta = MetaInfo(

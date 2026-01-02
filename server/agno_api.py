@@ -1339,3 +1339,126 @@ async def generate_artifacts(req: ArtifactRequest):
             "error": "LLM request failed",
             "detail": str(exc),
         }
+
+
+# ========== PPV (Psychometric Persona Vector) API Endpoints ==========
+# Import PPV modules
+from extraction_agent import extract_ppv
+from impersonation_agent import chat_with_digital_twin
+from generator_agent import generate_diverse_personas
+from ppv_schema import PPVInstance
+
+# PPV Database configuration
+PPV_DB_FILE = Path("server/personas.json")
+
+def load_ppv_db() -> List[PPVInstance]:
+    """從 JSON 檔案讀取所有客戶資料"""
+    if not PPV_DB_FILE.exists():
+        return []
+    try:
+        with open(PPV_DB_FILE, "r", encoding="utf-8") as f:
+            data = json.load(f)
+            return [PPVInstance(**item) for item in data]
+    except Exception as e:
+        print(f"讀取 PPV 資料庫失敗: {e}")
+        return []
+
+def save_ppv_db(new_personas: List[PPVInstance]):
+    """將新生成的客戶寫入 JSON 檔案 (更新模式)"""
+    all_data = load_ppv_db()
+
+    # 建立一個 ID 對照表 (Dictionary)
+    data_map = {p.id: p for p in all_data}
+
+    # 更新或新增資料
+    for p in new_personas:
+        data_map[p.id] = p  # 如果 ID 存在就覆蓋 (更新)，不存在就新增
+
+    # 轉回 List 並存檔
+    updated_list = list(data_map.values())
+
+    with open(PPV_DB_FILE, "w", encoding="utf-8") as f:
+        json_data = [p.model_dump() for p in updated_list]
+        json.dump(json_data, f, ensure_ascii=False, indent=2)
+
+# Request models for PPV APIs
+class ExtractRequest(BaseModel):
+    chat_log: str
+    user_id: str = "user_default"
+
+class ChatRequest(BaseModel):
+    ppv_profile: PPVInstance
+    user_query: str
+    context_data: Optional[str] = None
+
+class GenerateRequest(BaseModel):
+    hint: str = "General public"
+    count: int = 3
+
+# --- API 1: 提取人格 (Phase 2) ---
+@app.post("/api/extract_ppv", response_model=PPVInstance)
+def api_extract_ppv(request: ExtractRequest):
+    print(f"收到提取請求: {request.user_id}")
+    result = extract_ppv(request.chat_log, request.user_id)
+    if not result:
+        return JSONResponse({"error": "提取失敗"}, status_code=500)
+    return result
+
+# --- API 2: 更新 Persona (用於保存訪談記錄) ---
+@app.post("/api/update_persona")
+def api_update_persona(persona: PPVInstance):
+    save_ppv_db([persona])
+    return {"status": "updated", "id": persona.id}
+
+# --- API 3: 數位孿生對話 (Phase 3) ---
+@app.post("/api/chat_with_twin")
+def api_chat_with_twin(request: ChatRequest):
+    try:
+        response_text = chat_with_digital_twin(
+            request.ppv_profile,
+            request.user_query,
+            request.context_data
+        )
+        return {"response": response_text}
+    except Exception as e:
+        print(f"對話錯誤: {e}")
+        return JSONResponse({"error": str(e)}, status_code=500)
+
+# --- API 4: 生成多元虛擬客戶 (Phase 4 Generation) ---
+@app.post("/api/generate_personas")
+def api_generate_personas(req: GenerateRequest):
+    print(f"收到生成請求: {req.hint} (x{req.count})")
+    results = generate_diverse_personas(req.hint, req.count)
+
+    if results:
+        save_ppv_db(results)
+        return results
+    else:
+        return JSONResponse({"error": "生成失敗"}, status_code=500)
+
+# --- API 5: 取得/刪除 歷史客戶資料 (Persistence) ---
+@app.get("/api/personas")
+def api_get_personas():
+    return load_ppv_db()
+
+@app.delete("/api/personas")
+def api_clear_personas():
+    if PPV_DB_FILE.exists():
+        os.remove(PPV_DB_FILE)
+    return {"status": "cleared"}
+
+@app.delete("/api/personas/{persona_id}")
+def api_delete_persona(persona_id: str):
+    """刪除單一 persona"""
+    all_data = load_ppv_db()
+    filtered = [p for p in all_data if p.id != persona_id]
+
+    if len(filtered) == len(all_data):
+        return JSONResponse({"error": "Persona not found"}, status_code=404)
+
+    # 重新寫入檔案
+    with open(PPV_DB_FILE, "w", encoding="utf-8") as f:
+        json_data = [p.model_dump() for p in filtered]
+        json.dump(json_data, f, ensure_ascii=False, indent=2)
+
+    return {"status": "deleted", "id": persona_id}

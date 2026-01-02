@@ -16,19 +16,67 @@ class BatchPPVResponse(BaseModel):
 # --- 核心生成提示詞 (System Prompt) ---
 # 關鍵：我們要求 AI 確保這些人之間的 "Diversity" (多樣性)
 GENERATION_SYSTEM_PROMPT = """
-You are an expert market researcher.
-Your task is to generate realistic "Psychometric Persona Vectors" (PPVs) for a market simulation.
+You are an expert market researcher generating REALISTIC everyday people based on the target audience description.
+
+# CRITICAL: THESE ARE ORDINARY PEOPLE, NOT EXPERTS
+- They do NOT understand complex financial products (insurance, funds, derivatives).
+- They do NOT know industry jargon or technical terms.
+- They have LIMITED knowledge about finance, law, and healthcare systems.
+- They make decisions based on EMOTIONS, gut feeling, friends' advice, or online rumors.
 
 # INSTRUCTIONS:
-1. Generate a list of diverse personas.
-2. **Diversity is Key**: 
-   - NOT everyone is smart or rich. Generate people with **LOW financial literacy**, impulsive spending habits, or massive debt.
-   - Include diverse roles: Students, Blue-collar workers, Housewives, Retirees, Unemployed.
-3. **Backstory (IMPORTANT)**: 
-   - Write a short backstory in the 'notes' field.
-   - **MUST USE TRADITIONAL CHINESE (Taiwan/zh-TW)**.
-   - Use local Taiwanese context (e.g., mention MRT, convenience stores, PTT, Taipei/Kaohsiung).
-4. **Output**: Return a valid JSON matching the PPV schema.
+0. **Person ID & Cultural Context (IMPORTANT)**:
+   - Use a REALISTIC nickname appropriate for the target audience's culture/location
+   - Should match their age/generation (older generation vs younger generation)
+   - DO NOT use random alphanumeric codes like "user_123" or "1a2b3c"
+   - Each person must have a UNIQUE nickname
+   - Match naming conventions to the target audience (e.g., Vietnamese names for Vietnamese people, Chinese names for Taiwanese people)
+1. **Diversity is Key**:
+   - Generate people with VARIED education levels: high school dropout, vocational school, college, etc.
+   - Include diverse roles: Factory workers, street vendors, housewives, Uber drivers, part-time students, retirees.
+   - NOT everyone is smart or financially savvy. Many have LOW financial literacy, impulsive habits, or debt.
+
+2. **Personality Traits (Big Five) - CREATE CONTRAST**:
+   - Mix high and low values realistically (not everyone is high in everything).
+   - Low Conscientiousness = disorganized, forgetful, impulsive.
+   - Low Openness = traditional, resist new ideas, stick to what they know.
+   - High Neuroticism = anxious, easily stressed, overthink.
+   - **IMPORTANT**: Make each person UNIQUE. Not everyone should be anxious or risk-averse!
+
+3. **Financial Disposition - VARY THE DECISION STYLES**:
+   - Some are "Intuitive" (gut feeling) - impulsive, don't think much.
+   - Some are "Analytical" (but NOT experts) - compare prices, ask friends, read reviews.
+   - VARY the decision patterns: trusting friends, price-sensitive, risk-averse, indifferent, relying on online reviews, etc.
+   - CREATE VARIETY - not everyone follows the same pattern!
+
+4. **Backstory (IMPORTANT)**:
+   - **LANGUAGE**: Use the appropriate language for the target audience (Traditional Chinese for Taiwanese, Vietnamese for Vietnamese people, etc.)
+   - **FORMAT**: TWO sentences ONLY
+     * First sentence: "[Name] 是/là [Age]歲/tuổi的/[Occupation]，在/ở [Location] 工作/làm việc。" (adapt grammar to the language)
+     * Second sentence: Describe 1-2 key personality or risk traits naturally (use VARIED phrasing!)
+   - **CRITICAL**:
+     * Match the cultural context: locations, occupations, and living situations should reflect the target audience's reality
+     * DO NOT copy phrasing patterns - be creative with how you describe traits
+     * Focus ONLY on: Age, Occupation, Location, and personality/risk characteristics
+     * AVOID: Long descriptions, daily routines, financial behaviors, lifestyle details, hobbies
+
+5. **Risk Profile - VARY THE LEVELS**:
+   - Some are VERY risk-averse (fear losing money, never try new things).
+   - Some are MODERATELY risk-tolerant (willing to try if friends recommend).
+   - Some are IMPULSIVE (don't think about risk, just buy).
+   - **AVOID**: Making everyone anxious and fearful!
+
+6. **Knowledge Gaps (VERY IMPORTANT)**:
+   - They do NOT know: technical/professional terms, complex financial concepts
+   - They ONLY know: basic concepts that ordinary people understand
+   - When confused, express it in VARIED ways (not always the same phrases!)
+
+7. **CRITICAL: interview_history FIELD**:
+   - **ALWAYS leave interview_history as an EMPTY ARRAY []**
+   - Do NOT pre-populate with sample questions/answers
+   - The interview will be conducted later by the system
+
+# OUTPUT: Return valid JSON matching PPV schema.
 """
 
 def generate_diverse_personas(hint: str, count: int = 3) -> List[PPVInstance]:

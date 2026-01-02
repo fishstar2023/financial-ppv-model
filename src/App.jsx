@@ -1,71 +1,60 @@
-import React, { useState } from 'react';
-import './styles.css'; 
-
-// 引入兩個功能模組
-import { PPVAnalyzer } from './features/PPVAnalyzer';     // 舊的：單人提取
-import { MarketSimulator } from './features/MarketSimulator'; // 新的：市場模擬
+import './styles.css';
+import { MarketSimulator } from './features/MarketSimulator';
 
 function App() {
-  // 控制現在要顯示哪個畫面
-  const [activeTab, setActiveTab] = useState('individual'); // 預設顯示單人
-
   return (
-    <div className="app-layout">
-      {/* === 左側導航欄 === */}
-      <aside className="sidebar">
-        <div style={{ padding: '20px', borderBottom: '1px solid #eee', marginBottom: '20px' }}>
-          <h2 style={{ margin: 0, fontSize: '1.2rem' }}>🧠 PPV Lab</h2>
+    <div style={{
+      minHeight: '100vh',
+      background: 'linear-gradient(135deg, #f5f8fa 0%, #e8eef3 100%)',
+      padding: '0'
+    }}>
+      {/* 莫蘭迪風格頂部欄 - 藍黃色調 */}
+      <header style={{
+        background: 'rgba(255, 255, 255, 0.85)',
+        backdropFilter: 'blur(10px)',
+        borderBottom: '1px solid rgba(157, 180, 199, 0.2)',
+        padding: '20px 32px',
+        boxShadow: '0 2px 12px rgba(90, 107, 122, 0.08)'
+      }}>
+        <div style={{ maxWidth: '1400px', margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            <div style={{
+              width: '40px',
+              height: '40px',
+              background: 'linear-gradient(135deg, #9db4c7 0%, #7a95ab 100%)',
+              borderRadius: '12px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'white',
+              fontWeight: 600,
+              fontSize: '20px',
+              boxShadow: '0 4px 12px rgba(90, 107, 122, 0.15)'
+            }}>M</div>
+            <div>
+              <h1 style={{
+                margin: 0,
+                fontSize: '22px',
+                fontWeight: 600,
+                color: '#5a6b7a',
+                letterSpacing: '-0.02em'
+              }}>
+                Market Research Simulator
+              </h1>
+              <p style={{ margin: '4px 0 0 0', color: '#8599a8', fontSize: '14px', fontWeight: 400 }}>
+                Synthetic Persona Interview Platform
+              </p>
+            </div>
+          </div>
         </div>
-        
-        <nav className="nav-menu">
-          <button 
-            className={`nav-item ${activeTab === 'individual' ? 'active' : ''}`}
-            onClick={() => setActiveTab('individual')}
-          >
-            <span style={{ marginRight: '10px' }}>🧬</span>
-            單人提取 (Extraction)
-          </button>
-          
-          <button 
-            className={`nav-item ${activeTab === 'market' ? 'active' : ''}`}
-            onClick={() => setActiveTab('market')}
-          >
-            <span style={{ marginRight: '10px' }}>📊</span>
-            市場模擬 (Simulation)
-          </button>
-        </nav>
-      </aside>
+      </header>
 
-      {/* === 右側主畫面 === */}
-      <main className="main-content">
-        <div style={{ maxWidth: '900px', margin: '0 auto' }}>
-          
-          {/* 根據 activeTab 決定顯示哪個元件 */}
-          
-          {activeTab === 'individual' ? (
-            // 這是您原本截圖裡的畫面
-            <PPVAnalyzerWrapper />
-          ) : (
-            // 這是新畫面：輸入信用卡客群的地方
-            <MarketSimulator />
-          )}
-          
-        </div>
+      {/* 主內容區 */}
+      <main style={{ maxWidth: '1400px', margin: '0 auto', padding: '28px 32px' }}>
+        <MarketSimulator />
       </main>
     </div>
   );
-}
-
-// 簡單包裝原本的提取邏輯
-function PPVAnalyzerWrapper() {
-  // 這裡可以復用您原本寫在 App.jsx 裡的聊天邏輯
-  // 為了簡化，我先直接呼叫 PPVAnalyzer 元件
-  return (
-    <>
-      <h2 style={{ marginBottom: '10px' }}>單人數位孿生</h2>
-      <PPVAnalyzer onAnalysisComplete={(data) => console.log(data)} />
-    </>
-  )
 }
 
 export default App;
