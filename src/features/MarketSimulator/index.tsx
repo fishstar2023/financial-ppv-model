@@ -42,33 +42,33 @@ export const MarketSimulator = () => {
   const [currentQuestion, setCurrentQuestion] = useState("");
   const [isInterviewing, setIsInterviewing] = useState(false);
   const [targetAudience, setTargetAudience] = useState("");
+  const [personaCount, setPersonaCount] = useState(5);
 
-  const fetchHistory = async () => {
+  const fetchHistory = async (autoLoadToCurrent = false) => {
     try {
       const res = await fetch('http://localhost:8787/api/personas');
       const data = await res.json();
       if (Array.isArray(data)) {
         const reversed = data.reverse();
         setHistoryPersonas(reversed);
-        // 如果 currentPersonas 是空的，自動載入歷史資料到 current
-        if (currentPersonas.length === 0 && reversed.length > 0) {
+        // 初次載入時，自動把歷史資料載入到 current
+        if (autoLoadToCurrent && reversed.length > 0) {
           setCurrentPersonas(reversed);
         }
       }
     } catch (e) { console.error(e); }
   };
 
-  useEffect(() => { fetchHistory(); }, []);
+  useEffect(() => { fetchHistory(true); }, []);
 
   const handleGenerate = async () => {
     if (!targetAudience) return alert("Please specify target audience");
     setLoading(true);
     try {
-      const randomCount = Math.floor(Math.random() * 4) + 2;
       const res = await fetch('http://localhost:8787/api/generate_personas', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ hint: targetAudience, count: randomCount })
+        body: JSON.stringify({ hint: targetAudience, count: personaCount })
       });
       const data = await res.json();
       setCurrentPersonas(data);
@@ -157,6 +157,12 @@ export const MarketSimulator = () => {
     }
   };
 
+  const handleUpdatePersona = (updatedPersona: PPVInstance) => {
+    // 更新本地狀態
+    setCurrentPersonas(prev => prev.map(p => p.id === updatedPersona.id ? updatedPersona : p));
+    setHistoryPersonas(prev => prev.map(p => p.id === updatedPersona.id ? updatedPersona : p));
+  };
+
   return (
     <div style={{ paddingBottom: '180px' }}>
       {/* 莫蘭迪風格 Tab Navigation */}
@@ -191,7 +197,7 @@ export const MarketSimulator = () => {
             <label style={{ display: 'block', marginBottom: '10px', fontSize: '15px', fontWeight: 500, color: colors.textPrimary }}>
               Target Audience
             </label>
-            <div style={{ display: 'flex', gap: '12px' }}>
+            <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
               <input
                 type="text"
                 style={{
@@ -211,6 +217,27 @@ export const MarketSimulator = () => {
                 onFocus={(e) => e.target.style.borderColor = colors.primary}
                 onBlur={(e) => e.target.style.borderColor = colors.border}
               />
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <label style={{ fontSize: '14px', color: colors.textSecondary, whiteSpace: 'nowrap' }}>人數</label>
+                <select
+                  value={personaCount}
+                  onChange={(e) => setPersonaCount(Number(e.target.value))}
+                  style={{
+                    padding: '12px 16px',
+                    border: `1px solid ${colors.border}`,
+                    borderRadius: '12px',
+                    fontSize: '15px',
+                    outline: 'none',
+                    background: 'rgba(255, 255, 255, 0.6)',
+                    color: colors.textPrimary,
+                    cursor: 'pointer'
+                  }}
+                >
+                  {[3, 5, 8, 10].map(n => (
+                    <option key={n} value={n}>{n}</option>
+                  ))}
+                </select>
+              </div>
               <button
                 style={{
                   padding: '12px 28px',
@@ -239,7 +266,7 @@ export const MarketSimulator = () => {
           {currentPersonas.length > 0 ? (
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '16px' }}>
               {currentPersonas.map((p, i) => (
-                <PersonaCard key={i} p={p} defaultExpanded={true} onDelete={handleDeletePersona} />
+                <PersonaCard key={i} p={p} defaultExpanded={true} onDelete={handleDeletePersona} onUpdate={handleUpdatePersona} />
               ))}
             </div>
           ) : (
@@ -364,7 +391,7 @@ export const MarketSimulator = () => {
             </button>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '16px' }}>
-            {historyPersonas.map((p, i) => <PersonaCard key={i} p={p} isHistory onDelete={handleDeletePersona} />)}
+            {historyPersonas.map((p, i) => <PersonaCard key={i} p={p} isHistory onDelete={handleDeletePersona} onUpdate={handleUpdatePersona} />)}
           </div>
         </div>
       )}
@@ -405,9 +432,26 @@ const TabButton = ({ label, isActive, onClick }: any) => (
   >{label}</button>
 );
 
-const PersonaCard = ({ p, isHistory = false, defaultExpanded = false, onDelete }: any) => {
+const PersonaCard = ({ p, isHistory = false, defaultExpanded = false, onDelete, onUpdate }: any) => {
   const [expanded, setExpanded] = useState(defaultExpanded);
+  const [isEditingNotes, setIsEditingNotes] = useState(false);
+  const [editedInterviewerNotes, setEditedInterviewerNotes] = useState(p.interviewer_notes || "");
   const records = [...(p.interview_history || [])].reverse();
+
+  const handleSaveInterviewerNotes = async () => {
+    const updatedPersona = { ...p, interviewer_notes: editedInterviewerNotes };
+    try {
+      await fetch('http://localhost:8787/api/update_persona', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updatedPersona)
+      });
+      if (onUpdate) onUpdate(updatedPersona);
+      setIsEditingNotes(false);
+    } catch (e) {
+      console.error('Failed to save interviewer notes:', e);
+    }
+  };
 
   return (
     <div style={{
@@ -424,7 +468,7 @@ const PersonaCard = ({ p, isHistory = false, defaultExpanded = false, onDelete }
     onMouseEnter={(e) => e.currentTarget.style.boxShadow = `0 8px 24px ${colors.shadowMedium}`}
     onMouseLeave={(e) => e.currentTarget.style.boxShadow = `0 4px 16px ${colors.shadow}`}
     >
-      {/* Header */}
+      {/* Header - Name and Demographics */}
       <div style={{
         padding: '18px 20px',
         borderBottom: `1px solid ${colors.borderLight}`,
@@ -475,13 +519,20 @@ const PersonaCard = ({ p, isHistory = false, defaultExpanded = false, onDelete }
             </button>
           </div>
         </div>
+
+        {/* Demographic Profile (read-only) */}
         <div style={{
-          fontSize: '14px',
+          fontSize: '13px',
           color: colors.textSecondary,
           marginTop: '10px',
-          lineHeight: '1.6'
+          lineHeight: '1.8',
+          padding: '10px 12px',
+          background: 'rgba(255,255,255,0.5)',
+          borderRadius: '8px',
+          border: `1px solid ${colors.borderLight}`,
+          whiteSpace: 'pre-line'  // 保留換行
         }}>
-          {p.notes || "No background information"}
+          {p.notes || "No demographic information"}
         </div>
       </div>
 
@@ -556,6 +607,103 @@ const PersonaCard = ({ p, isHistory = false, defaultExpanded = false, onDelete }
                 )}
               </div>
             )}
+
+            {/* Interviewer Notes Section - After Interview Records */}
+            <div style={{ marginTop: '16px', borderTop: `1px solid ${colors.borderLight}`, paddingTop: '16px' }}>
+              <div style={{
+                fontSize: '12px',
+                color: colors.textMuted,
+                marginBottom: '8px',
+                fontWeight: 600,
+                textTransform: 'uppercase',
+                letterSpacing: '0.5px'
+              }}>
+                📝 Interviewer Notes
+              </div>
+              {isEditingNotes ? (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  <textarea
+                    value={editedInterviewerNotes}
+                    onChange={(e) => setEditedInterviewerNotes(e.target.value)}
+                    style={{
+                      width: '100%',
+                      minHeight: '80px',
+                      padding: '10px 12px',
+                      border: `1px solid ${colors.primary}`,
+                      borderRadius: '8px',
+                      fontSize: '14px',
+                      lineHeight: '1.6',
+                      resize: 'vertical',
+                      outline: 'none',
+                      fontFamily: 'inherit',
+                      color: colors.textPrimary,
+                      background: 'white'
+                    }}
+                    placeholder="Add your observations, insights, or notes from the interview..."
+                    autoFocus
+                  />
+                  <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+                    <button
+                      onClick={() => { setEditedInterviewerNotes(p.interviewer_notes || ""); setIsEditingNotes(false); }}
+                      style={{
+                        padding: '6px 12px',
+                        background: 'transparent',
+                        border: `1px solid ${colors.border}`,
+                        borderRadius: '6px',
+                        fontSize: '13px',
+                        cursor: 'pointer',
+                        color: colors.textSecondary
+                      }}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={handleSaveInterviewerNotes}
+                      style={{
+                        padding: '6px 12px',
+                        background: colors.primary,
+                        border: 'none',
+                        borderRadius: '6px',
+                        fontSize: '13px',
+                        cursor: 'pointer',
+                        color: 'white',
+                        fontWeight: 500
+                      }}
+                    >
+                      Save
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div
+                  onClick={() => setIsEditingNotes(true)}
+                  style={{
+                    fontSize: '14px',
+                    color: p.interviewer_notes ? colors.textPrimary : colors.textMuted,
+                    lineHeight: '1.6',
+                    cursor: 'pointer',
+                    padding: '10px 12px',
+                    borderRadius: '8px',
+                    border: `1px dashed ${colors.borderLight}`,
+                    transition: 'all 0.2s',
+                    background: 'transparent',
+                    fontStyle: p.interviewer_notes ? 'normal' : 'italic'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = colors.bgHover;
+                    e.currentTarget.style.borderColor = colors.border;
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = 'transparent';
+                    e.currentTarget.style.borderColor = colors.borderLight;
+                  }}
+                  title="Click to add interviewer notes"
+                >
+                  {p.interviewer_notes || "Click to add notes..."}
+                  <span style={{ marginLeft: '8px', opacity: 0.5, fontSize: '12px' }}>✎</span>
+                </div>
+              )}
+            </div>
           </>
         ) : (
           <div style={{

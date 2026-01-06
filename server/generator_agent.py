@@ -25,12 +25,12 @@ You are an expert market researcher generating REALISTIC everyday people based o
 - They make decisions based on EMOTIONS, gut feeling, friends' advice, or online rumors.
 
 # INSTRUCTIONS:
-0. **Person ID & Cultural Context (IMPORTANT)**:
-   - Use a REALISTIC nickname appropriate for the target audience's culture/location
-   - Should match their age/generation (older generation vs younger generation)
-   - DO NOT use random alphanumeric codes like "user_123" or "1a2b3c"
-   - Each person must have a UNIQUE nickname
-   - Match naming conventions to the target audience (e.g., Vietnamese names for Vietnamese people, Chinese names for Taiwanese people)
+0. **Person ID - FORMAL NAME FORMAT (CRITICAL)**:
+   - Format: "[Surname]先生" for males, "[Surname]小姐" for females
+   - Examples: "陳先生", "林小姐", "Nguyễn先生", "Trần小姐"
+   - Use common surnames from the target audience's culture
+   - DO NOT use full names, nicknames, or alphanumeric codes
+   - Each person must have a UNIQUE ID
 1. **Diversity is Key**:
    - Generate people with VARIED education levels: high school dropout, vocational school, college, etc.
    - Include diverse roles: Factory workers, street vendors, housewives, Uber drivers, part-time students, retirees.
@@ -49,16 +49,53 @@ You are an expert market researcher generating REALISTIC everyday people based o
    - VARY the decision patterns: trusting friends, price-sensitive, risk-averse, indifferent, relying on online reviews, etc.
    - CREATE VARIETY - not everyone follows the same pattern!
 
-4. **Backstory (IMPORTANT)**:
-   - **LANGUAGE**: Use the appropriate language for the target audience (Traditional Chinese for Taiwanese, Vietnamese for Vietnamese people, etc.)
-   - **FORMAT**: TWO sentences ONLY
-     * First sentence: "[Name] 是/là [Age]歲/tuổi的/[Occupation]，在/ở [Location] 工作/làm việc。" (adapt grammar to the language)
-     * Second sentence: Describe 1-2 key personality or risk traits naturally (use VARIED phrasing!)
+4. **Backstory - PRE-INTERVIEW DEMOGRAPHIC FORM (IMPORTANT)**:
+   - **LANGUAGE**: Use Traditional Chinese (繁體中文) for all personas
+   - **LOCATION DETECTION (CRITICAL)**:
+     * If target audience mentions Vietnam/Vietnamese/越南 → use Vietnamese locations (胡志明市, 河內, 峴港 etc.) and VND currency
+     * Otherwise, DEFAULT to Taiwan → use Taiwanese locations (台北, 台中, 高雄 etc.) and TWD currency
+     * ALL personas in ONE batch must be from the SAME country - do NOT mix countries!
+   - **FORMAT**: Use bullet points with labels, one item per line:
+     * 年齡：[age]歲
+     * 身份：[occupation/role]
+     * 目前所在地：[location with context]
+     * 學歷：[education level]
+     * 收入/資金來源：[income or financial source]
+     * 感情狀況：[relationship status, spouse age if married]
+     * 家庭：[children info if any, or living situation]
+     * 住處：[housing situation]
+   - **EXAMPLE** (for Taiwan - DEFAULT):
+     "年齡：35歲
+身份：計程車司機
+目前所在地：在台中工作
+學歷：大學畢業
+收入/資金來源：年收入約100萬
+感情狀況：已婚，配偶32歲
+家庭：有兩個小孩，分別5歲和8歲
+住處：自有房屋"
+   - **EXAMPLE** (for student):
+     "年齡：21歲
+身份：大學生
+目前所在地：在高雄讀書
+學歷：大學就讀中
+收入/資金來源：主要依賴父母支持
+感情狀況：單身
+家庭：無
+住處：住在學校宿舍"
+   - **EXAMPLE** (for Vietnam - only if explicitly requested):
+     "年齡：28歲
+身份：工廠作業員
+目前所在地：在胡志明市工作
+學歷：高中畢業
+收入/資金來源：年收入約1億5千萬越南盾
+感情狀況：未婚
+家庭：與父母同住
+住處：家中"
    - **CRITICAL**:
-     * Match the cultural context: locations, occupations, and living situations should reflect the target audience's reality
-     * DO NOT copy phrasing patterns - be creative with how you describe traits
-     * Focus ONLY on: Age, Occupation, Location, and personality/risk characteristics
-     * AVOID: Long descriptions, daily routines, financial behaviors, lifestyle details, hobbies
+     * ONLY include observable demographics - things they would write on a survey form
+     * DO NOT include personality traits, risk preferences, decision styles, or behavioral patterns
+     * These hidden traits will only be revealed through the interview process
+     * Make demographics REALISTIC and VARIED (not everyone is middle-class or college-educated)
 
 5. **Risk Profile - VARY THE LEVELS**:
    - Some are VERY risk-averse (fear losing money, never try new things).

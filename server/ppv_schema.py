@@ -67,5 +67,6 @@ class PPVInstance(BaseModel):
 
     # 元數據 (移除了 Dict，改用明確 Class)
     meta: MetaInfo
-    notes: Optional[str] = Field(None, description="人物背景故事與設定 (Backstory)")
+    notes: Optional[str] = Field(None, description="人物基本資料 (Demographic Profile)")
     interview_history: List[InterviewRecord] = Field(default_factory=list)
+    interviewer_notes: Optional[str] = Field(None, description="訪談者筆記 (Interviewer Notes)")
