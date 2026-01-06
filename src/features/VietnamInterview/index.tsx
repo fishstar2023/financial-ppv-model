@@ -1,15 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
   VietnamPersona,
-  VietnamInterviewRecord,
-  createEmptyVietnamPersona,
-  PURCHASE_CHANNELS,
-  INSURANCE_BRANDS
+  VietnamInterviewRecord
 } from './vietnamPersonaSchema';
-import {
-  VIETNAM_INTERVIEW_SECTIONS,
-  getTotalQuestions
-} from './interviewQuestions';
 
 // 莫蘭迪色系 - 越南版用較暖的色調
 const colors = {
@@ -39,7 +32,7 @@ const colors = {
 };
 
 export const VietnamInterview = () => {
-  const [activeTab, setActiveTab] = useState<'generate' | 'manual' | 'interview' | 'history' | 'analysis'>('generate');
+  const [activeTab, setActiveTab] = useState<'generate' | 'interview' | 'batch' | 'history' | 'analysis'>('generate');
   const [personas, setPersonas] = useState<VietnamPersona[]>([]);
   const [currentPersona, setCurrentPersona] = useState<VietnamPersona | null>(null);
   const [loading, setLoading] = useState(false);
@@ -49,18 +42,35 @@ export const VietnamInterview = () => {
   const [personaCount, setPersonaCount] = useState(3);
   const [generatedPersonas, setGeneratedPersonas] = useState<VietnamPersona[]>([]);
 
-  // 表單狀態
-  const [formData, setFormData] = useState<VietnamPersona>(createEmptyVietnamPersona());
-
   // 訪談狀態 - 彈性問答模式
   const [currentQuestion, setCurrentQuestion] = useState('');
   const [currentAnswer, setCurrentAnswer] = useState('');
+  const [currentTopicTag, setCurrentTopicTag] = useState('');  // 主題標籤
   const [isThinking, setIsThinking] = useState(false);
+
+  // 使用 ref 追蹤最新的 persona ID，避免 async closure 問題
+  const currentPersonaIdRef = useRef<string | null>(null);
 
   // 分析狀態
   const [selectedQuestion, setSelectedQuestion] = useState<string>('');
+  const [selectedTopicTag, setSelectedTopicTag] = useState<string>('');  // 主題標籤篩選
   const [analysisResult, setAnalysisResult] = useState<string>('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+
+  // 批量訪談狀態
+  const [selectedPersonaIds, setSelectedPersonaIds] = useState<string[]>([]);
+  const [batchQuestion, setBatchQuestion] = useState('');
+  const [batchTopicTag, setBatchTopicTag] = useState('');
+  const [isBatchProcessing, setIsBatchProcessing] = useState(false);
+  const [batchResults, setBatchResults] = useState<Array<{
+    personaId: string;
+    personaName: string;
+    success: boolean;
+    response?: string;
+    error?: string;
+  }>>([]);
+  const [batchProgress, setBatchProgress] = useState(0);
+  const [currentProcessingPersona, setCurrentProcessingPersona] = useState<string>('');
 
   // 載入歷史資料
   useEffect(() => {
@@ -135,34 +145,32 @@ export const VietnamInterview = () => {
     }
   };
 
-  // 手動新增受訪者
-  const handleFormSubmit = async () => {
-    if (!formData.lastName || !formData.occupation) {
-      alert('Please fill in required fields (Last Name, Occupation)');
-      return;
+  const startInterview = (persona: VietnamPersona) => {
+    // 如果 AI 正在思考中，警告使用者並詢問是否要切換
+    if (isThinking) {
+      const confirmSwitch = window.confirm(
+        '⚠️ AI 正在生成回答中，切換受訪者將會丟棄目前的回答。\n\n確定要切換嗎？'
+      );
+      if (!confirmSwitch) {
+        return; // 使用者取消切換
+      }
+      // 使用者確認切換，停止等待並清除狀態
+      setIsThinking(false);
+      setCurrentAnswer('');
     }
 
-    const newPersona: VietnamPersona = {
-      ...formData,
-      id: formData.id || `${formData.lastName}_${Date.now()}`,
-      createdAt: formData.createdAt || new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    };
-
-    await savePersona(newPersona);
-    setCurrentPersona(newPersona);
-    setActiveTab('interview');
-    setFormData(createEmptyVietnamPersona());
-  };
-
-  const startInterview = (persona: VietnamPersona) => {
     setCurrentPersona(persona);
+    currentPersonaIdRef.current = persona.id;  // 同步更新 ref
     setActiveTab('interview');
   };
 
   // 彈性問答模式 - AI 模擬回答
   const handleFlexibleAIInterview = async () => {
     if (!currentPersona || !currentQuestion.trim()) return;
+
+    // 記錄發起請求時的 persona ID 和問題，避免 race condition
+    const requestPersonaId = currentPersona.id;
+    const requestQuestion = currentQuestion;
 
     setIsThinking(true);
 
@@ -172,14 +180,23 @@ export const VietnamInterview = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           persona: currentPersona,
-          question: currentQuestion,
+          question: requestQuestion,
           subQuestions: []
         })
       });
 
       if (res.ok) {
         const data = await res.json();
-        setCurrentAnswer(data.response);
+
+        // 使用 ref 檢查回來時是否還在同一個 persona
+        // ref 會即時反映最新的 persona，避免 closure 過時問題
+        if (currentPersonaIdRef.current === requestPersonaId) {
+          setCurrentAnswer(data.response);
+        } else {
+          // 使用者已切換到其他受訪者，顯示提示
+          console.log(`⚠️ AI 回答完成，但已切換受訪者。回答屬於: ${requestPersonaId}, 目前: ${currentPersonaIdRef.current}`);
+          alert(`AI 已完成回答，但你已切換到其他受訪者。\n\n回答已針對原本的受訪者生成，請回到該受訪者查看或重新發問。`);
+        }
       }
     } catch (e) {
       console.error('AI interview failed:', e);
@@ -197,7 +214,8 @@ export const VietnamInterview = () => {
       questionId: `q_${Date.now()}`,
       question: currentQuestion,
       answer: currentAnswer,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      topicTag: currentTopicTag.trim() || undefined  // 主題標籤
     };
 
     const updatedPersona: VietnamPersona = {
@@ -210,35 +228,205 @@ export const VietnamInterview = () => {
     setCurrentPersona(updatedPersona);
     setCurrentQuestion('');
     setCurrentAnswer('');
+    // 保留 topicTag 方便連續問同主題問題
+  };
+
+  // 取得所有主題標籤列表
+  const getAllTopicTags = (): string[] => {
+    const tagSet = new Set<string>();
+    personas.forEach(p => {
+      p.interviewHistory.forEach(record => {
+        if (record.topicTag) {
+          tagSet.add(record.topicTag);
+        }
+      });
+    });
+    return Array.from(tagSet);
   };
 
   // 取得所有問題列表（從所有受訪者的訪談紀錄中）
+  // 如果有選擇主題標籤，則只顯示該主題的問題
   const getAllQuestions = (): string[] => {
     const questionSet = new Set<string>();
     personas.forEach(p => {
       p.interviewHistory.forEach(record => {
         if (record.question) {
-          questionSet.add(record.question);
+          // 如果有選擇主題標籤，只顯示該主題的問題
+          if (!selectedTopicTag || record.topicTag === selectedTopicTag) {
+            questionSet.add(record.question);
+          }
         }
       });
     });
     return Array.from(questionSet);
   };
 
-  // 取得特定問題的所有回答
+  // 取得特定問題的所有回答（支援主題標籤篩選）
   const getResponsesForQuestion = (question: string) => {
-    const responses: Array<{ persona: VietnamPersona; answer: string }> = [];
+    const responses: Array<{ persona: VietnamPersona; answer: string; topicTag?: string }> = [];
     personas.forEach(persona => {
       persona.interviewHistory.forEach(record => {
         if (record.question === question) {
+          // 如果有選擇主題標籤，只顯示該主題的回答
+          if (!selectedTopicTag || record.topicTag === selectedTopicTag) {
+            responses.push({
+              persona,
+              answer: record.answer,
+              topicTag: record.topicTag
+            });
+          }
+        }
+      });
+    });
+    return responses;
+  };
+
+  // 取得特定主題標籤的所有回答（跨問題）
+  const getResponsesForTopicTag = (tag: string) => {
+    const responses: Array<{ persona: VietnamPersona; question: string; answer: string }> = [];
+    personas.forEach(persona => {
+      persona.interviewHistory.forEach(record => {
+        if (record.topicTag === tag) {
           responses.push({
             persona,
+            question: record.question,
             answer: record.answer
           });
         }
       });
     });
     return responses;
+  };
+
+  // 批量訪談處理 - 逐一呼叫以顯示即時進度
+  const handleBatchInterview = async () => {
+    if (selectedPersonaIds.length === 0 || !batchQuestion.trim()) {
+      alert('請選擇至少一位受訪者並輸入問題');
+      return;
+    }
+
+    setIsBatchProcessing(true);
+    setBatchResults([]);
+    setBatchProgress(0);
+
+    const total = selectedPersonaIds.length;
+    const results: typeof batchResults = [];
+
+    // 建立 persona 對照表
+    const personaMap = new Map(personas.map(p => [p.id, p]));
+
+    for (let i = 0; i < selectedPersonaIds.length; i++) {
+      const personaId = selectedPersonaIds[i];
+      const persona = personaMap.get(personaId);
+
+      // 更新進度
+      setBatchProgress(Math.round((i / total) * 100));
+
+      if (!persona) {
+        results.push({
+          personaId,
+          personaName: '未知',
+          success: false,
+          error: '找不到此受訪者'
+        });
+        setBatchResults([...results]);
+        continue;
+      }
+
+      const personaName = `${persona.lastName} ${persona.gender === 'Male' ? '先生' : '小姐'}`;
+
+      // 顯示正在處理的受訪者
+      setCurrentProcessingPersona(personaName);
+
+      try {
+        // 逐一呼叫單人訪談 API
+        const res = await fetch('http://localhost:8787/api/vietnam_interview', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            persona: persona,
+            question: batchQuestion,
+            subQuestions: []
+          })
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+
+          // 建立訪談記錄並更新 persona
+          const newRecord = {
+            sectionId: 'batch',
+            questionId: `batch_${Date.now()}_${personaId}`,
+            question: batchQuestion,
+            answer: data.response,
+            timestamp: new Date().toISOString(),
+            topicTag: batchTopicTag.trim() || undefined
+          };
+
+          const updatedPersona = {
+            ...persona,
+            interviewHistory: [...persona.interviewHistory, newRecord],
+            updatedAt: new Date().toISOString()
+          };
+
+          // 儲存更新
+          await fetch('http://localhost:8787/api/vietnam_personas', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(updatedPersona)
+          });
+
+          results.push({
+            personaId,
+            personaName,
+            success: true,
+            response: data.response
+          });
+        } else {
+          results.push({
+            personaId,
+            personaName,
+            success: false,
+            error: '訪談請求失敗'
+          });
+        }
+      } catch (e) {
+        console.error(`Interview failed for ${personaId}:`, e);
+        results.push({
+          personaId,
+          personaName,
+          success: false,
+          error: String(e)
+        });
+      }
+
+      // 即時更新結果顯示
+      setBatchResults([...results]);
+    }
+
+    setBatchProgress(100);
+    setCurrentProcessingPersona('');
+    // 重新載入 personas 以獲取更新的訪談記錄
+    loadPersonas();
+    setIsBatchProcessing(false);
+  };
+
+  // 選擇/取消選擇受訪者
+  const togglePersonaSelection = (personaId: string) => {
+    setSelectedPersonaIds(prev =>
+      prev.includes(personaId)
+        ? prev.filter(id => id !== personaId)
+        : [...prev, personaId]
+    );
+  };
+
+  // 全選/取消全選
+  const toggleSelectAll = () => {
+    if (selectedPersonaIds.length === personas.length) {
+      setSelectedPersonaIds([]);
+    } else {
+      setSelectedPersonaIds(personas.map(p => p.id));
+    }
   };
 
   // 執行分析
@@ -288,18 +476,6 @@ export const VietnamInterview = () => {
     }
   };
 
-  const getProgress = () => {
-    if (!currentPersona) return 0;
-
-    let completedQuestions = 0;
-    for (let i = 0; i < currentPersona.currentSectionIndex; i++) {
-      completedQuestions += VIETNAM_INTERVIEW_SECTIONS[i].questions.length;
-    }
-    completedQuestions += currentPersona.currentQuestionIndex;
-
-    return (completedQuestions / getTotalQuestions()) * 100;
-  };
-
   return (
     <div style={{ paddingBottom: '40px' }}>
       {/* Tab Navigation */}
@@ -314,8 +490,8 @@ export const VietnamInterview = () => {
       }}>
         <div style={{ display: 'flex', borderBottom: `1px solid ${colors.borderLight}` }}>
           <TabButton label="🤖 AI Generate" isActive={activeTab === 'generate'} onClick={() => setActiveTab('generate')} />
-          <TabButton label="✏️ Manual Input" isActive={activeTab === 'manual'} onClick={() => setActiveTab('manual')} />
           <TabButton label="🎤 Interview" isActive={activeTab === 'interview'} onClick={() => setActiveTab('interview')} disabled={!currentPersona} />
+          <TabButton label="📢 Batch" isActive={activeTab === 'batch'} onClick={() => setActiveTab('batch')} disabled={personas.length === 0} />
           <TabButton label="📋 History" isActive={activeTab === 'history'} onClick={() => setActiveTab('history')} />
           <TabButton label="📊 Analysis" isActive={activeTab === 'analysis'} onClick={() => setActiveTab('analysis')} />
         </div>
@@ -429,199 +605,6 @@ export const VietnamInterview = () => {
         </div>
       )}
 
-      {/* Manual Tab - 手動輸入受訪者資料 */}
-      {activeTab === 'manual' && (
-        <div style={{
-          background: colors.bgPrimary,
-          backdropFilter: 'blur(10px)',
-          borderRadius: '16px',
-          padding: '32px',
-          border: `1px solid ${colors.borderLight}`,
-          boxShadow: `0 4px 16px ${colors.shadow}`
-        }}>
-          <h2 style={{ margin: '0 0 24px 0', color: colors.textPrimary, fontSize: '20px', fontWeight: 600 }}>
-            ✏️ Manual Input / 手動輸入受訪者資料
-          </h2>
-
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px' }}>
-            {/* Last Name */}
-            <FormField label="Last Name / 姓氏 *">
-              <input
-                type="text"
-                value={formData.lastName}
-                onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-                placeholder="e.g., Nguyễn, Trần, Lê..."
-                style={inputStyle}
-              />
-            </FormField>
-
-            {/* Gender */}
-            <FormField label="Gender / 性別 *">
-              <select
-                value={formData.gender}
-                onChange={(e) => setFormData({ ...formData, gender: e.target.value as 'Male' | 'Female' })}
-                style={inputStyle}
-              >
-                <option value="Male">Male / 男</option>
-                <option value="Female">Female / 女</option>
-              </select>
-            </FormField>
-
-            {/* Age */}
-            <FormField label="Age / 年齡 *">
-              <input
-                type="number"
-                value={formData.age}
-                onChange={(e) => setFormData({ ...formData, age: parseInt(e.target.value) || 0 })}
-                min={18}
-                max={80}
-                style={inputStyle}
-              />
-            </FormField>
-
-            {/* Occupation */}
-            <FormField label="Occupation / Title / 職業 *">
-              <input
-                type="text"
-                value={formData.occupation}
-                onChange={(e) => setFormData({ ...formData, occupation: e.target.value })}
-                placeholder="e.g., Office Worker, Business Owner..."
-                style={inputStyle}
-              />
-            </FormField>
-
-            {/* Times of Travel Insurance */}
-            <FormField label="Times of Overseas Travel Insurance / 購買次數">
-              <input
-                type="number"
-                value={formData.timesOfOverseasTravelInsurance}
-                onChange={(e) => setFormData({ ...formData, timesOfOverseasTravelInsurance: parseInt(e.target.value) || 0 })}
-                min={0}
-                style={inputStyle}
-              />
-            </FormField>
-
-            {/* Purchased Brand */}
-            <FormField label="Purchased Brand / 購買過的品牌">
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                {INSURANCE_BRANDS.map(brand => (
-                  <label key={brand} style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '4px',
-                    padding: '6px 12px',
-                    background: formData.purchasedBrand.includes(brand) ? colors.primary : colors.bgSecondary,
-                    color: formData.purchasedBrand.includes(brand) ? 'white' : colors.textSecondary,
-                    borderRadius: '8px',
-                    cursor: 'pointer',
-                    fontSize: '13px',
-                    transition: 'all 0.2s'
-                  }}>
-                    <input
-                      type="checkbox"
-                      checked={formData.purchasedBrand.includes(brand)}
-                      onChange={(e) => {
-                        if (e.target.checked) {
-                          setFormData({ ...formData, purchasedBrand: [...formData.purchasedBrand, brand] });
-                        } else {
-                          setFormData({ ...formData, purchasedBrand: formData.purchasedBrand.filter(b => b !== brand) });
-                        }
-                      }}
-                      style={{ display: 'none' }}
-                    />
-                    {brand}
-                  </label>
-                ))}
-              </div>
-            </FormField>
-
-            {/* Purchased Channels */}
-            <FormField label="Purchased Channels / 購買管道">
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                {PURCHASE_CHANNELS.map(channel => (
-                  <label key={channel} style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '4px',
-                    padding: '6px 12px',
-                    background: formData.purchasedChannels.includes(channel) ? colors.primary : colors.bgSecondary,
-                    color: formData.purchasedChannels.includes(channel) ? 'white' : colors.textSecondary,
-                    borderRadius: '8px',
-                    cursor: 'pointer',
-                    fontSize: '13px',
-                    transition: 'all 0.2s'
-                  }}>
-                    <input
-                      type="checkbox"
-                      checked={formData.purchasedChannels.includes(channel)}
-                      onChange={(e) => {
-                        if (e.target.checked) {
-                          setFormData({ ...formData, purchasedChannels: [...formData.purchasedChannels, channel] });
-                        } else {
-                          setFormData({ ...formData, purchasedChannels: formData.purchasedChannels.filter(c => c !== channel) });
-                        }
-                      }}
-                      style={{ display: 'none' }}
-                    />
-                    {channel}
-                  </label>
-                ))}
-              </div>
-            </FormField>
-          </div>
-
-          {/* Personal Background */}
-          <div style={{ marginTop: '20px' }}>
-            <FormField label="Personal Background / 個人背景">
-              <textarea
-                value={formData.personalBackground}
-                onChange={(e) => setFormData({ ...formData, personalBackground: e.target.value })}
-                placeholder="Brief description of the interviewee's background..."
-                style={{
-                  ...inputStyle,
-                  minHeight: '100px',
-                  resize: 'vertical'
-                }}
-              />
-            </FormField>
-          </div>
-
-          {/* Submit Button */}
-          <div style={{ marginTop: '24px', display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
-            <button
-              onClick={() => setFormData(createEmptyVietnamPersona())}
-              style={{
-                padding: '12px 24px',
-                background: 'transparent',
-                border: `1px solid ${colors.border}`,
-                borderRadius: '12px',
-                color: colors.textSecondary,
-                fontSize: '15px',
-                cursor: 'pointer'
-              }}
-            >
-              Clear / 清除
-            </button>
-            <button
-              onClick={handleFormSubmit}
-              style={{
-                padding: '12px 32px',
-                background: `linear-gradient(135deg, ${colors.primary} 0%, ${colors.primaryDark} 100%)`,
-                border: 'none',
-                borderRadius: '12px',
-                color: 'white',
-                fontSize: '15px',
-                fontWeight: 500,
-                cursor: 'pointer',
-                boxShadow: `0 4px 12px ${colors.shadow}`
-              }}
-            >
-              Start Interview / 開始訪談
-            </button>
-          </div>
-        </div>
-      )}
-
       {/* Interview Tab - 彈性問答模式 */}
       {activeTab === 'interview' && currentPersona && (
         <div>
@@ -685,6 +668,58 @@ export const VietnamInterview = () => {
             }}>
               💬 Ask Any Question / 輸入任何問題
             </h3>
+
+            {/* Topic Tag Input */}
+            <div style={{ marginBottom: '16px' }}>
+              <label style={{
+                display: 'block',
+                marginBottom: '8px',
+                fontSize: '14px',
+                fontWeight: 500,
+                color: colors.textSecondary
+              }}>
+                🏷️ 主題標籤 / Topic Tag <span style={{ fontWeight: 400, color: colors.textMuted }}>(同標籤的問題會被分組分析)</span>
+              </label>
+              <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
+                <input
+                  type="text"
+                  value={currentTopicTag}
+                  onChange={(e) => setCurrentTopicTag(e.target.value)}
+                  placeholder="例如：購買決策、品牌認知、通路偏好..."
+                  disabled={isThinking}
+                  style={{
+                    flex: 1,
+                    minWidth: '200px',
+                    padding: '10px 14px',
+                    border: `1px solid ${colors.border}`,
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    outline: 'none',
+                    color: colors.textPrimary,
+                    background: 'rgba(255, 255, 255, 0.6)'
+                  }}
+                />
+                {/* Quick tag buttons from existing tags */}
+                {getAllTopicTags().slice(0, 4).map((tag) => (
+                  <button
+                    key={tag}
+                    onClick={() => setCurrentTopicTag(tag)}
+                    style={{
+                      padding: '6px 12px',
+                      background: currentTopicTag === tag ? colors.primary : colors.bgSecondary,
+                      border: `1px solid ${currentTopicTag === tag ? colors.primary : colors.border}`,
+                      borderRadius: '16px',
+                      fontSize: '12px',
+                      color: currentTopicTag === tag ? 'white' : colors.textSecondary,
+                      cursor: 'pointer',
+                      whiteSpace: 'nowrap'
+                    }}
+                  >
+                    {tag}
+                  </button>
+                ))}
+              </div>
+            </div>
 
             {/* Question Input */}
             <div style={{ marginBottom: '20px' }}>
@@ -854,33 +889,310 @@ export const VietnamInterview = () => {
         </div>
       )}
 
-      {/* History Tab */}
-      {activeTab === 'history' && (
+      {/* Batch Interview Tab - 批量訪談 */}
+      {activeTab === 'batch' && (
         <div>
-          {personas.length > 0 ? (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              {personas.map((persona, idx) => (
-                <HistoryCard
-                  key={idx}
-                  persona={persona}
-                  onContinue={() => startInterview(persona)}
-                />
-              ))}
+          <div style={{
+            background: colors.bgPrimary,
+            backdropFilter: 'blur(10px)',
+            borderRadius: '16px',
+            padding: '32px',
+            marginBottom: '24px',
+            border: `1px solid ${colors.borderLight}`,
+            boxShadow: `0 4px 16px ${colors.shadow}`
+          }}>
+            <h2 style={{ margin: '0 0 24px 0', color: colors.textPrimary, fontSize: '20px', fontWeight: 600 }}>
+              📢 批量訪談 / Batch Interview
+            </h2>
+            <p style={{ margin: '0 0 20px 0', color: colors.textSecondary, fontSize: '14px' }}>
+              選擇多位受訪者，讓他們同時回答同一個問題。回答會自動儲存到每位受訪者的訪談記錄中。
+            </p>
+
+            {/* 受訪者選擇區 */}
+            <div style={{ marginBottom: '24px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                <label style={{ fontSize: '15px', fontWeight: 500, color: colors.textPrimary }}>
+                  選擇受訪者 ({selectedPersonaIds.length}/{personas.length} 已選)
+                </label>
+                <button
+                  onClick={toggleSelectAll}
+                  style={{
+                    padding: '6px 12px',
+                    background: 'transparent',
+                    border: `1px solid ${colors.border}`,
+                    borderRadius: '8px',
+                    fontSize: '13px',
+                    color: colors.textSecondary,
+                    cursor: 'pointer'
+                  }}
+                >
+                  {selectedPersonaIds.length === personas.length ? '取消全選' : '全選'}
+                </button>
+              </div>
+
+              {personas.length === 0 ? (
+                <div style={{
+                  padding: '40px',
+                  textAlign: 'center',
+                  background: colors.bgSecondary,
+                  borderRadius: '12px',
+                  color: colors.textMuted
+                }}>
+                  <div style={{ fontSize: '32px', marginBottom: '12px', opacity: 0.5 }}>👥</div>
+                  <div>尚無受訪者，請先在「AI Generate」生成受訪者</div>
+                </div>
+              ) : (
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))',
+                  gap: '12px',
+                  maxHeight: '300px',
+                  overflowY: 'auto',
+                  padding: '4px'
+                }}>
+                  {personas.map((persona) => {
+                    const isSelected = selectedPersonaIds.includes(persona.id);
+                    return (
+                      <div
+                        key={persona.id}
+                        onClick={() => !isBatchProcessing && togglePersonaSelection(persona.id)}
+                        style={{
+                          padding: '14px',
+                          background: isSelected ? `linear-gradient(135deg, ${colors.primary}15 0%, ${colors.primaryLight}20 100%)` : colors.bgSecondary,
+                          border: `2px solid ${isSelected ? colors.primary : 'transparent'}`,
+                          borderRadius: '12px',
+                          cursor: isBatchProcessing ? 'not-allowed' : 'pointer',
+                          transition: 'all 0.2s ease',
+                          opacity: isBatchProcessing ? 0.6 : 1
+                        }}
+                      >
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                          <div style={{
+                            width: '22px',
+                            height: '22px',
+                            borderRadius: '6px',
+                            border: `2px solid ${isSelected ? colors.primary : colors.border}`,
+                            background: isSelected ? colors.primary : 'transparent',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            color: 'white',
+                            fontSize: '14px',
+                            flexShrink: 0
+                          }}>
+                            {isSelected && '✓'}
+                          </div>
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <div style={{ fontWeight: 600, color: colors.textPrimary, fontSize: '14px' }}>
+                              {persona.lastName} {persona.gender === 'Male' ? '先生' : '小姐'}
+                            </div>
+                            <div style={{ fontSize: '12px', color: colors.textMuted, marginTop: '2px' }}>
+                              {persona.occupation} • {persona.age} tuổi
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
-          ) : (
+
+            {/* 主題標籤 */}
+            <div style={{ marginBottom: '16px' }}>
+              <label style={{
+                display: 'block',
+                marginBottom: '8px',
+                fontSize: '14px',
+                fontWeight: 500,
+                color: colors.textSecondary
+              }}>
+                🏷️ 主題標籤 / Topic Tag
+              </label>
+              <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
+                <input
+                  type="text"
+                  value={batchTopicTag}
+                  onChange={(e) => setBatchTopicTag(e.target.value)}
+                  placeholder="例如：購買決策、品牌認知..."
+                  disabled={isBatchProcessing}
+                  style={{
+                    flex: 1,
+                    minWidth: '200px',
+                    padding: '10px 14px',
+                    border: `1px solid ${colors.border}`,
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    outline: 'none',
+                    color: colors.textPrimary,
+                    background: 'rgba(255, 255, 255, 0.6)'
+                  }}
+                />
+                {getAllTopicTags().slice(0, 3).map((tag) => (
+                  <button
+                    key={tag}
+                    onClick={() => setBatchTopicTag(tag)}
+                    disabled={isBatchProcessing}
+                    style={{
+                      padding: '6px 12px',
+                      background: batchTopicTag === tag ? colors.primary : colors.bgSecondary,
+                      border: `1px solid ${batchTopicTag === tag ? colors.primary : colors.border}`,
+                      borderRadius: '16px',
+                      fontSize: '12px',
+                      color: batchTopicTag === tag ? 'white' : colors.textSecondary,
+                      cursor: isBatchProcessing ? 'not-allowed' : 'pointer',
+                      whiteSpace: 'nowrap'
+                    }}
+                  >
+                    {tag}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* 問題輸入 */}
+            <div style={{ marginBottom: '20px' }}>
+              <label style={{
+                display: 'block',
+                marginBottom: '8px',
+                fontSize: '14px',
+                fontWeight: 500,
+                color: colors.textSecondary
+              }}>
+                訪談問題 / Question
+              </label>
+              <textarea
+                value={batchQuestion}
+                onChange={(e) => setBatchQuestion(e.target.value)}
+                placeholder="輸入要讓所有受訪者回答的問題..."
+                disabled={isBatchProcessing}
+                style={{
+                  width: '100%',
+                  minHeight: '100px',
+                  padding: '14px',
+                  border: `1px solid ${colors.border}`,
+                  borderRadius: '12px',
+                  fontSize: '15px',
+                  lineHeight: '1.6',
+                  resize: 'vertical',
+                  outline: 'none',
+                  fontFamily: 'inherit',
+                  color: colors.textPrimary,
+                  background: 'rgba(255, 255, 255, 0.6)'
+                }}
+              />
+            </div>
+
+            {/* 執行按鈕 */}
+            <button
+              onClick={handleBatchInterview}
+              disabled={isBatchProcessing || selectedPersonaIds.length === 0 || !batchQuestion.trim()}
+              style={{
+                padding: '14px 32px',
+                background: isBatchProcessing || selectedPersonaIds.length === 0 || !batchQuestion.trim()
+                  ? colors.textMuted
+                  : `linear-gradient(135deg, ${colors.accent} 0%, #b89960 100%)`,
+                border: 'none',
+                borderRadius: '12px',
+                color: 'white',
+                fontSize: '15px',
+                fontWeight: 500,
+                cursor: isBatchProcessing || selectedPersonaIds.length === 0 || !batchQuestion.trim() ? 'not-allowed' : 'pointer',
+                boxShadow: `0 4px 12px ${colors.shadow}`,
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px'
+              }}
+            >
+              {isBatchProcessing ? (
+                <>🔄 處理中 {batchProgress}% - {currentProcessingPersona || '準備中...'}</>
+              ) : (
+                <>📢 開始批量訪談 ({selectedPersonaIds.length} 人)</>
+              )}
+            </button>
+          </div>
+
+          {/* 批量訪談結果 */}
+          {batchResults.length > 0 && (
             <div style={{
-              textAlign: 'center',
-              padding: '60px 20px',
               background: colors.bgPrimary,
+              backdropFilter: 'blur(10px)',
               borderRadius: '16px',
+              padding: '32px',
               border: `1px solid ${colors.borderLight}`,
-              color: colors.textMuted
+              boxShadow: `0 4px 16px ${colors.shadow}`
             }}>
-              <div style={{ fontSize: '48px', marginBottom: '16px', opacity: 0.3 }}>📋</div>
-              <div style={{ fontSize: '15px' }}>No interview records yet. Generate personas or input manually to start.</div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+                <h3 style={{ margin: 0, fontSize: '18px', color: colors.textPrimary }}>
+                  📝 批量訪談結果 ({batchResults.filter(r => r.success).length}/{batchResults.length} 成功)
+                </h3>
+                <button
+                  onClick={() => {
+                    setBatchResults([]);
+                    setBatchQuestion('');
+                    setSelectedPersonaIds([]);
+                  }}
+                  style={{
+                    padding: '8px 16px',
+                    background: 'transparent',
+                    border: `1px solid ${colors.border}`,
+                    borderRadius: '8px',
+                    fontSize: '13px',
+                    color: colors.textSecondary,
+                    cursor: 'pointer'
+                  }}
+                >
+                  清除結果
+                </button>
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', maxHeight: '500px', overflowY: 'auto' }}>
+                {batchResults.map((result, idx) => (
+                  <div key={idx} style={{
+                    padding: '18px',
+                    background: result.success ? colors.bgSecondary : `${colors.danger}10`,
+                    borderRadius: '12px',
+                    borderLeft: `4px solid ${result.success ? colors.primary : colors.danger}`
+                  }}>
+                    <div style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      marginBottom: '10px'
+                    }}>
+                      <span style={{ fontWeight: 600, color: colors.textPrimary, fontSize: '15px' }}>
+                        {result.success ? '✓' : '✗'} {result.personaName}
+                      </span>
+                      {!result.success && (
+                        <span style={{ fontSize: '12px', color: colors.danger }}>
+                          {result.error}
+                        </span>
+                      )}
+                    </div>
+                    {result.success && result.response && (
+                      <div style={{
+                        fontSize: '14px',
+                        color: colors.textPrimary,
+                        lineHeight: '1.7',
+                        whiteSpace: 'pre-wrap'
+                      }}>
+                        {result.response}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
             </div>
           )}
         </div>
+      )}
+
+      {/* History Tab - 重新設計：雙視圖模式 */}
+      {activeTab === 'history' && (
+        <HistoryTabContent
+          personas={personas}
+          onContinueInterview={startInterview}
+        />
       )}
 
       {/* Analysis Tab - 回答分析 */}
@@ -899,7 +1211,7 @@ export const VietnamInterview = () => {
               📊 Summary Report / 總結報告
             </h2>
 
-            {getAllQuestions().length === 0 ? (
+            {getAllQuestions().length === 0 && getAllTopicTags().length === 0 ? (
               <div style={{
                 textAlign: 'center',
                 padding: '40px 20px',
@@ -910,6 +1222,67 @@ export const VietnamInterview = () => {
               </div>
             ) : (
               <>
+                {/* Topic Tag Filter */}
+                {getAllTopicTags().length > 0 && (
+                  <div style={{ marginBottom: '20px' }}>
+                    <label style={{
+                      display: 'block',
+                      marginBottom: '10px',
+                      fontSize: '15px',
+                      fontWeight: 500,
+                      color: colors.textPrimary
+                    }}>
+                      🏷️ 按主題篩選 / Filter by Topic Tag
+                    </label>
+                    <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                      <button
+                        onClick={() => {
+                          setSelectedTopicTag('');
+                          setSelectedQuestion('');
+                          setAnalysisResult('');
+                        }}
+                        style={{
+                          padding: '8px 16px',
+                          background: !selectedTopicTag ? colors.primary : 'transparent',
+                          border: `1px solid ${!selectedTopicTag ? colors.primary : colors.border}`,
+                          borderRadius: '20px',
+                          fontSize: '13px',
+                          color: !selectedTopicTag ? 'white' : colors.textSecondary,
+                          cursor: 'pointer',
+                          fontWeight: !selectedTopicTag ? 600 : 400
+                        }}
+                      >
+                        全部
+                      </button>
+                      {getAllTopicTags().map((tag) => {
+                        const tagCount = getResponsesForTopicTag(tag).length;
+                        return (
+                          <button
+                            key={tag}
+                            onClick={() => {
+                              setSelectedTopicTag(tag);
+                              setSelectedQuestion('');
+                              setAnalysisResult('');
+                            }}
+                            style={{
+                              padding: '8px 16px',
+                              background: selectedTopicTag === tag ? colors.primary : 'transparent',
+                              border: `1px solid ${selectedTopicTag === tag ? colors.primary : colors.border}`,
+                              borderRadius: '20px',
+                              fontSize: '13px',
+                              color: selectedTopicTag === tag ? 'white' : colors.textSecondary,
+                              cursor: 'pointer',
+                              fontWeight: selectedTopicTag === tag ? 600 : 400
+                            }}
+                          >
+                            {tag} ({tagCount})
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
                 {/* Question Selector */}
                 <div style={{ marginBottom: '24px' }}>
                   <label style={{
@@ -920,6 +1293,7 @@ export const VietnamInterview = () => {
                     color: colors.textPrimary
                   }}>
                     選擇要分析的問題 / Select Question to Analyze
+                    {selectedTopicTag && <span style={{ fontWeight: 400, color: colors.textMuted }}> (已篩選: {selectedTopicTag})</span>}
                   </label>
                   <select
                     value={selectedQuestion}
@@ -1039,21 +1413,384 @@ export const VietnamInterview = () => {
               border: `1px solid ${colors.borderLight}`,
               boxShadow: `0 4px 16px ${colors.shadow}`
             }}>
-              <h3 style={{ margin: '0 0 20px 0', fontSize: '18px', color: colors.textPrimary }}>
-                📈 總結報告 / Summary Report
-              </h3>
-              <div style={{
-                fontSize: '14px',
-                color: colors.textPrimary,
-                lineHeight: '1.8',
-                whiteSpace: 'pre-wrap'
-              }}>
-                {analysisResult}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+                <h3 style={{ margin: 0, fontSize: '18px', color: colors.textPrimary }}>
+                  📈 總結報告 / Summary Report
+                </h3>
+                {/* Export Buttons */}
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <button
+                    onClick={() => {
+                      navigator.clipboard.writeText(analysisResult);
+                      alert('已複製到剪貼簿！');
+                    }}
+                    style={{
+                      padding: '8px 16px',
+                      background: 'transparent',
+                      border: `1px solid ${colors.border}`,
+                      borderRadius: '8px',
+                      color: colors.textSecondary,
+                      fontSize: '13px',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px'
+                    }}
+                  >
+                    📋 複製
+                  </button>
+                  <button
+                    onClick={async () => {
+                      const responses = getResponsesForQuestion(selectedQuestion);
+                      const timestamp = new Date().toISOString().split('T')[0];
+                      const formattedDate = new Date().toLocaleDateString('zh-TW', { year: 'numeric', month: 'long', day: 'numeric' });
+
+                      // Create HTML content for PDF
+                      const pdfContent = document.createElement('div');
+                      pdfContent.innerHTML = `
+<div style="font-family: 'Microsoft JhengHei', 'PingFang TC', sans-serif; padding: 20px; color: #1f2937;">
+  <h1 style="color: #1e3a5f; font-size: 20pt; text-align: center; border-bottom: 2px solid #1e3a5f; padding-bottom: 12px; margin-bottom: 8px;">
+    越南消費者旅遊保險市場調研報告
+  </h1>
+  <p style="text-align: center; color: #64748b; font-size: 11pt; margin-bottom: 25px;">
+    Vietnam Consumer Travel Insurance Market Research Report
+  </p>
+
+  <h2 style="color: #1e3a5f; font-size: 13pt; margin-top: 30px; border-left: 4px solid #1e3a5f; padding-left: 12px;">
+    一、報告資訊 | Report Information
+  </h2>
+  <table style="width: 100%; border-collapse: collapse; margin: 15px 0 25px 0;">
+    <tr>
+      <td style="padding: 10px 14px; border: 1px solid #e2e8f0; width: 100px; font-weight: 600; background: #1e3a5f; color: white; font-size: 11px;">報告日期</td>
+      <td style="padding: 10px 14px; border: 1px solid #e2e8f0; font-size: 12px;">${formattedDate}</td>
+    </tr>
+    <tr>
+      <td style="padding: 10px 14px; border: 1px solid #e2e8f0; font-weight: 600; background: #1e3a5f; color: white; font-size: 11px;">研究主題</td>
+      <td style="padding: 10px 14px; border: 1px solid #e2e8f0; font-size: 12px;">越南消費者旅遊保險認知與購買行為研究</td>
+    </tr>
+    <tr>
+      <td style="padding: 10px 14px; border: 1px solid #e2e8f0; font-weight: 600; background: #1e3a5f; color: white; font-size: 11px;">訪談問題</td>
+      <td style="padding: 10px 14px; border: 1px solid #e2e8f0; font-size: 12px;">${selectedQuestion}</td>
+    </tr>
+    <tr>
+      <td style="padding: 10px 14px; border: 1px solid #e2e8f0; font-weight: 600; background: #1e3a5f; color: white; font-size: 11px;">樣本數量</td>
+      <td style="padding: 10px 14px; border: 1px solid #e2e8f0; font-size: 12px;">${responses.length} 位受訪者</td>
+    </tr>
+    <tr>
+      <td style="padding: 10px 14px; border: 1px solid #e2e8f0; font-weight: 600; background: #1e3a5f; color: white; font-size: 11px;">研究方法</td>
+      <td style="padding: 10px 14px; border: 1px solid #e2e8f0; font-size: 12px;">AI 模擬深度訪談法</td>
+    </tr>
+  </table>
+
+  <h2 style="color: #1e3a5f; font-size: 13pt; margin-top: 30px; border-left: 4px solid #1e3a5f; padding-left: 12px;">
+    二、分析摘要 | Executive Summary
+  </h2>
+  <div style="margin: 15px 0;">
+    ${formatAnalysisForExport(analysisResult)}
+  </div>
+
+  <h2 style="color: #1e3a5f; font-size: 13pt; margin-top: 30px; border-left: 4px solid #1e3a5f; padding-left: 12px;">
+    三、受訪者基本資料 | Respondent Profiles
+  </h2>
+  <table style="width: 100%; border-collapse: collapse; margin: 15px 0;">
+    <tr style="background: #1e3a5f; color: white;">
+      <th style="padding: 10px; border: 1px solid #1e3a5f; text-align: left; font-size: 11px;">#</th>
+      <th style="padding: 10px; border: 1px solid #1e3a5f; text-align: left; font-size: 11px;">姓名</th>
+      <th style="padding: 10px; border: 1px solid #1e3a5f; text-align: left; font-size: 11px;">性別</th>
+      <th style="padding: 10px; border: 1px solid #1e3a5f; text-align: left; font-size: 11px;">年齡</th>
+      <th style="padding: 10px; border: 1px solid #1e3a5f; text-align: left; font-size: 11px;">職業</th>
+      <th style="padding: 10px; border: 1px solid #1e3a5f; text-align: left; font-size: 11px;">保險購買次數</th>
+    </tr>
+    ${responses.map((r, i) => `
+    <tr style="background: ${i % 2 === 0 ? '#f8fafc' : 'white'};">
+      <td style="padding: 8px 10px; border: 1px solid #e2e8f0; font-size: 11px;">${i + 1}</td>
+      <td style="padding: 8px 10px; border: 1px solid #e2e8f0; font-size: 11px;">${r.persona.lastName} ${r.persona.gender === 'Male' ? '先生' : '小姐'}</td>
+      <td style="padding: 8px 10px; border: 1px solid #e2e8f0; font-size: 11px;">${r.persona.gender === 'Male' ? '男' : '女'}</td>
+      <td style="padding: 8px 10px; border: 1px solid #e2e8f0; font-size: 11px;">${r.persona.age} 歲</td>
+      <td style="padding: 8px 10px; border: 1px solid #e2e8f0; font-size: 11px;">${r.persona.occupation}</td>
+      <td style="padding: 8px 10px; border: 1px solid #e2e8f0; font-size: 11px;">${r.persona.timesOfOverseasTravelInsurance} 次</td>
+    </tr>
+    `).join('')}
+  </table>
+
+  <h2 style="color: #1e3a5f; font-size: 14pt; margin-top: 35px; border-left: 4px solid #1e3a5f; padding-left: 12px;">
+    四、訪談紀錄詳情 | Interview Details
+  </h2>
+  ${responses.map((r, i) => `
+  <div style="border: 1px solid #e2e8f0; border-radius: 6px; margin: 15px 0; overflow: hidden; page-break-inside: avoid; break-inside: avoid;">
+    <div style="background: #1e3a5f; padding: 12px 16px; font-weight: 600; color: white; font-size: 13px;">
+      受訪者 ${i + 1}：${r.persona.lastName} ${r.persona.gender === 'Male' ? '先生' : '小姐'}
+    </div>
+    <div style="padding: 10px 16px; background: #f1f5f9; font-size: 11px; color: #64748b; border-bottom: 1px solid #e2e8f0;">
+      年齡：${r.persona.age} 歲 | 職業：${r.persona.occupation} | 保險經驗：${r.persona.timesOfOverseasTravelInsurance} 次
+    </div>
+    <div style="padding: 16px; background: #ffffff; border-left: 3px solid #3b82f6; line-height: 1.8; font-size: 12px; color: #374151;">
+      ${r.answer}
+    </div>
+  </div>
+  `).join('')}
+
+  <div style="margin-top: 35px; padding: 16px; background: #f8fafc; border-radius: 6px; page-break-inside: avoid; break-inside: avoid;">
+    <h3 style="color: #1e3a5f; font-size: 11pt; margin: 0 0 10px 0;">附錄：研究方法說明</h3>
+    <p style="color: #64748b; font-size: 10px; line-height: 1.7; margin: 0 0 8px 0;">
+      本研究採用半結構式深度訪談法，透過 AI 模擬技術生成具代表性的越南消費者 Persona，針對旅遊保險相關議題進行訪談，並以 AI 輔助分析技術彙整質性資料。
+    </p>
+    <p style="color: #64748b; font-size: 10px; line-height: 1.7; margin: 0;">
+      <strong>報告聲明：</strong>本報告由 Vietnam Interview AI System 自動生成，資料來源為模擬訪談結果，僅供市場研究參考使用。
+    </p>
+  </div>
+
+  <div style="text-align: center; margin-top: 30px; padding-top: 15px; border-top: 1px solid #e2e8f0; color: #94a3b8; font-size: 9px;">
+    <p style="margin: 0;">Report Generated by Vietnam Interview AI System</p>
+    <p style="margin: 4px 0 0 0;">${timestamp}</p>
+  </div>
+</div>`;
+
+                      // Dynamic import html2pdf
+                      const html2pdf = (await import('html2pdf.js')).default;
+
+                      const opt = {
+                        margin: 10,
+                        filename: `越南旅遊保險調研報告_${timestamp}.pdf`,
+                        image: { type: 'jpeg' as const, quality: 0.98 },
+                        html2canvas: { scale: 2, useCORS: true },
+                        jsPDF: { unit: 'mm' as const, format: 'a4' as const, orientation: 'portrait' as const }
+                      };
+
+                      html2pdf().set(opt).from(pdfContent).save();
+                    }}
+                    style={{
+                      padding: '8px 16px',
+                      background: colors.danger,
+                      border: 'none',
+                      borderRadius: '8px',
+                      color: 'white',
+                      fontSize: '13px',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px'
+                    }}
+                  >
+                    匯出 PDF
+                  </button>
+                </div>
               </div>
+              {/* 專業格式化的分析結果 */}
+              <AnalysisResultDisplay content={analysisResult} />
             </div>
           )}
         </div>
       )}
+    </div>
+  );
+};
+
+// 格式化分析結果為專業 HTML（用於 PDF/Word 匯出）
+const formatAnalysisForExport = (content: string): string => {
+  const lines = content.split('\n').filter(line => line.trim());
+  let html = '';
+  let currentSection = '';
+  let listIndex = 0;
+
+  for (const line of lines) {
+    const trimmed = line.trim();
+
+    // 識別標題（移除 emoji）
+    if (trimmed.startsWith('📌') || trimmed.includes('一句話總結')) {
+      const text = trimmed.replace(/^📌\s*/, '').replace('一句話總結', '').trim();
+      html += `<div style="background: #1e3a5f; color: white; padding: 14px 18px; border-radius: 6px 6px 0 0; font-weight: 600; font-size: 13px; letter-spacing: 0.5px;">SUMMARY</div>`;
+      if (text) {
+        html += `<div style="background: #f1f5f9; padding: 14px 18px; font-size: 13px; line-height: 1.7; color: #1f2937; border-left: 3px solid #1e3a5f;">${text}</div>`;
+      }
+    } else if (trimmed.startsWith('🔑') || trimmed.includes('關鍵發現')) {
+      currentSection = 'findings';
+      listIndex = 0;
+      html += `<div style="display: flex; align-items: center; gap: 8px; padding: 12px 0 8px 0; margin-top: 16px; border-bottom: 2px solid #3b82f6;"><span style="font-size: 12px; font-weight: 700; color: #3b82f6; letter-spacing: 1px; text-transform: uppercase;">KEY FINDINGS</span></div>`;
+    } else if (trimmed.startsWith('💡') || trimmed.includes('行動建議')) {
+      currentSection = 'recommendations';
+      listIndex = 0;
+      html += `<div style="display: flex; align-items: center; gap: 8px; padding: 12px 0 8px 0; margin-top: 16px; border-bottom: 2px solid #ca8a04;"><span style="font-size: 12px; font-weight: 700; color: #ca8a04; letter-spacing: 1px; text-transform: uppercase;">RECOMMENDATIONS</span></div>`;
+    } else if (/^\d+[\.、]/.test(trimmed)) {
+      listIndex++;
+      const text = trimmed.replace(/^\d+[\.、]\s*/, '');
+      const isAction = currentSection === 'recommendations';
+      const bgColor = isAction ? '#fefce8' : '#f8fafc';
+      const borderColor = isAction ? '#ca8a04' : '#3b82f6';
+      html += `<div style="display: flex; align-items: flex-start; gap: 12px; padding: 10px 14px; background: ${bgColor}; border-left: 3px solid ${borderColor}; margin-top: 3px;"><span style="min-width: 20px; height: 20px; border-radius: 4px; background: ${borderColor}; color: white; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; flex-shrink: 0;">${listIndex}</span><span style="font-size: 13px; line-height: 1.6; color: #1f2937;">${text}</span></div>`;
+    } else if (html.includes('SUMMARY') && !html.includes('KEY FINDINGS')) {
+      // Summary 內容
+      html += `<div style="background: #f1f5f9; padding: 14px 18px; font-size: 13px; line-height: 1.7; color: #1f2937; border-left: 3px solid #1e3a5f;">${trimmed}</div>`;
+    } else {
+      html += `<div style="padding: 6px 14px; font-size: 13px; line-height: 1.5; color: #6b7280;">${trimmed}</div>`;
+    }
+  }
+
+  return `<div style="display: flex; flex-direction: column; gap: 0;">${html}</div>`;
+};
+
+// 專業格式化的分析結果顯示組件
+const AnalysisResultDisplay = ({ content }: { content: string }) => {
+  // 解析內容，識別不同區塊並標記所屬 section
+  const sections = content.split('\n').reduce((acc: Array<{type: string; content: string; section?: string}>, line) => {
+    const trimmed = line.trim();
+    if (!trimmed) return acc;
+
+    // 取得當前 section
+    const lastSection = acc.findLast(s => s.type === 'section-title');
+    const currentSection = lastSection?.content || '';
+
+    // 識別標題（移除 emoji 符號）
+    if (trimmed.startsWith('📌') || trimmed.includes('一句話總結')) {
+      acc.push({ type: 'headline', content: trimmed.replace(/^📌\s*/, '').replace('一句話總結', '').trim() || '核心發現' });
+    } else if (trimmed.startsWith('🔑') || trimmed.includes('關鍵發現')) {
+      acc.push({ type: 'section-title', content: '關鍵發現' });
+    } else if (trimmed.startsWith('💡') || trimmed.includes('行動建議')) {
+      acc.push({ type: 'section-title', content: '行動建議' });
+    } else if (/^\d+[\.、]/.test(trimmed)) {
+      // 數字列表項目，標記所屬 section
+      acc.push({ type: 'list-item', content: trimmed.replace(/^\d+[\.、]\s*/, ''), section: currentSection });
+    } else if (acc.length > 0 && acc[acc.length - 1].type === 'headline') {
+      // 緊跟在 headline 後的是摘要內容
+      acc.push({ type: 'summary', content: trimmed });
+    } else {
+      acc.push({ type: 'text', content: trimmed, section: currentSection });
+    }
+    return acc;
+  }, []);
+
+  // 專業配色 - 低調商務風格
+  const proColors = {
+    headlineBg: '#1e3a5f',
+    headlineText: '#ffffff',
+    sectionTitle: '#1e3a5f',
+    findingBg: '#f8fafc',
+    findingBorder: '#3b82f6',
+    actionBg: '#fefce8',
+    actionBorder: '#ca8a04',
+    text: '#1f2937',
+    textMuted: '#6b7280'
+  };
+
+  // 計算列表編號
+  let findingIndex = 0;
+  let actionIndex = 0;
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '0' }}>
+      {sections.map((section, idx) => {
+        if (section.type === 'headline') {
+          return (
+            <div key={idx} style={{
+              background: proColors.headlineBg,
+              color: proColors.headlineText,
+              padding: '14px 18px',
+              borderRadius: '6px 6px 0 0',
+              fontWeight: 600,
+              fontSize: '13px',
+              letterSpacing: '0.5px'
+            }}>
+              SUMMARY
+            </div>
+          );
+        }
+
+        if (section.type === 'summary') {
+          return (
+            <div key={idx} style={{
+              background: '#f1f5f9',
+              padding: '14px 18px',
+              fontSize: '13px',
+              lineHeight: '1.7',
+              color: proColors.text,
+              borderLeft: `3px solid ${proColors.headlineBg}`,
+              borderRadius: '0 0 0 0'
+            }}>
+              {section.content}
+            </div>
+          );
+        }
+
+        if (section.type === 'section-title') {
+          const isAction = section.content.includes('建議');
+          // 重置計數器
+          if (isAction) actionIndex = 0;
+          else findingIndex = 0;
+
+          return (
+            <div key={idx} style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              padding: '12px 0 8px 0',
+              marginTop: '16px',
+              borderBottom: `2px solid ${isAction ? proColors.actionBorder : proColors.findingBorder}`
+            }}>
+              <span style={{
+                fontSize: '12px',
+                fontWeight: 700,
+                color: isAction ? proColors.actionBorder : proColors.findingBorder,
+                letterSpacing: '1px',
+                textTransform: 'uppercase'
+              }}>
+                {isAction ? 'RECOMMENDATIONS' : 'KEY FINDINGS'}
+              </span>
+            </div>
+          );
+        }
+
+        if (section.type === 'list-item') {
+          const isAction = section.section?.includes('建議');
+          const itemNum = isAction ? ++actionIndex : ++findingIndex;
+
+          return (
+            <div key={idx} style={{
+              display: 'flex',
+              alignItems: 'flex-start',
+              gap: '12px',
+              padding: '10px 14px',
+              background: isAction ? proColors.actionBg : proColors.findingBg,
+              borderLeft: `3px solid ${isAction ? proColors.actionBorder : proColors.findingBorder}`,
+              marginTop: '3px'
+            }}>
+              <span style={{
+                minWidth: '20px',
+                height: '20px',
+                borderRadius: '4px',
+                background: isAction ? proColors.actionBorder : proColors.findingBorder,
+                color: 'white',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '11px',
+                fontWeight: 600,
+                flexShrink: 0
+              }}>
+                {itemNum}
+              </span>
+              <span style={{
+                fontSize: '13px',
+                lineHeight: '1.6',
+                color: proColors.text
+              }}>
+                {section.content}
+              </span>
+            </div>
+          );
+        }
+
+        // 一般文字
+        return (
+          <div key={idx} style={{
+            padding: '6px 14px',
+            fontSize: '13px',
+            lineHeight: '1.5',
+            color: proColors.textMuted
+          }}>
+            {section.content}
+          </div>
+        );
+      })}
     </div>
   );
 };
@@ -1078,33 +1815,6 @@ const TabButton = ({ label, isActive, onClick, disabled = false }: any) => (
     }}
   >{label}</button>
 );
-
-const FormField = ({ label, children }: { label: string; children: React.ReactNode }) => (
-  <div>
-    <label style={{
-      display: 'block',
-      marginBottom: '8px',
-      fontSize: '14px',
-      fontWeight: 500,
-      color: colors.textSecondary
-    }}>
-      {label}
-    </label>
-    {children}
-  </div>
-);
-
-const inputStyle: React.CSSProperties = {
-  width: '100%',
-  padding: '12px 16px',
-  border: `1px solid ${colors.border}`,
-  borderRadius: '12px',
-  fontSize: '15px',
-  outline: 'none',
-  background: 'rgba(255, 255, 255, 0.6)',
-  color: colors.textPrimary,
-  transition: 'all 0.3s ease'
-};
 
 // 生成的 Persona 卡片
 const GeneratedPersonaCard = ({ persona, onStartInterview }: { persona: VietnamPersona; onStartInterview: () => void }) => (
@@ -1181,16 +1891,281 @@ const GeneratedPersonaCard = ({ persona, onStartInterview }: { persona: VietnamP
   </div>
 );
 
+// History Tab 新設計：支援「按受訪者」和「按問題」兩種視圖
+const HistoryTabContent = ({
+  personas,
+  onContinueInterview
+}: {
+  personas: VietnamPersona[];
+  onContinueInterview: (persona: VietnamPersona) => void;
+}) => {
+  const [viewMode, setViewMode] = useState<'by-persona' | 'by-question'>('by-question');
+  const [expandedQuestions, setExpandedQuestions] = useState<Set<string>>(new Set());
+
+  // 收集所有問題和對應的回答
+  const getQuestionGroups = () => {
+    const groups: Map<string, Array<{
+      persona: VietnamPersona;
+      record: VietnamInterviewRecord;
+    }>> = new Map();
+
+    personas.forEach(persona => {
+      persona.interviewHistory?.forEach(record => {
+        const key = record.question;
+        if (!groups.has(key)) {
+          groups.set(key, []);
+        }
+        groups.get(key)!.push({ persona, record });
+      });
+    });
+
+    return groups;
+  };
+
+  const questionGroups = getQuestionGroups();
+  const totalResponses = personas.reduce((sum, p) => sum + (p.interviewHistory?.length || 0), 0);
+
+  const toggleQuestion = (question: string) => {
+    setExpandedQuestions(prev => {
+      const next = new Set(prev);
+      if (next.has(question)) {
+        next.delete(question);
+      } else {
+        next.add(question);
+      }
+      return next;
+    });
+  };
+
+  if (personas.length === 0) {
+    return (
+      <div style={{
+        textAlign: 'center',
+        padding: '60px 20px',
+        background: colors.bgPrimary,
+        borderRadius: '16px',
+        border: `1px solid ${colors.borderLight}`,
+        color: colors.textMuted
+      }}>
+        <div style={{ fontSize: '48px', marginBottom: '16px', opacity: 0.3 }}>📋</div>
+        <div style={{ fontSize: '15px' }}>尚無訪談記錄。請先生成受訪者並開始訪談。</div>
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      {/* 頂部控制列 */}
+      <div style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: '20px',
+        padding: '16px 20px',
+        background: colors.bgPrimary,
+        borderRadius: '12px',
+        border: `1px solid ${colors.borderLight}`
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+          <span style={{ fontSize: '14px', color: colors.textSecondary }}>
+            👥 {personas.length} 位受訪者 • 💬 {totalResponses} 則回答 • ❓ {questionGroups.size} 個問題
+          </span>
+        </div>
+        <div style={{ display: 'flex', gap: '8px' }}>
+          <button
+            onClick={() => setViewMode('by-question')}
+            style={{
+              padding: '8px 16px',
+              background: viewMode === 'by-question' ? colors.primary : 'transparent',
+              border: `1px solid ${viewMode === 'by-question' ? colors.primary : colors.border}`,
+              borderRadius: '8px',
+              fontSize: '13px',
+              color: viewMode === 'by-question' ? 'white' : colors.textSecondary,
+              cursor: 'pointer'
+            }}
+          >
+            📝 按問題
+          </button>
+          <button
+            onClick={() => setViewMode('by-persona')}
+            style={{
+              padding: '8px 16px',
+              background: viewMode === 'by-persona' ? colors.primary : 'transparent',
+              border: `1px solid ${viewMode === 'by-persona' ? colors.primary : colors.border}`,
+              borderRadius: '8px',
+              fontSize: '13px',
+              color: viewMode === 'by-persona' ? 'white' : colors.textSecondary,
+              cursor: 'pointer'
+            }}
+          >
+            👤 按受訪者
+          </button>
+        </div>
+      </div>
+
+      {/* 按問題分組視圖 */}
+      {viewMode === 'by-question' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          {Array.from(questionGroups.entries()).map(([question, responses]) => {
+            const isExpanded = expandedQuestions.has(question);
+            const topicTag = responses[0]?.record.topicTag;
+
+            return (
+              <div key={question} style={{
+                background: colors.bgPrimary,
+                borderRadius: '16px',
+                overflow: 'hidden',
+                border: `1px solid ${colors.borderLight}`,
+                boxShadow: `0 4px 16px ${colors.shadow}`
+              }}>
+                {/* 問題標題 */}
+                <div
+                  onClick={() => toggleQuestion(question)}
+                  style={{
+                    padding: '18px 24px',
+                    background: colors.bgSecondary,
+                    cursor: 'pointer',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'flex-start',
+                    gap: '16px'
+                  }}
+                >
+                  <div style={{ flex: 1 }}>
+                    <div style={{
+                      fontSize: '15px',
+                      fontWeight: 600,
+                      color: colors.textPrimary,
+                      lineHeight: '1.5'
+                    }}>
+                      ❓ {question.length > 100 ? question.slice(0, 100) + '...' : question}
+                    </div>
+                    {topicTag && (
+                      <span style={{
+                        display: 'inline-block',
+                        marginTop: '8px',
+                        padding: '4px 10px',
+                        background: `${colors.accent}20`,
+                        color: colors.accent,
+                        borderRadius: '12px',
+                        fontSize: '12px'
+                      }}>
+                        🏷️ {topicTag}
+                      </span>
+                    )}
+                  </div>
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px',
+                    flexShrink: 0
+                  }}>
+                    <span style={{
+                      padding: '6px 12px',
+                      background: colors.primary,
+                      color: 'white',
+                      borderRadius: '20px',
+                      fontSize: '13px',
+                      fontWeight: 500
+                    }}>
+                      {responses.length} 人回答
+                    </span>
+                    <span style={{
+                      fontSize: '18px',
+                      color: colors.textMuted,
+                      transition: 'transform 0.2s'
+                    }}>
+                      {isExpanded ? '▲' : '▼'}
+                    </span>
+                  </div>
+                </div>
+
+                {/* 回答列表 */}
+                {isExpanded && (
+                  <div style={{ padding: '16px 24px' }}>
+                    <div style={{
+                      display: 'grid',
+                      gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))',
+                      gap: '16px'
+                    }}>
+                      {responses.map(({ persona, record }, idx) => (
+                        <div key={idx} style={{
+                          padding: '16px',
+                          background: colors.bgSecondary,
+                          borderRadius: '12px',
+                          borderLeft: `4px solid ${colors.primary}`
+                        }}>
+                          {/* 受訪者資訊 */}
+                          <div style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '10px',
+                            marginBottom: '12px',
+                            paddingBottom: '10px',
+                            borderBottom: `1px solid ${colors.borderLight}`
+                          }}>
+                            <div style={{
+                              width: '36px',
+                              height: '36px',
+                              borderRadius: '50%',
+                              background: `linear-gradient(135deg, ${colors.primary} 0%, ${colors.primaryLight} 100%)`,
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              color: 'white',
+                              fontSize: '14px',
+                              fontWeight: 600
+                            }}>
+                              {persona.lastName.charAt(0)}
+                            </div>
+                            <div>
+                              <div style={{ fontWeight: 600, fontSize: '14px', color: colors.textPrimary }}>
+                                {persona.lastName} {persona.gender === 'Male' ? '先生' : '小姐'}
+                              </div>
+                              <div style={{ fontSize: '12px', color: colors.textMuted }}>
+                                {persona.occupation} • {persona.age} tuổi
+                              </div>
+                            </div>
+                          </div>
+                          {/* 回答內容 */}
+                          <div style={{
+                            fontSize: '14px',
+                            color: colors.textPrimary,
+                            lineHeight: '1.7',
+                            whiteSpace: 'pre-wrap'
+                          }}>
+                            {record.answer}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {/* 按受訪者分組視圖 */}
+      {viewMode === 'by-persona' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          {personas.map((persona, idx) => (
+            <HistoryCard
+              key={idx}
+              persona={persona}
+              onContinue={() => onContinueInterview(persona)}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
 const HistoryCard = ({ persona, onContinue }: { persona: VietnamPersona; onContinue: () => void }) => {
   const [expanded, setExpanded] = useState(false);
-  const progress = (() => {
-    let completed = 0;
-    for (let i = 0; i < persona.currentSectionIndex; i++) {
-      completed += VIETNAM_INTERVIEW_SECTIONS[i].questions.length;
-    }
-    completed += persona.currentQuestionIndex;
-    return (completed / getTotalQuestions()) * 100;
-  })();
+  const responseCount = persona.interviewHistory?.length || 0;
 
   return (
     <div style={{
@@ -1232,7 +2207,7 @@ const HistoryCard = ({ persona, onContinue }: { persona: VietnamPersona; onConti
           ) : (
             <>
               <span style={{ fontSize: '14px', color: colors.textSecondary }}>
-                {progress.toFixed(0)}% complete
+                {responseCount} responses
               </span>
               <button
                 onClick={onContinue}
@@ -1253,11 +2228,11 @@ const HistoryCard = ({ persona, onContinue }: { persona: VietnamPersona; onConti
         </div>
       </div>
 
-      {/* Progress */}
+      {/* Response indicator */}
       <div style={{ height: '4px', background: colors.bgSecondary }}>
         <div style={{
           height: '100%',
-          width: `${progress}%`,
+          width: responseCount > 0 ? '100%' : '0%',
           background: persona.isCompleted ? colors.success : colors.primary,
           transition: 'width 0.3s ease'
         }} />

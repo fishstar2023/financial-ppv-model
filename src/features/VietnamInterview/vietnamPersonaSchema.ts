@@ -37,6 +37,7 @@ export interface VietnamInterviewRecord {
   question: string;
   answer: string;
   timestamp: string;
+  topicTag?: string;  // 主題標籤，用於分組相似問題
 }
 
 // 用於 AI 生成的請求格式

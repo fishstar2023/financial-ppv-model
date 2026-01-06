@@ -1578,6 +1578,95 @@ class AnalysisRequest(BaseModel):
     responses: List[Dict[str, Any]]
 
 
+class BatchInterviewRequest(BaseModel):
+    """批量訪談請求 - 讓多位受訪者同時回答同一問題"""
+    personaIds: List[str]  # 受訪者 ID 列表
+    question: str
+    subQuestions: List[str] = []
+    topicTag: Optional[str] = None  # 主題標籤
+
+
+@app.post("/api/vietnam_batch_interview")
+def api_vietnam_batch_interview(request: BatchInterviewRequest):
+    """批量訪談 - 讓多位受訪者同時回答同一問題"""
+    try:
+        print(f"📢 批量訪談請求: {len(request.personaIds)} 位受訪者, 問題: {request.question[:50]}...")
+
+        # 載入所有 persona
+        all_personas = load_vietnam_db()
+        persona_map = {p.get('id'): p for p in all_personas}
+
+        results = []
+        for persona_id in request.personaIds:
+            persona = persona_map.get(persona_id)
+            if not persona:
+                results.append({
+                    "personaId": persona_id,
+                    "success": False,
+                    "error": "找不到此受訪者"
+                })
+                continue
+
+            try:
+                # 呼叫 AI 訪談
+                response_text = interview_vietnam_persona(
+                    persona,
+                    request.question,
+                    request.subQuestions
+                )
+
+                # 建立訪談記錄
+                new_record = {
+                    "sectionId": "batch",
+                    "questionId": f"batch_{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}_{persona_id}",
+                    "question": request.question,
+                    "answer": response_text,
+                    "timestamp": datetime.datetime.now().isoformat(),
+                    "topicTag": request.topicTag if request.topicTag else None
+                }
+
+                # 更新 persona 的訪談記錄
+                if "interviewHistory" not in persona:
+                    persona["interviewHistory"] = []
+                persona["interviewHistory"].append(new_record)
+                persona["updatedAt"] = datetime.datetime.now().isoformat()
+
+                # 儲存更新
+                save_vietnam_db(persona)
+
+                results.append({
+                    "personaId": persona_id,
+                    "personaName": f"{persona.get('lastName', '')} {'先生' if persona.get('gender') == 'Male' else '小姐'}",
+                    "success": True,
+                    "response": response_text,
+                    "record": new_record
+                })
+                print(f"  ✓ {persona.get('lastName', persona_id)} 回答完成")
+
+            except Exception as e:
+                print(f"  ✗ {persona_id} 訪談失敗: {e}")
+                results.append({
+                    "personaId": persona_id,
+                    "success": False,
+                    "error": str(e)
+                })
+
+        success_count = sum(1 for r in results if r.get('success'))
+        print(f"📢 批量訪談完成: {success_count}/{len(request.personaIds)} 成功")
+
+        return {
+            "question": request.question,
+            "topicTag": request.topicTag,
+            "totalRequested": len(request.personaIds),
+            "successCount": success_count,
+            "results": results
+        }
+
+    except Exception as e:
+        print(f"批量訪談錯誤: {e}")
+        return JSONResponse({"error": str(e)}, status_code=500)
+
+
 @app.post("/api/vietnam_analysis")
 def api_vietnam_analysis(request: AnalysisRequest):
     """分析多位受訪者對同一問題的回答"""

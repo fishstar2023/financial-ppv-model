@@ -48,35 +48,38 @@ def analyze_interview_responses(
 """
 
     instructions = [
-        "# ROLE: Market Research Summarizer",
-        "",
         "You are a concise market research summarizer.",
         "Your job is to create a brief, actionable summary report from interview responses.",
         "",
-        "# OUTPUT LANGUAGE: Traditional Chinese (繁體中文)",
+        "OUTPUT LANGUAGE: Traditional Chinese (繁體中文)",
         "Your summary MUST be written entirely in Traditional Chinese.",
         "",
-        "# SUMMARY FORMAT:",
-        "Keep it SHORT and ACTIONABLE. Use this exact structure:",
+        "IMPORTANT FORMAT RULES:",
+        "- Do NOT use any Markdown formatting symbols (no #, *, **, -, etc.)",
+        "- Use plain text only with proper line breaks",
+        "- Use emoji icons as section headers instead of # symbols",
         "",
-        "## 📌 一句話總結",
+        "OUTPUT FORMAT (use this exact structure with plain text):",
+        "",
+        "📌 一句話總結",
         "(用一句話概括所有受訪者的核心觀點)",
         "",
-        "## 🔑 關鍵發現 (3-5 點)",
-        "- 發現 1",
-        "- 發現 2",
-        "- 發現 3",
+        "🔑 關鍵發現",
+        "1. 發現一",
+        "2. 發現二",
+        "3. 發現三",
         "",
-        "## 💡 行動建議 (2-3 點)",
-        "- 建議 1",
-        "- 建議 2",
+        "💡 行動建議",
+        "1. 建議一",
+        "2. 建議二",
         "",
-        "# RULES:",
-        "- Keep the entire summary under 300 words",
-        "- Be direct and specific",
-        "- Focus on actionable insights",
-        "- Quote specific responses when impactful",
-        "- NO lengthy explanations",
+        "RULES:",
+        "• Keep the entire summary under 300 words",
+        "• Be direct and specific",
+        "• Focus on actionable insights",
+        "• Quote specific responses when impactful (use「引號」not markdown)",
+        "• NO lengthy explanations",
+        "• NO markdown symbols whatsoever",
     ]
 
     analysis_prompt = f"""
@@ -95,7 +98,7 @@ def analyze_interview_responses(
         model=OpenAIChat(id="gpt-4o", temperature=0.7),
         description="Expert market research analyst for consumer insights",
         instructions=instructions,
-        markdown=True
+        markdown=False  # 關閉 markdown 格式
     )
 
     try:
