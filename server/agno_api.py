@@ -1468,6 +1468,7 @@ def api_delete_persona(persona_id: str):
 from vietnam_interview_agent import interview_vietnam_persona
 from vietnam_generator_agent import generate_vietnam_personas
 from vietnam_analysis_agent import analyze_interview_responses
+from vietnam_classifier_agent import classify_responses
 import datetime
 
 VIETNAM_DB_FILE = Path("server/vietnam_personas.json")
@@ -1545,9 +1546,14 @@ def api_generate_vietnam_personas(req: GenerateRequest):
         results = generate_vietnam_personas(req.hint, req.count)
 
         if results:
+            import uuid
+            saved_personas = []
             for p in results:
+                # 加入唯一識別碼避免 ID 重複覆蓋
+                unique_suffix = str(uuid.uuid4())[:6]
+                unique_id = f"{p.id}_{unique_suffix}"
                 full_persona = {
-                    "id": p.id,
+                    "id": unique_id,
                     "lastName": p.lastName,
                     "gender": p.gender,
                     "age": p.age,
@@ -1564,8 +1570,9 @@ def api_generate_vietnam_personas(req: GenerateRequest):
                     "updatedAt": datetime.datetime.now().isoformat()
                 }
                 save_vietnam_db(full_persona)
+                saved_personas.append(full_persona)
 
-            return [p.model_dump() for p in results]
+            return saved_personas
         else:
             return JSONResponse({"error": "生成失敗"}, status_code=500)
     except Exception as e:
@@ -1679,4 +1686,26 @@ def api_vietnam_analysis(request: AnalysisRequest):
         return {"analysis": analysis}
     except Exception as e:
         print(f"分析錯誤: {e}")
+        return JSONResponse({"error": str(e)}, status_code=500)
+
+
+class ClassifyRequest(BaseModel):
+    question: str
+    responses: List[Dict[str, Any]]
+    classification_type: str = "auto"  # auto, yes_no, sentiment, custom
+
+
+@app.post("/api/vietnam_classify")
+def api_vietnam_classify(request: ClassifyRequest):
+    """將回答分類為結構化資料，用於圖表視覺化"""
+    try:
+        print(f"📊 收到分類請求: {request.question[:50]}... ({len(request.responses)} responses)")
+        result = classify_responses(
+            request.question,
+            request.responses,
+            request.classification_type
+        )
+        return result
+    except Exception as e:
+        print(f"分類錯誤: {e}")
         return JSONResponse({"error": str(e)}, status_code=500)

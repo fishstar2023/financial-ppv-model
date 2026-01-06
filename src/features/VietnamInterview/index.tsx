@@ -3,6 +3,7 @@ import {
   VietnamPersona,
   VietnamInterviewRecord
 } from './vietnamPersonaSchema';
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
 
 // 莫蘭迪色系 - 越南版用較暖的色調
 const colors = {
@@ -32,7 +33,7 @@ const colors = {
 };
 
 export const VietnamInterview = () => {
-  const [activeTab, setActiveTab] = useState<'generate' | 'interview' | 'batch' | 'history' | 'analysis'>('generate');
+  const [activeTab, setActiveTab] = useState<'home' | 'generate' | 'interview' | 'batch' | 'history' | 'analysis'>('home');
   const [personas, setPersonas] = useState<VietnamPersona[]>([]);
   const [currentPersona, setCurrentPersona] = useState<VietnamPersona | null>(null);
   const [loading, setLoading] = useState(false);
@@ -56,6 +57,12 @@ export const VietnamInterview = () => {
   const [selectedTopicTag, setSelectedTopicTag] = useState<string>('');  // 主題標籤篩選
   const [analysisResult, setAnalysisResult] = useState<string>('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [classificationData, setClassificationData] = useState<{
+    categories: Array<{ name: string; count: number; percentage: number; color: string }>;
+    details: Array<{ personaId: string; personaName: string; category: string; reason: string }>;
+    recommendedChart: 'pie' | 'bar' | 'horizontal_bar';
+  } | null>(null);
+  const [isClassifying, setIsClassifying] = useState(false);
 
   // 批量訪談狀態
   const [selectedPersonaIds, setSelectedPersonaIds] = useState<string[]>([]);
@@ -99,6 +106,32 @@ export const VietnamInterview = () => {
       loadPersonas();
     } catch (e) {
       console.error('Failed to save persona:', e);
+    }
+  };
+
+  // 刪除受訪者
+  const deletePersona = async (personaId: string, personaName: string) => {
+    if (!window.confirm(`確定要刪除「${personaName}」嗎？\n\n此操作無法復原，該受訪者的所有訪談記錄也會一併刪除。`)) {
+      return;
+    }
+    try {
+      const res = await fetch(`http://localhost:8787/api/vietnam_personas/${encodeURIComponent(personaId)}`, {
+        method: 'DELETE'
+      });
+      if (res.ok) {
+        // 如果刪除的是當前選中的受訪者，清除選擇
+        if (currentPersona?.id === personaId) {
+          setCurrentPersona(null);
+        }
+        // 從批量選擇中移除
+        setSelectedPersonaIds(prev => prev.filter(id => id !== personaId));
+        loadPersonas();
+      } else {
+        alert('刪除失敗，請稍後再試');
+      }
+    } catch (e) {
+      console.error('Failed to delete persona:', e);
+      alert('刪除失敗，請稍後再試');
     }
   };
 
@@ -440,39 +473,64 @@ export const VietnamInterview = () => {
     }
 
     setIsAnalyzing(true);
+    setIsClassifying(true);
     setAnalysisResult('');
+    setClassificationData(null);
 
+    const requestBody = {
+      question: selectedQuestion,
+      responses: responses.map(r => ({
+        persona: {
+          id: r.persona.id,
+          lastName: r.persona.lastName,
+          gender: r.persona.gender,
+          age: r.persona.age,
+          occupation: r.persona.occupation,
+          timesOfOverseasTravelInsurance: r.persona.timesOfOverseasTravelInsurance,
+          purchasedBrand: r.persona.purchasedBrand
+        },
+        answer: r.answer
+      }))
+    };
+
+    // 同時執行分析和分類
     try {
-      const res = await fetch('http://localhost:8787/api/vietnam_analysis', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          question: selectedQuestion,
-          responses: responses.map(r => ({
-            persona: {
-              lastName: r.persona.lastName,
-              gender: r.persona.gender,
-              age: r.persona.age,
-              occupation: r.persona.occupation,
-              timesOfOverseasTravelInsurance: r.persona.timesOfOverseasTravelInsurance,
-              purchasedBrand: r.persona.purchasedBrand
-            },
-            answer: r.answer
-          }))
+      const [analysisRes, classifyRes] = await Promise.all([
+        fetch('http://localhost:8787/api/vietnam_analysis', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(requestBody)
+        }),
+        fetch('http://localhost:8787/api/vietnam_classify', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ...requestBody, classification_type: 'auto' })
         })
-      });
+      ]);
 
-      if (res.ok) {
-        const data = await res.json();
+      if (analysisRes.ok) {
+        const data = await analysisRes.json();
         setAnalysisResult(data.analysis);
       } else {
         setAnalysisResult('分析失敗，請稍後再試');
+      }
+
+      if (classifyRes.ok) {
+        const classifyData = await classifyRes.json();
+        if (classifyData.categories && classifyData.categories.length > 0) {
+          setClassificationData({
+            categories: classifyData.categories,
+            details: classifyData.details || [],
+            recommendedChart: classifyData.recommended_chart || 'pie'
+          });
+        }
       }
     } catch (e) {
       console.error('Analysis failed:', e);
       setAnalysisResult('分析失敗，請稍後再試');
     } finally {
       setIsAnalyzing(false);
+      setIsClassifying(false);
     }
   };
 
@@ -489,6 +547,7 @@ export const VietnamInterview = () => {
         boxShadow: `0 4px 16px ${colors.shadow}`
       }}>
         <div style={{ display: 'flex', borderBottom: `1px solid ${colors.borderLight}` }}>
+          <TabButton label="🏠 Home" isActive={activeTab === 'home'} onClick={() => setActiveTab('home')} />
           <TabButton label="🤖 AI Generate" isActive={activeTab === 'generate'} onClick={() => setActiveTab('generate')} />
           <TabButton label="🎤 Interview" isActive={activeTab === 'interview'} onClick={() => setActiveTab('interview')} disabled={!currentPersona} />
           <TabButton label="📢 Batch" isActive={activeTab === 'batch'} onClick={() => setActiveTab('batch')} disabled={personas.length === 0} />
@@ -496,6 +555,209 @@ export const VietnamInterview = () => {
           <TabButton label="📊 Analysis" isActive={activeTab === 'analysis'} onClick={() => setActiveTab('analysis')} />
         </div>
       </div>
+
+      {/* Home Tab - 首頁總覽 */}
+      {activeTab === 'home' && (
+        <div>
+          {/* Hero Section */}
+          <div style={{
+            background: `linear-gradient(135deg, ${colors.primary} 0%, ${colors.primaryDark} 100%)`,
+            borderRadius: '16px',
+            padding: '40px',
+            marginBottom: '24px',
+            color: 'white',
+            textAlign: 'center'
+          }}>
+            <div style={{ fontSize: '48px', marginBottom: '16px' }}>🇻🇳</div>
+            <h1 style={{ margin: '0 0 12px 0', fontSize: '28px', fontWeight: 700 }}>
+              Vietnam Market Research
+            </h1>
+            <p style={{ margin: 0, fontSize: '15px', opacity: 0.9 }}>
+              越南旅遊保險市場調研系統 | AI-Powered Consumer Insights
+            </p>
+          </div>
+
+          {/* Stats Overview */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(4, 1fr)',
+            gap: '16px',
+            marginBottom: '24px'
+          }}>
+            <div style={{
+              background: colors.bgPrimary,
+              borderRadius: '12px',
+              padding: '24px',
+              textAlign: 'center',
+              border: `1px solid ${colors.borderLight}`,
+              boxShadow: `0 2px 8px ${colors.shadow}`
+            }}>
+              <div style={{ fontSize: '32px', fontWeight: 700, color: colors.primary }}>{personas.length}</div>
+              <div style={{ fontSize: '13px', color: colors.textMuted, marginTop: '4px' }}>受訪者 Personas</div>
+            </div>
+            <div style={{
+              background: colors.bgPrimary,
+              borderRadius: '12px',
+              padding: '24px',
+              textAlign: 'center',
+              border: `1px solid ${colors.borderLight}`,
+              boxShadow: `0 2px 8px ${colors.shadow}`
+            }}>
+              <div style={{ fontSize: '32px', fontWeight: 700, color: colors.info }}>
+                {personas.reduce((sum, p) => sum + (p.interviewHistory?.length || 0), 0)}
+              </div>
+              <div style={{ fontSize: '13px', color: colors.textMuted, marginTop: '4px' }}>訪談記錄 Responses</div>
+            </div>
+            <div style={{
+              background: colors.bgPrimary,
+              borderRadius: '12px',
+              padding: '24px',
+              textAlign: 'center',
+              border: `1px solid ${colors.borderLight}`,
+              boxShadow: `0 2px 8px ${colors.shadow}`
+            }}>
+              <div style={{ fontSize: '32px', fontWeight: 700, color: colors.success }}>
+                {new Set(personas.flatMap(p => p.interviewHistory?.map(h => h.question) || [])).size}
+              </div>
+              <div style={{ fontSize: '13px', color: colors.textMuted, marginTop: '4px' }}>問題數 Questions</div>
+            </div>
+            <div style={{
+              background: colors.bgPrimary,
+              borderRadius: '12px',
+              padding: '24px',
+              textAlign: 'center',
+              border: `1px solid ${colors.borderLight}`,
+              boxShadow: `0 2px 8px ${colors.shadow}`
+            }}>
+              <div style={{ fontSize: '32px', fontWeight: 700, color: colors.warning }}>
+                {personas.filter(p => (p.interviewHistory?.length || 0) > 0).length}
+              </div>
+              <div style={{ fontSize: '13px', color: colors.textMuted, marginTop: '4px' }}>已訪談 Interviewed</div>
+            </div>
+          </div>
+
+          {/* Quick Actions */}
+          <div style={{
+            background: colors.bgPrimary,
+            borderRadius: '16px',
+            padding: '28px',
+            marginBottom: '24px',
+            border: `1px solid ${colors.borderLight}`,
+            boxShadow: `0 4px 16px ${colors.shadow}`
+          }}>
+            <h2 style={{ margin: '0 0 20px 0', fontSize: '16px', fontWeight: 600, color: colors.textPrimary }}>
+              Quick Actions / 快速操作
+            </h2>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px' }}>
+              <button
+                onClick={() => setActiveTab('generate')}
+                style={{
+                  padding: '20px',
+                  background: `linear-gradient(135deg, ${colors.primary}15, ${colors.primary}05)`,
+                  border: `1px solid ${colors.primary}30`,
+                  borderRadius: '12px',
+                  cursor: 'pointer',
+                  textAlign: 'left',
+                  transition: 'all 0.2s'
+                }}
+              >
+                <div style={{ fontSize: '24px', marginBottom: '8px' }}>🤖</div>
+                <div style={{ fontSize: '14px', fontWeight: 600, color: colors.textPrimary }}>AI Generate</div>
+                <div style={{ fontSize: '12px', color: colors.textMuted, marginTop: '4px' }}>生成模擬受訪者</div>
+              </button>
+              <button
+                onClick={() => setActiveTab('batch')}
+                disabled={personas.length === 0}
+                style={{
+                  padding: '20px',
+                  background: personas.length === 0 ? colors.bgSecondary : `linear-gradient(135deg, ${colors.info}15, ${colors.info}05)`,
+                  border: `1px solid ${personas.length === 0 ? colors.borderLight : colors.info + '30'}`,
+                  borderRadius: '12px',
+                  cursor: personas.length === 0 ? 'not-allowed' : 'pointer',
+                  textAlign: 'left',
+                  opacity: personas.length === 0 ? 0.5 : 1,
+                  transition: 'all 0.2s'
+                }}
+              >
+                <div style={{ fontSize: '24px', marginBottom: '8px' }}>📢</div>
+                <div style={{ fontSize: '14px', fontWeight: 600, color: colors.textPrimary }}>Batch Interview</div>
+                <div style={{ fontSize: '12px', color: colors.textMuted, marginTop: '4px' }}>批量訪談多位受訪者</div>
+              </button>
+              <button
+                onClick={() => setActiveTab('analysis')}
+                style={{
+                  padding: '20px',
+                  background: `linear-gradient(135deg, ${colors.warning}15, ${colors.warning}05)`,
+                  border: `1px solid ${colors.warning}30`,
+                  borderRadius: '12px',
+                  cursor: 'pointer',
+                  textAlign: 'left',
+                  transition: 'all 0.2s'
+                }}
+              >
+                <div style={{ fontSize: '24px', marginBottom: '8px' }}>📊</div>
+                <div style={{ fontSize: '14px', fontWeight: 600, color: colors.textPrimary }}>Analysis</div>
+                <div style={{ fontSize: '12px', color: colors.textMuted, marginTop: '4px' }}>分析回答並產生報告</div>
+              </button>
+            </div>
+          </div>
+
+          {/* Workflow Guide */}
+          <div style={{
+            background: colors.bgPrimary,
+            borderRadius: '16px',
+            padding: '28px',
+            border: `1px solid ${colors.borderLight}`,
+            boxShadow: `0 4px 16px ${colors.shadow}`
+          }}>
+            <h2 style={{ margin: '0 0 20px 0', fontSize: '16px', fontWeight: 600, color: colors.textPrimary }}>
+              Workflow Guide / 使用流程
+            </h2>
+            <div style={{ display: 'flex', gap: '16px' }}>
+              {[
+                { step: 1, icon: '🤖', title: 'Generate', desc: 'AI 生成受訪者 Personas' },
+                { step: 2, icon: '📢', title: 'Batch Interview', desc: '批量發送問題給多位受訪者' },
+                { step: 3, icon: '📊', title: 'Analyze', desc: 'AI 分析回答並產生圖表報告' },
+                { step: 4, icon: '📄', title: 'Export', desc: '匯出 PDF 研究報告' }
+              ].map((item, idx) => (
+                <div key={idx} style={{ flex: 1, textAlign: 'center' }}>
+                  <div style={{
+                    width: '48px',
+                    height: '48px',
+                    borderRadius: '50%',
+                    background: colors.primary,
+                    color: 'white',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    margin: '0 auto 12px',
+                    fontSize: '20px'
+                  }}>
+                    {item.icon}
+                  </div>
+                  <div style={{ fontSize: '13px', fontWeight: 600, color: colors.textPrimary, marginBottom: '4px' }}>
+                    Step {item.step}: {item.title}
+                  </div>
+                  <div style={{ fontSize: '11px', color: colors.textMuted }}>
+                    {item.desc}
+                  </div>
+                  {idx < 3 && (
+                    <div style={{
+                      position: 'absolute',
+                      right: '-20px',
+                      top: '24px',
+                      color: colors.textMuted,
+                      fontSize: '16px'
+                    }}>
+                      →
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Generate Tab - AI 生成受訪者 */}
       {activeTab === 'generate' && (
@@ -990,6 +1252,47 @@ export const VietnamInterview = () => {
                               {persona.occupation} • {persona.age} tuổi
                             </div>
                           </div>
+                          {/* 刪除按鈕 */}
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation(); // 防止觸發選擇
+                              const personaName = `${persona.lastName} ${persona.gender === 'Male' ? '先生' : '小姐'}`;
+                              deletePersona(persona.id, personaName);
+                            }}
+                            disabled={isBatchProcessing}
+                            title="刪除此受訪者"
+                            style={{
+                              width: '24px',
+                              height: '24px',
+                              padding: 0,
+                              border: 'none',
+                              borderRadius: '6px',
+                              background: 'transparent',
+                              color: colors.textMuted,
+                              fontSize: '14px',
+                              cursor: isBatchProcessing ? 'not-allowed' : 'pointer',
+                              opacity: 0.5,
+                              transition: 'all 0.2s ease',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              flexShrink: 0
+                            }}
+                            onMouseEnter={(e) => {
+                              if (!isBatchProcessing) {
+                                e.currentTarget.style.opacity = '1';
+                                e.currentTarget.style.color = '#dc3545';
+                                e.currentTarget.style.background = 'rgba(220, 53, 69, 0.1)';
+                              }
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.opacity = '0.5';
+                              e.currentTarget.style.color = colors.textMuted;
+                              e.currentTarget.style.background = 'transparent';
+                            }}
+                          >
+                            🗑️
+                          </button>
                         </div>
                       </div>
                     );
@@ -1192,6 +1495,7 @@ export const VietnamInterview = () => {
         <HistoryTabContent
           personas={personas}
           onContinueInterview={startInterview}
+          onDeletePersona={deletePersona}
         />
       )}
 
@@ -1576,6 +1880,245 @@ export const VietnamInterview = () => {
                   </button>
                 </div>
               </div>
+
+              {/* 圖表視覺化 - 依據題型自動選擇圖表類型 */}
+              {classificationData && classificationData.categories.length > 0 && (
+                <div style={{
+                  background: 'white',
+                  borderRadius: '12px',
+                  padding: '20px',
+                  marginBottom: '20px',
+                  border: `1px solid ${colors.borderLight}`,
+                  boxShadow: `0 2px 8px ${colors.shadow}`
+                }}>
+                  <div style={{
+                    fontSize: '13px',
+                    fontWeight: 600,
+                    color: colors.textPrimary,
+                    marginBottom: '16px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px'
+                  }}>
+                    <span style={{ fontSize: '16px' }}>📊</span>
+                    回答分類統計
+                    <span style={{
+                      fontSize: '11px',
+                      color: colors.textMuted,
+                      fontWeight: 400,
+                      marginLeft: 'auto',
+                      padding: '2px 8px',
+                      background: colors.bgSecondary,
+                      borderRadius: '4px'
+                    }}>
+                      {classificationData.recommendedChart === 'pie' ? '圓餅圖' :
+                       classificationData.recommendedChart === 'bar' ? '長條圖' : '橫條圖'}
+                    </span>
+                  </div>
+
+                  {/* 圓餅圖 */}
+                  {classificationData.recommendedChart === 'pie' && (
+                    <div style={{ display: 'flex', gap: '24px', alignItems: 'center' }}>
+                      <div style={{ width: '200px', height: '200px' }}>
+                        <ResponsiveContainer width="100%" height="100%">
+                          <PieChart>
+                            <Pie
+                              data={classificationData.categories}
+                              cx="50%"
+                              cy="50%"
+                              innerRadius={45}
+                              outerRadius={80}
+                              paddingAngle={2}
+                              dataKey="count"
+                              nameKey="name"
+                            >
+                              {classificationData.categories.map((entry, index) => (
+                                <Cell key={`cell-${index}`} fill={entry.color} />
+                              ))}
+                            </Pie>
+                            <Tooltip
+                              formatter={(value) => [`${value} 人`]}
+                              contentStyle={{
+                                borderRadius: '8px',
+                                border: 'none',
+                                boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+                                fontSize: '12px'
+                              }}
+                            />
+                          </PieChart>
+                        </ResponsiveContainer>
+                      </div>
+                      {/* 圖例說明 */}
+                      <div style={{ flex: 1 }}>
+                        {classificationData.categories.map((cat, idx) => (
+                          <div key={idx} style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '10px',
+                            padding: '8px 12px',
+                            background: idx % 2 === 0 ? '#f8fafc' : 'white',
+                            borderRadius: '6px',
+                            marginBottom: '4px'
+                          }}>
+                            <div style={{
+                              width: '12px',
+                              height: '12px',
+                              borderRadius: '3px',
+                              background: cat.color,
+                              flexShrink: 0
+                            }} />
+                            <span style={{ flex: 1, fontSize: '13px', color: colors.textPrimary }}>
+                              {cat.name}
+                            </span>
+                            <span style={{
+                              fontSize: '13px',
+                              fontWeight: 600,
+                              color: colors.textPrimary
+                            }}>
+                              {cat.count} 人
+                            </span>
+                            <span style={{
+                              fontSize: '12px',
+                              color: colors.textMuted,
+                              minWidth: '45px',
+                              textAlign: 'right'
+                            }}>
+                              ({cat.percentage}%)
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* 垂直長條圖 */}
+                  {classificationData.recommendedChart === 'bar' && (
+                    <div style={{ width: '100%', height: '280px' }}>
+                      <ResponsiveContainer width="100%" height="100%">
+                        <BarChart
+                          data={classificationData.categories}
+                          margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
+                        >
+                          <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                          <XAxis
+                            dataKey="name"
+                            tick={{ fontSize: 12, fill: colors.textPrimary }}
+                            angle={-30}
+                            textAnchor="end"
+                            height={60}
+                          />
+                          <YAxis
+                            tick={{ fontSize: 12, fill: colors.textMuted }}
+                            allowDecimals={false}
+                          />
+                          <Tooltip
+                            formatter={(value) => [`${value} 人`]}
+                            contentStyle={{
+                              borderRadius: '8px',
+                              border: 'none',
+                              boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+                              fontSize: '12px'
+                            }}
+                          />
+                          <Bar dataKey="count" radius={[4, 4, 0, 0]}>
+                            {classificationData.categories.map((entry, index) => (
+                              <Cell key={`cell-${index}`} fill={entry.color} />
+                            ))}
+                          </Bar>
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </div>
+                  )}
+
+                  {/* 水平橫條圖 */}
+                  {classificationData.recommendedChart === 'horizontal_bar' && (
+                    <div style={{ width: '100%', height: Math.max(200, classificationData.categories.length * 50) }}>
+                      <ResponsiveContainer width="100%" height="100%">
+                        <BarChart
+                          data={classificationData.categories}
+                          layout="vertical"
+                          margin={{ top: 10, right: 30, left: 100, bottom: 10 }}
+                        >
+                          <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                          <XAxis
+                            type="number"
+                            tick={{ fontSize: 12, fill: colors.textMuted }}
+                            allowDecimals={false}
+                          />
+                          <YAxis
+                            type="category"
+                            dataKey="name"
+                            tick={{ fontSize: 12, fill: colors.textPrimary }}
+                            width={90}
+                          />
+                          <Tooltip
+                            formatter={(value) => [`${value} 人`]}
+                            contentStyle={{
+                              borderRadius: '8px',
+                              border: 'none',
+                              boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+                              fontSize: '12px'
+                            }}
+                          />
+                          <Bar dataKey="count" radius={[0, 4, 4, 0]}>
+                            {classificationData.categories.map((entry, index) => (
+                              <Cell key={`cell-${index}`} fill={entry.color} />
+                            ))}
+                          </Bar>
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </div>
+                  )}
+
+                  {/* 分類詳情 */}
+                  {classificationData.details.length > 0 && (
+                    <div style={{ marginTop: '16px', paddingTop: '16px', borderTop: `1px solid ${colors.borderLight}` }}>
+                      <div style={{ fontSize: '12px', color: colors.textMuted, marginBottom: '8px' }}>
+                        各受訪者分類結果：
+                      </div>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                        {classificationData.details.map((detail, idx) => (
+                          <span key={idx} style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '4px',
+                            padding: '4px 10px',
+                            background: classificationData.categories.find(c => c.name === detail.category)?.color + '20',
+                            borderRadius: '12px',
+                            fontSize: '11px',
+                            color: colors.textPrimary
+                          }}>
+                            <span style={{
+                              width: '6px',
+                              height: '6px',
+                              borderRadius: '50%',
+                              background: classificationData.categories.find(c => c.name === detail.category)?.color
+                            }} />
+                            {detail.personaName}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* 圖表載入中 */}
+              {isClassifying && !classificationData && (
+                <div style={{
+                  background: 'white',
+                  borderRadius: '12px',
+                  padding: '24px',
+                  marginBottom: '20px',
+                  border: `1px solid ${colors.borderLight}`,
+                  textAlign: 'center',
+                  color: colors.textMuted
+                }}>
+                  <div style={{ fontSize: '24px', marginBottom: '8px' }}>📊</div>
+                  <div style={{ fontSize: '13px' }}>正在分類回答，產生圖表中...</div>
+                </div>
+              )}
+
               {/* 專業格式化的分析結果 */}
               <AnalysisResultDisplay content={analysisResult} />
             </div>
@@ -1894,10 +2437,12 @@ const GeneratedPersonaCard = ({ persona, onStartInterview }: { persona: VietnamP
 // History Tab 新設計：支援「按受訪者」和「按問題」兩種視圖
 const HistoryTabContent = ({
   personas,
-  onContinueInterview
+  onContinueInterview,
+  onDeletePersona
 }: {
   personas: VietnamPersona[];
   onContinueInterview: (persona: VietnamPersona) => void;
+  onDeletePersona: (personaId: string, personaName: string) => void;
 }) => {
   const [viewMode, setViewMode] = useState<'by-persona' | 'by-question'>('by-question');
   const [expandedQuestions, setExpandedQuestions] = useState<Set<string>>(new Set());
@@ -2155,6 +2700,7 @@ const HistoryTabContent = ({
               key={idx}
               persona={persona}
               onContinue={() => onContinueInterview(persona)}
+              onDelete={() => onDeletePersona(persona.id, `${persona.lastName} ${persona.gender === 'Male' ? '先生' : '小姐'}`)}
             />
           ))}
         </div>
@@ -2163,7 +2709,7 @@ const HistoryTabContent = ({
   );
 };
 
-const HistoryCard = ({ persona, onContinue }: { persona: VietnamPersona; onContinue: () => void }) => {
+const HistoryCard = ({ persona, onContinue, onDelete }: { persona: VietnamPersona; onContinue: () => void; onDelete: () => void }) => {
   const [expanded, setExpanded] = useState(false);
   const responseCount = persona.interviewHistory?.length || 0;
 
@@ -2225,6 +2771,39 @@ const HistoryCard = ({ persona, onContinue }: { persona: VietnamPersona; onConti
               </button>
             </>
           )}
+          {/* 刪除按鈕 */}
+          <button
+            onClick={onDelete}
+            title="刪除此受訪者"
+            style={{
+              width: '32px',
+              height: '32px',
+              padding: 0,
+              border: 'none',
+              borderRadius: '8px',
+              background: 'transparent',
+              color: colors.textMuted,
+              fontSize: '16px',
+              cursor: 'pointer',
+              opacity: 0.5,
+              transition: 'all 0.2s ease',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.opacity = '1';
+              e.currentTarget.style.color = '#dc3545';
+              e.currentTarget.style.background = 'rgba(220, 53, 69, 0.1)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.opacity = '0.5';
+              e.currentTarget.style.color = colors.textMuted;
+              e.currentTarget.style.background = 'transparent';
+            }}
+          >
+            🗑️
+          </button>
         </div>
       </div>
 
