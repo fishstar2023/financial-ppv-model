@@ -1,393 +1,282 @@
 [
   {
-    "id": "豬哥",
-    "version": "v1.0",
-    "source_summary": {
-      "dialogue": 0.5,
-      "questionnaire": 0.4,
-      "behavior": 0.1
-    },
-    "big5": {
-      "openness": 20,
-      "conscientiousness": 50,
-      "extraversion": 40,
-      "agreeableness": 60,
-      "neuroticism": 70
-    },
-    "schwartz_values": null,
-    "risk_profile": {
-      "overall": 30,
-      "financial": 35,
-      "ethical": 65,
-      "confidence": 0.6
-    },
-    "financial_disposition": {
-      "long_term_orientation": 30,
-      "loss_aversion": 70,
-      "decision_style": "Analytical"
-    },
-    "meta": {
-      "model": "standard",
-      "method": "algorithm",
-      "paper_ref": "Journal of Behavioral Economics"
-    },
-    "notes": "豬哥在台北做了一名計程車司機，性格有點保守，時常為將來的經濟狀況感到憂慮。他很怕吃虧，所以對金錢的支出非常小心，不敢隨意嘗試新的理財產品。",
-    "interview_history": [
-      {
-        "question": "你有買過保險嗎",
-        "answer": "有啦，我有買一些基本的保險，這樣比較安心嘛。畢竟意外什麼的，誰知道呢。",
-        "timestamp": "2026-01-02T08:34:07.475Z"
-      }
-    ]
-  },
-  {
-    "id": "阿南",
-    "version": "v1.0",
-    "source_summary": {
-      "dialogue": 0.6,
-      "questionnaire": 0.3,
-      "behavior": 0.1
-    },
-    "big5": {
-      "openness": 45,
-      "conscientiousness": 30,
-      "extraversion": 50,
-      "agreeableness": 60,
-      "neuroticism": 70
-    },
-    "schwartz_values": null,
-    "risk_profile": {
-      "overall": 40,
-      "financial": 30,
-      "ethical": 50,
-      "confidence": 0.8
-    },
-    "financial_disposition": {
-      "long_term_orientation": 40,
-      "loss_aversion": 60,
-      "decision_style": "Intuitive"
-    },
-    "meta": {
-      "model": "default",
-      "method": "random",
-      "paper_ref": "Doe et al. 2020"
-    },
-    "notes": "阿南是27歲的工廠工人，在台中工作。他經常憂心未來，不願意嘗試新的投資方式。",
-    "interview_history": []
-  },
-  {
-    "id": "小芳",
-    "version": "v1.0",
-    "source_summary": {
-      "dialogue": 0.5,
-      "questionnaire": 0.4,
-      "behavior": 0.1
-    },
-    "big5": {
-      "openness": 35,
-      "conscientiousness": 75,
-      "extraversion": 60,
-      "agreeableness": 50,
-      "neuroticism": 45
-    },
-    "schwartz_values": null,
-    "risk_profile": {
-      "overall": 50,
-      "financial": 45,
-      "ethical": 55,
-      "confidence": 0.7
-    },
-    "financial_disposition": {
-      "long_term_orientation": 60,
-      "loss_aversion": 55,
-      "decision_style": "Analytical"
-    },
-    "meta": {
-      "model": "default",
-      "method": "random",
-      "paper_ref": "Doe et al. 2020"
-    },
-    "notes": "小芳是45歲的街頭小販，在台北賣水果。她善於規劃和管理，但對高風險的事情總是抱有疑慮。",
-    "interview_history": []
-  },
-  {
-    "id": "大偉",
+    "id": "許先生",
     "version": "v1.0",
     "source_summary": {
       "dialogue": 0.3,
-      "questionnaire": 0.6,
-      "behavior": 0.1
+      "questionnaire": 0.4,
+      "behavior": 0.3
     },
     "big5": {
-      "openness": 65,
+      "openness": 45,
       "conscientiousness": 55,
-      "extraversion": 70,
-      "agreeableness": 40,
-      "neuroticism": 50
-    },
-    "schwartz_values": null,
-    "risk_profile": {
-      "overall": 60,
-      "financial": 50,
-      "ethical": 60,
-      "confidence": 0.9
-    },
-    "financial_disposition": {
-      "long_term_orientation": 50,
-      "loss_aversion": 40,
-      "decision_style": "Intuitive"
-    },
-    "meta": {
-      "model": "default",
-      "method": "random",
-      "paper_ref": "Doe et al. 2020"
-    },
-    "notes": "大偉是35歲的計程車司機，在高雄工作。他傾向於依據直覺做決定，喜歡隨性而為。",
-    "interview_history": []
-  },
-  {
-    "id": "阿姨",
-    "version": "v1.0",
-    "source_summary": {
-      "dialogue": 0.4,
-      "questionnaire": 0.5,
-      "behavior": 0.1
-    },
-    "big5": {
-      "openness": 50,
-      "conscientiousness": 40,
-      "extraversion": 30,
-      "agreeableness": 70,
+      "extraversion": 50,
+      "agreeableness": 60,
       "neuroticism": 60
     },
     "schwartz_values": null,
     "risk_profile": {
       "overall": 45,
       "financial": 35,
-      "ethical": 65,
-      "confidence": 0.75
+      "ethical": 50,
+      "confidence": 0.8
     },
     "financial_disposition": {
-      "long_term_orientation": 55,
-      "loss_aversion": 70,
-      "decision_style": "Analytical"
-    },
-    "meta": {
-      "model": "default",
-      "method": "random",
-      "paper_ref": "Doe et al. 2020"
-    },
-    "notes": "阿姨是62歲的退休人員，住在新竹。她經常依賴親友的建議，希望避免所有風險。",
-    "interview_history": []
-  },
-  {
-    "id": "志明",
-    "version": "v1.0",
-    "source_summary": {
-      "dialogue": 0.6,
-      "questionnaire": 0.3,
-      "behavior": 0.1
-    },
-    "big5": {
-      "openness": 75,
-      "conscientiousness": 35,
-      "extraversion": 65,
-      "agreeableness": 55,
-      "neuroticism": 40
-    },
-    "schwartz_values": null,
-    "risk_profile": {
-      "overall": 70,
-      "financial": 65,
-      "ethical": 45,
-      "confidence": 0.85
-    },
-    "financial_disposition": {
-      "long_term_orientation": 30,
-      "loss_aversion": 30,
+      "long_term_orientation": 40,
+      "loss_aversion": 65,
       "decision_style": "Intuitive"
     },
     "meta": {
-      "model": "default",
-      "method": "random",
-      "paper_ref": "Doe et al. 2020"
+      "model": "chatgpt-4-turbo",
+      "method": "model_generation",
+      "paper_ref": "N/A"
     },
-    "notes": "志明是23歲的兼職學生，在新竹打工。他很衝動，經常不假思索就做出購買決定。",
-    "interview_history": []
+    "notes": "年齡：21歲\n身份：大學生\n目前所在地：在台中讀書\n學歷：大學就讀中\n收入/資金來源：兼職咖啡廳\n感情狀況：單身\n家庭：無\n住處：與同學合租公寓",
+    "interview_history": [
+      {
+        "question": "你有保過保險嗎",
+        "answer": "我目前還沒有保險喔，主要是因為還在讀書，沒有特別的需求。",
+        "timestamp": "2026-01-06T02:06:07.590Z"
+      },
+      {
+        "question": "你有保過保險嗎",
+        "answer": "呃，我目前沒有保險啦，就覺得還年輕，有點麻煩，等畢業工作穩定一點再考慮吧。",
+        "timestamp": "2026-01-06T02:06:13.299Z"
+      }
+    ],
+    "interviewer_notes": null
   },
   {
-    "id": "Minh",
+    "id": "劉小姐",
     "version": "v1.0",
     "source_summary": {
-      "dialogue": 0.2,
-      "questionnaire": 0.5,
+      "dialogue": 0.3,
+      "questionnaire": 0.4,
       "behavior": 0.3
     },
     "big5": {
-      "openness": 40,
-      "conscientiousness": 65,
-      "extraversion": 55,
-      "agreeableness": 70,
+      "openness": 85,
+      "conscientiousness": 75,
+      "extraversion": 80,
+      "agreeableness": 90,
       "neuroticism": 50
+    },
+    "schwartz_values": null,
+    "risk_profile": {
+      "overall": 75,
+      "financial": 70,
+      "ethical": 80,
+      "confidence": 0.8
+    },
+    "financial_disposition": {
+      "long_term_orientation": 70,
+      "loss_aversion": 40,
+      "decision_style": "Analytical"
+    },
+    "meta": {
+      "model": "chatgpt-4-turbo",
+      "method": "model_generation",
+      "paper_ref": "N/A"
+    },
+    "notes": "年齡：22歲\n身份：大學生\n目前所在地：在新竹讀書\n學歷：大學就讀中\n收入/資金來源：家教賺取\n感情狀況：有女友穩定交往\n家庭：無\n住處：與家人在當地同住",
+    "interview_history": [
+      {
+        "question": "你有保過保險嗎",
+        "answer": "嗯，有啦，就基本的意外險這樣。有時候保險還是蠻重要的，特別是學生嘛，家裡也會比較安心。",
+        "timestamp": "2026-01-06T02:06:09.107Z"
+      },
+      {
+        "question": "你有保過保險嗎",
+        "answer": "有啊，我有買一些基本的醫療和意外險，算是為了自己多點保障。",
+        "timestamp": "2026-01-06T02:06:13.899Z"
+      }
+    ],
+    "interviewer_notes": null
+  },
+  {
+    "id": "Nguyễn先生",
+    "version": "v1.0",
+    "source_summary": {
+      "dialogue": 0.2,
+      "questionnaire": 0.6,
+      "behavior": 0.2
+    },
+    "big5": {
+      "openness": 35,
+      "conscientiousness": 50,
+      "extraversion": 60,
+      "agreeableness": 70,
+      "neuroticism": 40
     },
     "schwartz_values": null,
     "risk_profile": {
       "overall": 30,
       "financial": 20,
       "ethical": 50,
-      "confidence": 0.6
+      "confidence": 0.8
     },
     "financial_disposition": {
-      "long_term_orientation": 50,
-      "loss_aversion": 80,
+      "long_term_orientation": 30,
+      "loss_aversion": 70,
       "decision_style": "Intuitive"
     },
     "meta": {
-      "model": "GPT-3.5",
-      "method": "Persona Simulation",
-      "paper_ref": "Doe, J. et al. (2020). Persona Generation for Market Research. Journal of Marketing Research."
+      "model": "PPV",
+      "method": "Survey",
+      "paper_ref": "XYZ2021"
     },
-    "notes": "Minh là 35 tuổi lái xe taxi, sống ở Hà Nội. Anh thường dựa vào linh cảm và không thích mạo hiểm với các quyết định tài chính.",
-    "interview_history": []
+    "notes": "年齡：45歲\n身份：小商販\n目前所在地：在胡志明市經營小攤販\n學歷：高中未畢業\n收入/資金來源：月收入約300萬越南盾，來自小店盈利和零工\n感情狀況：離婚\n家庭：與一名16歲的兒子同住\n住處：租住公寓單位",
+    "interview_history": [],
+    "interviewer_notes": null
   },
   {
-    "id": "Hoa",
+    "id": "Trần小姐",
     "version": "v1.0",
     "source_summary": {
       "dialogue": 0.3,
-      "questionnaire": 0.4,
-      "behavior": 0.3
+      "questionnaire": 0.5,
+      "behavior": 0.2
     },
     "big5": {
-      "openness": 55,
-      "conscientiousness": 80,
-      "extraversion": 60,
-      "agreeableness": 75,
-      "neuroticism": 45
+      "openness": 60,
+      "conscientiousness": 70,
+      "extraversion": 40,
+      "agreeableness": 80,
+      "neuroticism": 55
     },
     "schwartz_values": null,
     "risk_profile": {
-      "overall": 60,
-      "financial": 65,
-      "ethical": 70,
-      "confidence": 0.7
+      "overall": 50,
+      "financial": 40,
+      "ethical": 60,
+      "confidence": 0.8
     },
     "financial_disposition": {
-      "long_term_orientation": 65,
+      "long_term_orientation": 50,
       "loss_aversion": 60,
       "decision_style": "Analytical"
     },
     "meta": {
-      "model": "GPT-3.5",
-      "method": "Persona Simulation",
-      "paper_ref": "Doe, J. et al. (2020). Persona Generation for Market Research. Journal of Marketing Research."
+      "model": "PPV",
+      "method": "Interview",
+      "paper_ref": "XYZ2022"
     },
-    "notes": "Hoa là 28 tuổi nhân viên văn phòng tại TP.HCM. Cô tin tưởng vào những lời khuyên từ bạn bè trước khi đưa ra quyết định tài chính.",
-    "interview_history": []
+    "notes": "年齡：32歲\n身份：中學教師\n目前所在地：在河內教書\n學歷：大學畢業\n收入/資金來源：月收入約1千萬越南盾，主要來自教職薪水\n感情狀況：已婚，配偶35歲\n家庭：有一個3歲的女兒\n住處：自有房屋",
+    "interview_history": [],
+    "interviewer_notes": null
   },
   {
-    "id": "Tan",
+    "id": "Phạm先生",
     "version": "v1.0",
     "source_summary": {
-      "dialogue": 0.4,
-      "questionnaire": 0.3,
-      "behavior": 0.3
+      "dialogue": 0.1,
+      "questionnaire": 0.7,
+      "behavior": 0.2
     },
     "big5": {
       "openness": 30,
       "conscientiousness": 40,
       "extraversion": 50,
       "agreeableness": 60,
-      "neuroticism": 70
+      "neuroticism": 65
     },
     "schwartz_values": null,
     "risk_profile": {
-      "overall": 50,
-      "financial": 45,
-      "ethical": 60,
-      "confidence": 0.5
-    },
-    "financial_disposition": {
-      "long_term_orientation": 30,
-      "loss_aversion": 55,
-      "decision_style": "Analytical"
-    },
-    "meta": {
-      "model": "GPT-3.5",
-      "method": "Persona Simulation",
-      "paper_ref": "Doe, J. et al. (2020). Persona Generation for Market Research. Journal of Marketing Research."
-    },
-    "notes": "Tân là 40 tuổi thợ may ở Đà Nẵng. Anh chậm chạp trong việc chấp nhận thay đổi và hay lo lắng về mất mát tài chính.",
-    "interview_history": []
-  },
-  {
-    "id": "Thu",
-    "version": "v1.0",
-    "source_summary": {
-      "dialogue": 0.3,
-      "questionnaire": 0.4,
-      "behavior": 0.3
-    },
-    "big5": {
-      "openness": 70,
-      "conscientiousness": 85,
-      "extraversion": 65,
-      "agreeableness": 80,
-      "neuroticism": 40
-    },
-    "schwartz_values": null,
-    "risk_profile": {
-      "overall": 55,
-      "financial": 50,
-      "ethical": 60,
-      "confidence": 0.9
+      "overall": 40,
+      "financial": 30,
+      "ethical": 70,
+      "confidence": 0.85
     },
     "financial_disposition": {
       "long_term_orientation": 40,
-      "loss_aversion": 45,
+      "loss_aversion": 75,
       "decision_style": "Intuitive"
     },
     "meta": {
-      "model": "GPT-3.5",
-      "method": "Persona Simulation",
-      "paper_ref": "Doe, J. et al. (2020). Persona Generation for Market Research. Journal of Marketing Research."
+      "model": "PPV",
+      "method": "Survey",
+      "paper_ref": "XYZ2021"
     },
-    "notes": "Thu là 30 tuổi giáo viên tại Vinh. Cô thường nghe theo bản năng khi ra quyết định, nhưng không quá lo lắng về rủi ro.",
-    "interview_history": []
+    "notes": "年齡：55歲\n身份：退休工人在峴港\n目前所在地：居住在峴港\n學歷：職業學校畢業\n收入/資金來源：依靠退休金\n感情狀況：已婚，配偶52歲\n家庭：子女已搬出，獨立成家\n住處：自有房屋",
+    "interview_history": [
+      {
+        "question": "你有保過保險嗎",
+        "answer": "有啦，我有一些基本的保險，像是健康保險這類的，不過也沒有太多。",
+        "timestamp": "2026-01-06T02:13:03.024Z"
+      }
+    ],
+    "interviewer_notes": null
   },
   {
-    "id": "Long",
+    "id": "Lê小姐",
     "version": "v1.0",
     "source_summary": {
-      "dialogue": 0.5,
-      "questionnaire": 0.2,
-      "behavior": 0.3
+      "dialogue": 0.25,
+      "questionnaire": 0.5,
+      "behavior": 0.25
     },
     "big5": {
-      "openness": 65,
-      "conscientiousness": 50,
-      "extraversion": 70,
-      "agreeableness": 50,
-      "neuroticism": 60
+      "openness": 45,
+      "conscientiousness": 80,
+      "extraversion": 30,
+      "agreeableness": 60,
+      "neuroticism": 30
     },
     "schwartz_values": null,
     "risk_profile": {
       "overall": 45,
-      "financial": 40,
-      "ethical": 55,
-      "confidence": 0.8
+      "financial": 35,
+      "ethical": 50,
+      "confidence": 0.75
     },
     "financial_disposition": {
-      "long_term_orientation": 55,
-      "loss_aversion": 50,
+      "long_term_orientation": 65,
+      "loss_aversion": 55,
+      "decision_style": "Analytical"
+    },
+    "meta": {
+      "model": "PPV",
+      "method": "Interview",
+      "paper_ref": "XYZ2023"
+    },
+    "notes": "年齡：27歲\n身份：初創企業工作者\n目前所在地：在河內工作\n學歷：大學畢業\n收入/資金來源：月收入約1千5百萬越南盾，主要來自工作薪水\n感情狀況：單身\n家庭：無\n住處：合租公寓",
+    "interview_history": [],
+    "interviewer_notes": null
+  },
+  {
+    "id": "Hoàng先生",
+    "version": "v1.0",
+    "source_summary": {
+      "dialogue": 0.4,
+      "questionnaire": 0.4,
+      "behavior": 0.2
+    },
+    "big5": {
+      "openness": 55,
+      "conscientiousness": 30,
+      "extraversion": 70,
+      "agreeableness": 75,
+      "neuroticism": 50
+    },
+    "schwartz_values": null,
+    "risk_profile": {
+      "overall": 60,
+      "financial": 50,
+      "ethical": 55,
+      "confidence": 0.7
+    },
+    "financial_disposition": {
+      "long_term_orientation": 50,
+      "loss_aversion": 45,
       "decision_style": "Intuitive"
     },
     "meta": {
-      "model": "GPT-3.5",
-      "method": "Persona Simulation",
-      "paper_ref": "Doe, J. et al. (2020). Persona Generation for Market Research. Journal of Marketing Research."
+      "model": "PPV",
+      "method": "Survey",
+      "paper_ref": "XYZ2021"
     },
-    "notes": "Long là 22 tuổi sinh viên làm bán thời gian ở Cần Thơ. Anh quyết định một cách tự phát và không quan tâm nhiều đến rủi ro.",
-    "interview_history": []
+    "notes": "年齡：30歲\n身份�"年齡：30歲\n身份：摩托車接送服務司機\n目前所在地：在胡志明市工作\n學歷：高中畢業\n收入/資金來源：月收入約500萬越南盾\n感情狀況：未婚\n家庭：與兄弟同住\n住處：家中",
+    "interview_history": [],
+    "interviewer_notes": null
   }
 ]

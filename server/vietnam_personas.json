@@ -1,0 +1,279 @@
+[
+  {
+    "id": "Nguyễn先生",
+    "lastName": "Nguyễn",
+    "gender": "Male",
+    "age": 28,
+    "occupation": "Software Engineer",
+    "timesOfOverseasTravelInsurance": 3,
+    "purchasedBrand": [
+      "Bao Viet",
+      "Liberty",
+      "Prudential"
+    ],
+    "purchasedChannels": [
+      "Official website",
+      "Mobile app"
+    ],
+    "personalBackground": "居住地：胡志明市第一郡\n職業背景：在本地科技公司擔任軟體工程師，工作六年\n旅遊習慣：每年出國旅遊3-4次，經常去日本和韓國\n其他：注重安全與保障，因此對旅遊保險購買較有經驗",
+    "interviewHistory": [
+      {
+        "sectionId": "flexible",
+        "questionId": "q_1767678360462",
+        "question": "\"請概述自己的旅遊習慣與型態\n▪️旅遊地點、頻率、大概的天數和預算範圍\n▪️型態（自助/半自助/跟團）\n▪️旅伴 （獨旅/朋友/家庭）\n▪️是否有因旅遊借款的經驗\"\n\"第一次買旅遊險的時候，你怎麼決定要買哪一個旅遊險方案的？請概述當時情境\n▪️參考資訊來源\n▪️購買管道選擇 ＆ 原因\n▪️目前共有多少次自行購買旅遊險的經驗（旅行社代買的情況不算）\"",
+        "answer": "好的，我的旅遊習慣主要是每年出國旅遊3到4次，通常喜歡去日本和韓國。每次旅行大約是5到7天，因為工作關係，時間不太長。預算的話，大概每次旅行會花費在2000到3000萬越南盾左右。旅行型態都是自助旅行，因為我喜歡自己安排行程，可以更自由地選擇想去的地方。通常會跟朋友一起去旅遊，偶爾也會跟家人一起，但不太常獨旅。旅遊的時候沒有借款過啦，因為我平常會存一些旅遊基金。\n\n第一次買旅遊險的時候，我是去日本，考慮到安全和醫療保障，所以才決定要買。當時我上網查了很多資料，比如看一些旅遊論壇和保險公司的網站，比較一下不同方案的保障內容和價格。最後決定透過保險公司的官方網站購買，因為覺得比較方便，也比較信任官方的渠道。到目前為止，我已經自己購買過3次旅遊險，都是通過網絡的方式啦。",
+        "timestamp": "2026-01-06T05:46:00.462Z"
+      }
+    ],
+    "currentSectionIndex": 0,
+    "currentQuestionIndex": 0,
+    "isCompleted": false,
+    "createdAt": "2026-01-06T05:45:07.311Z",
+    "updatedAt": "2026-01-06T05:46:00.462Z"
+  },
+  {
+    "id": "Trần小姐",
+    "lastName": "Trần",
+    "gender": "Female",
+    "age": 34,
+    "occupation": "Marketing Manager",
+    "timesOfOverseasTravelInsurance": 3,
+    "purchasedBrand": [
+      "Prudential",
+      "AIA"
+    ],
+    "purchasedChannels": [
+      "Bank/Credit card",
+      "Mobile app"
+    ],
+    "personalBackground": "居住地：河內市內區\n職業背景：在國際公司擔任行銷經理\n旅遊習慣：每年出國旅遊3-4次，主要去亞洲和歐洲國家\n其他：經常參加工作會議，通常會考量購買性價比高的保險",
+    "interviewHistory": [],
+    "currentSectionIndex": 0,
+    "currentQuestionIndex": 0,
+    "isCompleted": false,
+    "createdAt": "2026-01-06T11:19:59.378842",
+    "updatedAt": "2026-01-06T11:19:59.378856"
+  },
+  {
+    "id": "Lê小姐",
+    "lastName": "Lê",
+    "gender": "Female",
+    "age": 35,
+    "occupation": "外語教師",
+    "timesOfOverseasTravelInsurance": 2,
+    "purchasedBrand": [
+      "Bao Viet",
+      "PTI"
+    ],
+    "purchasedChannels": [
+      "官網",
+      "旅行社"
+    ],
+    "personalBackground": "居住地：河內市\n職業背景：在當地高校教授英語，有十年教學經驗\n旅遊習慣：每年都會去歐洲旅遊，擅長計劃旅行\n其他：注重旅行中的安全問題，因此有購買旅行保險的習慣",
+    "interviewHistory": [],
+    "currentSectionIndex": 0,
+    "currentQuestionIndex": 0,
+    "isCompleted": false,
+    "createdAt": "2026-01-06T13:36:11.329718",
+    "updatedAt": "2026-01-06T13:36:11.329725"
+  },
+  {
+    "id": "Phạm先生",
+    "lastName": "Phạm",
+    "gender": "Male",
+    "age": 44,
+    "occupation": "建築工程師",
+    "timesOfOverseasTravelInsurance": 5,
+    "purchasedBrand": [
+      "Liberty",
+      "PVI",
+      "AIA"
+    ],
+    "purchasedChannels": [
+      "銀行/信用卡",
+      "第三方平台"
+    ],
+    "personalBackground": "居住地：峴港市\n職業背景：在一家國際建築公司工作，常出差\n旅遊習慣：每年出國3-4次，主要是工作需要以及家庭旅遊\n其他：經常購買旅行保險以保障出差安全，對不同保險產品相當熟悉",
+    "interviewHistory": [],
+    "currentSectionIndex": 0,
+    "currentQuestionIndex": 0,
+    "isCompleted": false,
+    "createdAt": "2026-01-06T13:36:11.330738",
+    "updatedAt": "2026-01-06T13:36:11.330742"
+  },
+  {
+    "id": "Huỳnh先生",
+    "lastName": "Huỳnh",
+    "gender": "Male",
+    "age": 52,
+    "occupation": "Sales Director",
+    "timesOfOverseasTravelInsurance": 2,
+    "purchasedBrand": [
+      "Bảo Minh"
+    ],
+    "purchasedChannels": [
+      "Mobile app",
+      "Travel agency"
+    ],
+    "personalBackground": "居住地：芽莊市\n職業背景：大型企業銷售總監\n旅遊習慣：常常因工作前往亞洲和歐洲國家出差，每年2-3次\n其他：主要依賴公司安排的出差計畫，但個人會關心保險保障",
+    "interviewHistory": [],
+    "currentSectionIndex": 0,
+    "currentQuestionIndex": 0,
+    "isCompleted": false,
+    "createdAt": "2026-01-06T11:19:59.379831",
+    "updatedAt": "2026-01-06T11:19:59.379834"
+  },
+  {
+    "id": "Hoàng小姐",
+    "lastName": "Hoàng",
+    "gender": "Female",
+    "age": 29,
+    "occupation": "Freelance Graphic Designer",
+    "timesOfOverseasTravelInsurance": 1,
+    "purchasedBrand": [
+      "PTI"
+    ],
+    "purchasedChannels": [
+      "Official website"
+    ],
+    "personalBackground": "居住地：河內市\n職業背景：自由職業圖形設計師，常接外包工作\n旅遊習慣：喜歡計畫短期出國自助旅行，每年出門一次\n其他：享受獨自旅行，曾因網路推薦選擇購買保險",
+    "interviewHistory": [],
+    "currentSectionIndex": 0,
+    "currentQuestionIndex": 0,
+    "isCompleted": false,
+    "createdAt": "2026-01-06T11:19:59.380125",
+    "updatedAt": "2026-01-06T11:19:59.380127"
+  },
+  {
+    "id": "Võ先生",
+    "lastName": "Võ",
+    "gender": "Male",
+    "age": 41,
+    "occupation": "Engineer",
+    "timesOfOverseasTravelInsurance": 0,
+    "purchasedBrand": [],
+    "purchasedChannels": [],
+    "personalBackground": "居住地：峴港市\n職業背景：擔任建設公司的工程師，工作忙碌\n旅遊習慣：主要在國內旅遊和休閒\n其他：對出國旅行不太感興趣，因此未有購買保險的需求",
+    "interviewHistory": [],
+    "currentSectionIndex": 0,
+    "currentQuestionIndex": 0,
+    "isCompleted": false,
+    "createdAt": "2026-01-06T11:19:59.380462",
+    "updatedAt": "2026-01-06T11:19:59.380465"
+  },
+  {
+    "id": "Đỗ小姐",
+    "lastName": "Đỗ",
+    "gender": "Female",
+    "age": 36,
+    "occupation": "Project Manager",
+    "timesOfOverseasTravelInsurance": 4,
+    "purchasedBrand": [
+      "Bao Viet",
+      "Cathay"
+    ],
+    "purchasedChannels": [
+      "Bank/Credit card",
+      "Airport counter"
+    ],
+    "personalBackground": "居住地：胡志明市\n職業背景：在國際項目公司擔任專案經理\n旅遊習慣：經常到亞太區出差，每年2-3次\n其他：重視旅行安全與便利性，習慣提前安排好保險",
+    "interviewHistory": [],
+    "currentSectionIndex": 0,
+    "currentQuestionIndex": 0,
+    "isCompleted": false,
+    "createdAt": "2026-01-06T11:19:59.380800",
+    "updatedAt": "2026-01-06T11:19:59.380802"
+  },
+  {
+    "id": "Phan先生",
+    "lastName": "Phan",
+    "gender": "Male",
+    "age": 50,
+    "occupation": "Accountant",
+    "timesOfOverseasTravelInsurance": 0,
+    "purchasedBrand": [],
+    "purchasedChannels": [],
+    "personalBackground": "居住地：芽莊市\n職業背景：會計師，主要處理公司財務報表\n旅遊習慣：臨時起意的旅遊者，旅行不規律\n其他：對旅行保險一知半解，通常不覺得有必要\n",
+    "interviewHistory": [],
+    "currentSectionIndex": 0,
+    "currentQuestionIndex": 0,
+    "isCompleted": false,
+    "createdAt": "2026-01-06T11:19:59.381200",
+    "updatedAt": "2026-01-06T11:19:59.381205"
+  },
+  {
+    "id": "Đặng小姐",
+    "lastName": "Đặng",
+    "gender": "Female",
+    "age": 27,
+    "occupation": "HR Specialist",
+    "timesOfOverseasTravelInsurance": 2,
+    "purchasedBrand": [
+      "MIC"
+    ],
+    "purchasedChannels": [
+      "Third-party platform"
+    ],
+    "personalBackground": "居住地：河內市\n職業背景：在跨國企業人資部門工作，勤奮進取\n旅遊習慣：每年和朋友一起度假，曾去過歐洲\n其他：朋友推薦購買旅遊保險，仍然在學習如何選擇",
+    "interviewHistory": [],
+    "currentSectionIndex": 0,
+    "currentQuestionIndex": 0,
+    "isCompleted": false,
+    "createdAt": "2026-01-06T11:19:59.381844",
+    "updatedAt": "2026-01-06T11:19:59.381849"
+  },
+  {
+    "id": "Phạm小姐",
+    "lastName": "Phạm",
+    "gender": "Female",
+    "age": 35,
+    "occupation": "Freelance Graphic Designer",
+    "timesOfOverseasTravelInsurance": 0,
+    "purchasedBrand": [],
+    "purchasedChannels": [],
+    "personalBackground": "居住地：河內市還劍郡\n職業背景：自由職業平面設計師，從事設計工作超過十年\n旅遊習慣：出國次數不多，多數是國內旅遊\n其他：主要和家人一起旅行，尚未考慮過旅遊保險的需求",
+    "interviewHistory": [
+      {
+        "sectionId": "flexible",
+        "questionId": "q_1767678391496",
+        "question": "\"請概述自己的旅遊習慣與型態\n▪️旅遊地點、頻率、大概的天數和預算範圍\n▪️型態（自助/半自助/跟團）\n▪️旅伴 （獨旅/朋友/家庭）\n▪️是否有因旅遊借款的經驗\"\n\"第一次買旅遊險的時候，你怎麼決定要買哪一個旅遊險方案的？請概述當時情境\n▪️參考資訊來源\n▪️購買管道選擇 ＆ 原因\n▪️目前共有多少次自行購買旅遊險的經驗（旅行社代買的情況不算）\"",
+        "answer": "嗯，我比較少出國旅遊啦，主要都是在越南國內旅遊比較多。就像去下龍灣、峴港或者大叻這些地方，頻率大概是一年兩次吧，通常是一兩個星期的行程。預算方面，因為是在國內，所以不會太高，大概每次花費在500萬到1000萬越南盾左右。\n\n我旅行的型態通常是自助啦，因為我覺得這樣比較自由，可以按照自己的興趣去安排行程。至於旅伴方面，通常都是和家人一起，有時候也會和幾個好朋友一起出去。至於借款的部分，因為旅遊花費不高，所以沒有因旅遊而借款的經驗。\n\n說到旅遊保險，其實我到目前為止都還沒有買過旅遊險的經驗。主要是因為我大部分的旅行都是在國內，我覺得風險相對小一些，沒有特別考慮過這個問題。如果以後有出國的計畫，我可能會考慮一下。不過目前我沒有參考過旅遊保險的資訊，也沒有使用過任何購買管道，所以在這方面暫時沒有什麼經驗可以分享喔。",
+        "timestamp": "2026-01-06T05:46:31.496Z"
+      }
+    ],
+    "currentSectionIndex": 0,
+    "currentQuestionIndex": 0,
+    "isCompleted": false,
+    "createdAt": "2026-01-06T05:45:07.311Z",
+    "updatedAt": "2026-01-06T05:46:31.496Z"
+  },
+  {
+    "id": "Trần先生",
+    "lastName": "Trần",
+    "gender": "Male",
+    "age": 48,
+    "occupation": "Sales Manager",
+    "timesOfOverseasTravelInsurance": 1,
+    "purchasedBrand": [
+      "PVI"
+    ],
+    "purchasedChannels": [
+      "Bank/Credit card"
+    ],
+    "personalBackground": "居住地：峴港市\n職業背景：在一家大型零售公司擔任銷售經理二十年\n旅遊習慣：每年出國1-2次，通常是出差或參加行業會議\n其他：對旅途中的意外情況較為謹慎，曾購買過一次旅遊保險",
+    "interviewHistory": [
+      {
+        "sectionId": "flexible",
+        "questionId": "q_1767678494079",
+        "question": "\"請概述自己的旅遊習慣與型態\n▪️旅遊地點、頻率、大概的天數和預算範圍\n▪️型態（自助/半自助/跟團）\n▪️旅伴 （獨旅/朋友/家庭）\n▪️是否有因旅遊借款的經驗\"\n\"第一次買旅遊險的時候，你怎麼決定要買哪一個旅遊險方案的？請概述當時情境\n▪️參考資訊來源\n▪️購買管道選擇 ＆ 原因\n▪️目前共有多少次自行購買旅遊險的經驗（旅行社代買的情況不算）\"",
+        "answer": "好的，我平時的旅遊習慣主要以出差和參加行業會議為主啦。每年大約會出國1到2次，大多是去亞洲一些鄰近的國家，例如泰國、日本或新加坡之類的地方。每次出差大概是一星期左右，預算就看公司的安排，不過我自己會控制在30,000,000到50,000,000越南盾之間。旅行的型態通常是半自助的，因為需要參加會議，所以有時也會有一些預先安排的活動。至於旅伴，通常是單獨出行或者跟同事一起，家庭旅遊比較少。\n\n第一次買旅遊險的時候嘛，印象中是因為公司要求員工在出差前購買旅遊保險。我當時沒有太多相關的知識，就詢問了一些朋友和同事，他們推薦我去銀行看看。我是通過銀行購買的，因為手續比較簡單，也感覺比較可靠安全。當時選擇了PVI這個品牌，因為它在越南市場上口碑挺不錯的。到目前為止，我自己買旅遊險的經驗只有這麼一次，其他時候都是透過旅行社代辦的。沒有因旅遊借款的經驗，基本上會按照自己的預算來規劃。",
+        "timestamp": "2026-01-06T05:48:14.079Z"
+      }
+    ],
+    "currentSectionIndex": 0,
+    "currentQuestionIndex": 0,
+    "isCompleted": false,
+    "createdAt": "2026-01-06T05:45:07.311Z",
+    "updatedAt": "2026-01-06T05:48:14.079Z"
+  }
+]
