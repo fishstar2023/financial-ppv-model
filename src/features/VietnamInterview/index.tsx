@@ -67,6 +67,7 @@ export const VietnamInterview = () => {
     }>;
   } | null>(null);
   const [isClassifying, setIsClassifying] = useState(false);
+  const [classificationError, setClassificationError] = useState<string | null>(null);
 
   // 批量訪談狀態
   const [selectedPersonaIds, setSelectedPersonaIds] = useState<string[]>([]);
@@ -135,6 +136,41 @@ export const VietnamInterview = () => {
       }
     } catch (e) {
       console.error('Failed to delete persona:', e);
+      alert('刪除失敗，請稍後再試');
+    }
+  };
+
+  // 刪除整個問題的所有回答
+  const deleteQuestion = async (question: string, responseCount: number) => {
+    if (!window.confirm(`確定要刪除此問題的 ${responseCount} 筆回答嗎？\n\n問題：「${question.slice(0, 50)}${question.length > 50 ? '...' : ''}」\n\n此操作無法復原。`)) {
+      return;
+    }
+
+    const normalizedTarget = normalizeQuestion(question);
+
+    try {
+      // 遍歷所有 persona，刪除符合的訪談記錄
+      for (const persona of personas) {
+        const originalLength = persona.interviewHistory?.length || 0;
+        const filteredHistory = persona.interviewHistory?.filter(
+          record => normalizeQuestion(record.question) !== normalizedTarget
+        ) || [];
+
+        // 如果有記錄被刪除，更新該 persona
+        if (filteredHistory.length < originalLength) {
+          const updatedPersona = {
+            ...persona,
+            interviewHistory: filteredHistory,
+            updatedAt: new Date().toISOString()
+          };
+          await savePersona(updatedPersona);
+        }
+      }
+
+      // 重新載入資料
+      loadPersonas();
+    } catch (e) {
+      console.error('Failed to delete question:', e);
       alert('刪除失敗，請稍後再試');
     }
   };
@@ -503,6 +539,7 @@ export const VietnamInterview = () => {
     setIsClassifying(true);
     setAnalysisResult('');
     setClassificationData(null);
+    setClassificationError(null);
 
     const requestBody = {
       question: selectedQuestion,
@@ -544,7 +581,13 @@ export const VietnamInterview = () => {
 
       if (classifyRes.ok) {
         const classifyData = await classifyRes.json();
-        if (classifyData.dimensions && classifyData.dimensions.length > 0) {
+        console.log('📊 Classification API response:', classifyData);
+
+        // Check for backend error in response
+        if (classifyData.error) {
+          console.warn('⚠️ Classification API returned error:', classifyData.error);
+          setClassificationError(classifyData.error);
+        } else if (classifyData.dimensions && classifyData.dimensions.length > 0) {
           setClassificationData({
             dimensions: classifyData.dimensions.map((dim: any) => ({
               dimension_name: dim.dimension_name,
@@ -553,7 +596,14 @@ export const VietnamInterview = () => {
               recommendedChart: dim.recommended_chart || 'bar'
             }))
           });
+        } else {
+          console.warn('⚠️ Classification returned no dimensions:', classifyData);
+          setClassificationError('分類 API 未返回有效維度資料');
         }
+      } else {
+        const errorText = await classifyRes.text();
+        console.error('❌ Classification API failed:', classifyRes.status, errorText);
+        setClassificationError(`圖表分類失敗 (${classifyRes.status})`);
       }
     } catch (e) {
       console.error('Analysis failed:', e);
@@ -1527,6 +1577,7 @@ export const VietnamInterview = () => {
           personas={personas}
           onContinueInterview={startInterview}
           onDeletePersona={deletePersona}
+          onDeleteQuestion={deleteQuestion}
         />
       )}
 
@@ -2239,6 +2290,30 @@ export const VietnamInterview = () => {
                 </div>
               )}
 
+              {/* 圖表分類失敗提示 */}
+              {classificationError && !classificationData && !isClassifying && (
+                <div style={{
+                  background: '#fff8f0',
+                  borderRadius: '12px',
+                  padding: '16px 20px',
+                  marginBottom: '20px',
+                  border: `1px solid ${colors.warning}40`,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px'
+                }}>
+                  <span style={{ fontSize: '18px' }}>⚠️</span>
+                  <div>
+                    <div style={{ fontSize: '13px', fontWeight: 500, color: colors.textPrimary }}>
+                      圖表生成失敗
+                    </div>
+                    <div style={{ fontSize: '12px', color: colors.textMuted, marginTop: '2px' }}>
+                      {classificationError}（文字摘要仍可正常使用）
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* 專業格式化的分析結果 */}
               <AnalysisResultDisplay content={analysisResult} />
             </div>
@@ -2568,11 +2643,13 @@ const GeneratedPersonaCard = ({ persona, onStartInterview }: { persona: VietnamP
 const HistoryTabContent = ({
   personas,
   onContinueInterview,
-  onDeletePersona
+  onDeletePersona,
+  onDeleteQuestion
 }: {
   personas: VietnamPersona[];
   onContinueInterview: (persona: VietnamPersona) => void;
   onDeletePersona: (personaId: string, personaName: string) => void;
+  onDeleteQuestion: (question: string, responseCount: number) => void;
 }) => {
   const [viewMode, setViewMode] = useState<'by-persona' | 'by-question'>('by-question');
   const [expandedQuestions, setExpandedQuestions] = useState<Set<string>>(new Set());
@@ -2633,6 +2710,11 @@ const HistoryTabContent = ({
       }
       return next;
     });
+  };
+
+  // 刪除整個問題的所有回答
+  const handleDeleteQuestion = (question: string, responseCount: number) => {
+    onDeleteQuestion(question, responseCount);
   };
 
   if (personas.length === 0) {
@@ -2768,6 +2850,37 @@ const HistoryTabContent = ({
                     }}>
                       {responses.length} 人回答
                     </span>
+                    {/* 刪除按鈕 */}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeleteQuestion(question, responses.length);
+                      }}
+                      style={{
+                        padding: '6px 10px',
+                        background: 'transparent',
+                        border: `1px solid ${colors.danger}40`,
+                        borderRadius: '8px',
+                        color: colors.danger,
+                        fontSize: '12px',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '4px',
+                        transition: 'all 0.2s'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.background = `${colors.danger}15`;
+                        e.currentTarget.style.borderColor = colors.danger;
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.background = 'transparent';
+                        e.currentTarget.style.borderColor = `${colors.danger}40`;
+                      }}
+                      title="刪除此問題的所有回答"
+                    >
+                      🗑️
+                    </button>
                     <span style={{
                       fontSize: '18px',
                       color: colors.textMuted,
@@ -2881,15 +2994,32 @@ const HistoryCard = ({ persona, onContinue, onDelete }: { persona: VietnamPerson
         borderBottom: `1px solid ${colors.borderLight}`,
         display: 'flex',
         justifyContent: 'space-between',
-        alignItems: 'center'
+        alignItems: 'flex-start',
+        gap: '16px'
       }}>
-        <div>
+        <div style={{ flex: 1 }}>
           <div style={{ fontSize: '18px', fontWeight: 600, color: colors.textPrimary }}>
             {persona.lastName} {persona.gender === 'Male' ? '先生' : '小姐'}
           </div>
           <div style={{ fontSize: '14px', color: colors.textSecondary, marginTop: '4px' }}>
             {persona.occupation} • {persona.age} tuổi • {persona.timesOfOverseasTravelInsurance} lần mua bảo hiểm
           </div>
+          {/* 完整背景描述 */}
+          {persona.personalBackground && (
+            <div style={{
+              marginTop: '10px',
+              padding: '10px 12px',
+              background: `${colors.primary}08`,
+              borderRadius: '8px',
+              borderLeft: `3px solid ${colors.primary}40`,
+              fontSize: '13px',
+              color: colors.textSecondary,
+              lineHeight: '1.6',
+              whiteSpace: 'pre-wrap'
+            }}>
+              {persona.personalBackground}
+            </div>
+          )}
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           {persona.isCompleted ? (

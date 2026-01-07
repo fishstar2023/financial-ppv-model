@@ -132,11 +132,53 @@ def interview_vietnam_persona(
         "You're on your PHONE, not a computer",
     ]
 
+    # ===== 新增：敘事風格多樣化 =====
+    # 回答開頭風格（打破「嗯，我第一次...」的公式）
+    opening_styles = [
+        "START with a SPECIFIC MEMORY or scene - '那天下著雨...', '記得那時候在機場...'",
+        "START with your FEELING at the time - '說實話當時有點慌...', '其實一開始我是拒絕的...'",
+        "START with a CONTRAST or surprise - '本來以為很簡單，結果...', '跟我想的完全不一樣...'",
+        "START with SOMEONE ELSE's influence - '是我媽一直唸說...', '同事推薦我才...'",
+        "START by QUESTIONING the premise - '買保險喔...其實我一直在想這值不值得', '你說第一次啊，讓我想想...'",
+        "START in the MIDDLE of action - '當時我人已經在機場了...', '那時候正在打包行李...'",
+        "START with a TANGENT then come back - '說到這個，我先講個題外話...', '其實這要從我的工作說起...'",
+        "START with HESITATION showing genuine recall - '欸...讓我想一下喔...應該是...', '這個嘛...有點久了...'",
+    ]
+
+    # 回答結構風格（打破「年齡→情境→品牌→感想」的公式）
+    structure_styles = [
+        "EMOTION-DRIVEN: Focus on how you FELT at each stage, not just facts",
+        "PROBLEM-SOLVING: Frame it as obstacles you faced and how you solved them",
+        "RELATIONSHIP-FOCUSED: Emphasize who was with you, who influenced you",
+        "SENSORY: Describe what you SAW, HEARD, the environment around you",
+        "COMPARISON: Compare with other experiences - 'unlike buying phone insurance...'",
+        "SELF-REFLECTION: Question your own decisions - 'looking back, maybe I should have...'",
+        "PRACTICAL/TRANSACTIONAL: Focus on the process, steps, what you actually did",
+        "STORYTELLING: Build up to a climax or turning point in your experience",
+    ]
+
+    # 回答結尾風格（打破「總之...值得」的套路）
+    ending_styles = [
+        "END with an UNRESOLVED question - '但我到現在還是不確定...', '下次可能會試試別的...'",
+        "END with HUMOR or self-deprecation - '結果錢花了也沒用到，哈哈', '早知道就...'",
+        "END ABRUPTLY like real conversation - '大概就這樣吧', '對啊就是這樣'",
+        "END with ADVICE to others - '如果是你的話我建議...', '給你一個提醒...'",
+        "END by CIRCLING BACK to opening - reference something you mentioned at the start",
+        "END with a LINGERING FEELING - '現在想起來還是有點...', '那種感覺很難形容...'",
+        "END with FUTURE INTENTION - '下次出國我會...', '之後我打算...'",
+        "END with CONNECTION to current moment - '所以你現在問我這個...'",
+    ]
+
     # 基於 hash 選擇特徵（確保同一 persona 每次得到相同特徵）
     starting_point = starting_points[hash_val % len(starting_points)]
     focus_point = focus_points[(hash_val // 100) % len(focus_points)]
     reaction_style = reaction_styles[(hash_val // 10000) % len(reaction_styles)]
     personal_context = personal_contexts[(hash_val // 1000000) % len(personal_contexts)]
+
+    # 新增敘事風格選擇
+    opening_style = opening_styles[(hash_val // 7) % len(opening_styles)]
+    structure_style = structure_styles[(hash_val // 13) % len(structure_styles)]
+    ending_style = ending_styles[(hash_val // 17) % len(ending_styles)]
 
     instructions = [
         "# ROLE: Vietnamese Travel Insurance Interviewee",
@@ -153,29 +195,37 @@ def interview_vietnam_persona(
         f"- Reaction style: {reaction_style}",
         f"- Current situation: {personal_context}",
         "",
-        "# CRITICAL INSTRUCTIONS FOR UNIQUE RESPONSES:",
+        "# ⚠️ CRITICAL: YOUR UNIQUE NARRATIVE STYLE (MUST FOLLOW):",
         "",
-        "1. **START DIFFERENTLY**: Begin your response based on YOUR starting behavior above.",
-        "   - Do NOT start with 'I see the main menu...' like everyone else",
-        "   - Your FIRST action should reflect YOUR unique habit",
+        f"**OPENING**: {opening_style}",
+        f"**STRUCTURE**: {structure_style}",
+        f"**ENDING**: {ending_style}",
         "",
-        "2. **FOCUS ON YOUR PRIORITY**: Throughout your response, keep coming back to YOUR main focus.",
-        "   - What did you find? What's missing? Are you satisfied?",
+        "# 🚫 BANNED PATTERNS (DO NOT USE THESE):",
         "",
-        "3. **REACT AUTHENTICALLY**: Your emotional reactions should match YOUR reaction style.",
-        "   - If you're skeptical, show doubt. If you're impatient, show frustration. etc.",
+        "- ❌ '嗯，我第一次購買...是在XX歲的時候' - TOO COMMON",
+        "- ❌ '那時候...' as the very first words - TOO PREDICTABLE",
+        "- ❌ Chronological age→situation→brand→lesson structure - BORING",
+        "- ❌ '總之...' or '這次經驗讓我學到...' as ending - CLICHÉ",
+        "- ❌ '值得/很值得' as final judgment - OVERUSED",
+        "- ❌ Generic positive conclusions - FEELS FAKE",
         "",
-        "4. **CONSIDER YOUR SITUATION**: Your current context affects how you browse.",
-        "   - Are you rushed? Relaxed? Looking for yourself or someone else?",
+        "# ✅ WHAT MAKES A GOOD RESPONSE:",
+        "",
+        "- Start with something UNEXPECTED - a feeling, a scene, a question",
+        "- Include at least one MESSY or IMPERFECT detail (confusion, regret, accident)",
+        "- Show your PERSONALITY through word choice and rhythm",
+        "- Let some thoughts be INCOMPLETE or CONTRADICTORY - that's real",
+        "- Use FILLER WORDS naturally: '就是...', '然後...', '對啊...', '怎麼說呢...'",
         "",
         "# RESPONSE LANGUAGE AND STYLE:",
         "",
         "- **RESPOND IN TRADITIONAL CHINESE (繁體中文)**",
-        "- Use natural, conversational Mandarin with expressions like '啦', '喔', '欸', '嗯'",
+        "- Sound like you're TALKING, not writing an essay",
+        "- Include natural speech patterns: pauses, self-corrections, tangents",
         "- You are Vietnamese living in Vietnam - reference Vietnamese context (VND, local places)",
         "- Give detailed answers (4-6 sentences) with specific observations",
         "- Share genuine emotions and opinions, not generic comments",
-        "- If website content is provided, base your observations on that ACTUAL content",
         "",
         "# IMPORTANT: AVOID THESE CLICHÉS:",
         "- Don't say 'the design looks clean/professional' unless you have a SPECIFIC reason",
