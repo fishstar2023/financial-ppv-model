@@ -70,10 +70,10 @@ CLASSIFICATION CATEGORIES (use exactly these):
 - "否" (No): The respondent clearly indicates NO or negative
 - "不確定" (Unclear): The answer is ambiguous or doesn't directly address the question
 
-COLOR CODES (coordinated green-blue palette):
-- "是": "#6B8065" (deep moss)
-- "否": "#A5B5BF" (steel blue)
-- "不確定": "#B5C4B1" (pale sage)
+COLOR CODES (high-contrast palette):
+- "是": "#6B8065" (deep moss green)
+- "否": "#8b5a5a" (wine red)
+- "不確定": "#c4a877" (golden sand)
 """
     elif classification_type == "sentiment":
         category_instruction = """
@@ -82,10 +82,10 @@ CLASSIFICATION CATEGORIES (use exactly these):
 - "中立" (Neutral): The respondent is balanced or has mixed feelings
 - "負面" (Negative): The respondent expresses dissatisfaction, concerns, or disapproval
 
-COLOR CODES (coordinated green-blue palette):
-- "正面": "#6B8065" (deep moss)
-- "中立": "#8B9EB7" (dusty blue)
-- "負面": "#A5B5BF" (steel blue)
+COLOR CODES (high-contrast palette):
+- "正面": "#6B8065" (deep moss green)
+- "中立": "#c4a877" (golden sand)
+- "負面": "#8b5a5a" (wine red)
 """
     else:  # auto or custom
         category_instruction = """
@@ -101,15 +101,15 @@ Based on the question type, recommend one of:
 - "bar": Best for comparison across 4+ categories, frequency questions, or rating scales (e.g., "旅遊頻率", "滿意程度")
 - "horizontal_bar": Best for preference rankings, brand comparisons, or when category names are long (e.g., "最重要的功能", "偏好哪些品牌")
 
-SUGGESTED COLOR PALETTE (use these coordinated green-blue Morandi colors in order):
-- "#7D9D9C" (sage green - primary)
-- "#9DB4AB" (mint green)
-- "#8B9EB7" (dusty blue)
-- "#A5B5BF" (steel blue)
-- "#B5C4B1" (pale sage)
-- "#6B8065" (deep moss)
-- "#8599A8" (slate)
-- "#AFC4C0" (seafoam)
+SUGGESTED COLOR PALETTE (use these HIGH-CONTRAST Morandi colors in order):
+- "#6B8065" (deep moss green)
+- "#8b5a5a" (wine red)
+- "#7a95ab" (steel blue)
+- "#c4a877" (golden sand)
+- "#9a7b8c" (dusty mauve)
+- "#5a7a7a" (teal)
+- "#a5896a" (warm taupe)
+- "#7d8a6b" (olive)
 
 EXAMPLES:
 - For "有無購買經驗" type questions: "有", "無", "考慮中" → recommend "pie"
@@ -251,6 +251,219 @@ Please classify each response and return the JSON result.
             "recommended_chart": "pie",
             "categories": [],
             "details": [],
+            "error": str(e)
+        }
+
+
+def classify_responses_multi_dimension(
+    question: str,
+    responses: List[Dict[str, Any]]
+) -> Dict[str, Any]:
+    """
+    多維度分類 - 自動識別問題中的多個面向，分別產生圖表
+
+    例如問題「請概述自己的旅遊習慣與型態」包含：
+    - 旅遊頻率
+    - 旅遊型態（自助/跟團）
+    - 旅伴類型
+    - 預算範圍
+
+    Returns:
+        {
+            "question": str,
+            "dimensions": [
+                {
+                    "dimension_name": "旅遊頻率",
+                    "recommended_chart": "bar",
+                    "categories": [...],
+                    "details": [...]
+                },
+                ...
+            ]
+        }
+    """
+    if not responses:
+        return {
+            "question": question,
+            "dimensions": []
+        }
+
+    # 建立回答摘要
+    response_list = []
+    for i, resp in enumerate(responses, 1):
+        persona = resp.get('persona', {})
+        name = f"{persona.get('lastName', 'Unknown')} {'先生' if persona.get('gender') == 'Male' else '小姐'}"
+        answer = resp.get('answer', '')
+        persona_id = persona.get('id', f'unknown_{i}')
+        response_list.append({
+            "index": i,
+            "personaId": persona_id,
+            "personaName": name,
+            "answer": answer[:800]  # 多維度需要更多內容
+        })
+
+    instructions = [
+        "You are an expert market research analyst specializing in multi-dimensional response classification.",
+        "",
+        "Your task is to:",
+        "1. Analyze the interview question to identify DISTINCT DIMENSIONS being asked",
+        "2. For each dimension, classify all responses into meaningful categories",
+        "",
+        "OUTPUT FORMAT: Return ONLY valid JSON, no markdown, no explanation.",
+        "",
+        "DIMENSION IDENTIFICATION RULES:",
+        "- Look for sub-questions separated by ■ or bullet points",
+        "- Common dimensions: 頻率, 型態, 金額/預算, 偏好, 原因, 是否有經驗",
+        "- Each dimension should have its own set of categories",
+        "- Maximum 5 dimensions per question",
+        "",
+        "COLOR PALETTE (use these HIGH-CONTRAST colors, cycle through for each dimension):",
+        '- "#6B8065" (deep moss green)',
+        '- "#8b5a5a" (wine red)',
+        '- "#7a95ab" (steel blue)',
+        '- "#c4a877" (golden sand)',
+        '- "#9a7b8c" (dusty mauve)',
+        '- "#5a7a7a" (teal)',
+        '- "#a5896a" (warm taupe)',
+        '- "#7d8a6b" (olive)',
+        "",
+        "CHART TYPE PER DIMENSION:",
+        '- "pie": For yes/no, binary choices, 2-3 categories',
+        '- "bar": For frequency, scales, 4+ categories',
+        '- "horizontal_bar": For preferences, rankings, long category names',
+        "",
+        "JSON OUTPUT STRUCTURE:",
+        '{',
+        '  "dimensions": [',
+        '    {',
+        '      "dimension_name": "維度名稱（如：旅遊頻率）",',
+        '      "recommended_chart": "pie|bar|horizontal_bar",',
+        '      "categories": [{"name": "類別", "color": "#hex"}],',
+        '      "classifications": [{"index": 1, "category": "類別", "reason": "理由"}]',
+        '    }',
+        '  ]',
+        '}',
+        "",
+        "RULES:",
+        "- Return ONLY the JSON object",
+        "- Every response MUST be classified for EACH dimension",
+        "- If a response doesn't mention a dimension, classify as '未提及'",
+        "- Category names in Traditional Chinese",
+        "- Reasons should be brief (under 15 characters)",
+    ]
+
+    classification_prompt = f"""
+Interview Question (may contain multiple sub-questions marked with ■):
+{question}
+
+Responses to analyze:
+{json.dumps(response_list, ensure_ascii=False, indent=2)}
+
+Please identify all dimensions in the question and classify each response for each dimension.
+"""
+
+    print(f"📊 [Multi-Classifier] Analyzing {len(responses)} responses for multiple dimensions...")
+
+    agent = Agent(
+        model=OpenAIChat(id="gpt-4o", temperature=0.3),
+        description="Multi-dimensional response classifier",
+        instructions=instructions,
+        markdown=False
+    )
+
+    try:
+        response = agent.run(classification_prompt, stream=False)
+        result_text = response.content.strip()
+
+        # 清理 markdown
+        if result_text.startswith('```'):
+            result_text = result_text.split('\n', 1)[1]
+        if result_text.endswith('```'):
+            result_text = result_text.rsplit('\n', 1)[0]
+        if result_text.startswith('json'):
+            result_text = result_text[4:].strip()
+
+        parsed = json.loads(result_text)
+
+        # 處理每個維度
+        processed_dimensions = []
+        total = len(responses)
+
+        for dim in parsed.get('dimensions', []):
+            dim_name = dim.get('dimension_name', '未命名維度')
+
+            # 統計類別
+            category_counts = {}
+            for cat in dim.get('categories', []):
+                category_counts[cat['name']] = {'count': 0, 'color': cat.get('color', '#9E9E9E')}
+
+            details = []
+            for cls in dim.get('classifications', []):
+                idx = cls.get('index', 0)
+                category = cls.get('category', '未提及')
+                reason = cls.get('reason', '')
+
+                if category in category_counts:
+                    category_counts[category]['count'] += 1
+                elif category == '未提及':
+                    if '未提及' not in category_counts:
+                        category_counts['未提及'] = {'count': 0, 'color': '#b0b0b0'}
+                    category_counts['未提及']['count'] += 1
+
+                if 0 < idx <= len(response_list):
+                    resp_info = response_list[idx - 1]
+                    details.append({
+                        "personaId": resp_info['personaId'],
+                        "personaName": resp_info['personaName'],
+                        "category": category,
+                        "reason": reason
+                    })
+
+            # 計算百分比
+            categories = []
+            for name, data in category_counts.items():
+                if data['count'] > 0:  # 只包含有資料的類別
+                    categories.append({
+                        "name": name,
+                        "count": data['count'],
+                        "percentage": round(data['count'] / total * 100, 1) if total > 0 else 0,
+                        "color": data['color']
+                    })
+
+            categories.sort(key=lambda x: x['count'], reverse=True)
+
+            recommended_chart = dim.get('recommended_chart', 'bar')
+            if recommended_chart not in ['pie', 'bar', 'horizontal_bar']:
+                recommended_chart = 'bar'
+
+            processed_dimensions.append({
+                "dimension_name": dim_name,
+                "recommended_chart": recommended_chart,
+                "categories": categories,
+                "details": details,
+                "total": total
+            })
+
+        print(f"✓ [Multi-Classifier] Found {len(processed_dimensions)} dimensions")
+
+        return {
+            "question": question,
+            "dimensions": processed_dimensions
+        }
+
+    except json.JSONDecodeError as e:
+        print(f"❌ [Multi-Classifier] JSON parse error: {e}")
+        # Fallback 到單維度分類
+        return {
+            "question": question,
+            "dimensions": [],
+            "error": f"JSON 解析失敗: {str(e)}"
+        }
+    except Exception as e:
+        print(f"❌ [Multi-Classifier] Error: {e}")
+        return {
+            "question": question,
+            "dimensions": [],
             "error": str(e)
         }
 

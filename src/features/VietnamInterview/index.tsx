@@ -57,10 +57,14 @@ export const VietnamInterview = () => {
   const [selectedTopicTag, setSelectedTopicTag] = useState<string>('');  // 主題標籤篩選
   const [analysisResult, setAnalysisResult] = useState<string>('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  // 支援多維度分類（多個圖表）
   const [classificationData, setClassificationData] = useState<{
-    categories: Array<{ name: string; count: number; percentage: number; color: string }>;
-    details: Array<{ personaId: string; personaName: string; category: string; reason: string }>;
-    recommendedChart: 'pie' | 'bar' | 'horizontal_bar';
+    dimensions: Array<{
+      dimension_name: string;
+      categories: Array<{ name: string; count: number; percentage: number; color: string }>;
+      details: Array<{ personaId: string; personaName: string; category: string; reason: string }>;
+      recommendedChart: 'pie' | 'bar' | 'horizontal_bar';
+    }>;
   } | null>(null);
   const [isClassifying, setIsClassifying] = useState(false);
 
@@ -277,29 +281,52 @@ export const VietnamInterview = () => {
     return Array.from(tagSet);
   };
 
+  // 正規化問題文字，讓語義相似的問題能被歸為同一組
+  const normalizeQuestion = (question: string): string => {
+    return question
+      .replace(/？/g, '')  // 移除全形問號
+      .replace(/\?/g, '')  // 移除半形問號
+      .replace(/的時候/g, '時')  // 統一用詞
+      .replace(/是幾歲/g, '幾歲')  // 統一用詞
+      .replace(/\s+/g, '')  // 移除空白
+      .trim();
+  };
+
   // 取得所有問題列表（從所有受訪者的訪談紀錄中）
   // 如果有選擇主題標籤，則只顯示該主題的問題
+  // 會將語義相似的問題合併為同一個選項
   const getAllQuestions = (): string[] => {
-    const questionSet = new Set<string>();
+    // 用於追蹤正規化後的問題對應到的原始問題
+    const normalizedToOriginal: Map<string, string> = new Map();
+
     personas.forEach(p => {
       p.interviewHistory.forEach(record => {
         if (record.question) {
           // 如果有選擇主題標籤，只顯示該主題的問題
           if (!selectedTopicTag || record.topicTag === selectedTopicTag) {
-            questionSet.add(record.question);
+            const normalized = normalizeQuestion(record.question);
+            // 只保留第一個出現的原始問題作為顯示用
+            if (!normalizedToOriginal.has(normalized)) {
+              normalizedToOriginal.set(normalized, record.question);
+            }
           }
         }
       });
     });
-    return Array.from(questionSet);
+
+    return Array.from(normalizedToOriginal.values());
   };
 
   // 取得特定問題的所有回答（支援主題標籤篩選）
+  // 會自動匹配語義相似的問題
   const getResponsesForQuestion = (question: string) => {
     const responses: Array<{ persona: VietnamPersona; answer: string; topicTag?: string }> = [];
+    const targetNormalized = normalizeQuestion(question);
+
     personas.forEach(persona => {
       persona.interviewHistory.forEach(record => {
-        if (record.question === question) {
+        // 比較正規化後的問題
+        if (normalizeQuestion(record.question) === targetNormalized) {
           // 如果有選擇主題標籤，只顯示該主題的回答
           if (!selectedTopicTag || record.topicTag === selectedTopicTag) {
             responses.push({
@@ -493,7 +520,7 @@ export const VietnamInterview = () => {
       }))
     };
 
-    // 同時執行分析和分類
+    // 同時執行分析和多維度分類
     try {
       const [analysisRes, classifyRes] = await Promise.all([
         fetch('http://localhost:8787/api/vietnam_analysis', {
@@ -501,10 +528,10 @@ export const VietnamInterview = () => {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(requestBody)
         }),
-        fetch('http://localhost:8787/api/vietnam_classify', {
+        fetch('http://localhost:8787/api/vietnam_classify_multi', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ ...requestBody, classification_type: 'auto' })
+          body: JSON.stringify(requestBody)
         })
       ]);
 
@@ -517,11 +544,14 @@ export const VietnamInterview = () => {
 
       if (classifyRes.ok) {
         const classifyData = await classifyRes.json();
-        if (classifyData.categories && classifyData.categories.length > 0) {
+        if (classifyData.dimensions && classifyData.dimensions.length > 0) {
           setClassificationData({
-            categories: classifyData.categories,
-            details: classifyData.details || [],
-            recommendedChart: classifyData.recommended_chart || 'pie'
+            dimensions: classifyData.dimensions.map((dim: any) => ({
+              dimension_name: dim.dimension_name,
+              categories: dim.categories || [],
+              details: dim.details || [],
+              recommendedChart: dim.recommended_chart || 'bar'
+            }))
           });
         }
       }
@@ -547,12 +577,12 @@ export const VietnamInterview = () => {
         boxShadow: `0 4px 16px ${colors.shadow}`
       }}>
         <div style={{ display: 'flex', borderBottom: `1px solid ${colors.borderLight}` }}>
-          <TabButton label="🏠 Home" isActive={activeTab === 'home'} onClick={() => setActiveTab('home')} />
-          <TabButton label="🤖 AI Generate" isActive={activeTab === 'generate'} onClick={() => setActiveTab('generate')} />
-          <TabButton label="🎤 Interview" isActive={activeTab === 'interview'} onClick={() => setActiveTab('interview')} disabled={!currentPersona} />
-          <TabButton label="📢 Batch" isActive={activeTab === 'batch'} onClick={() => setActiveTab('batch')} disabled={personas.length === 0} />
-          <TabButton label="📋 History" isActive={activeTab === 'history'} onClick={() => setActiveTab('history')} />
-          <TabButton label="📊 Analysis" isActive={activeTab === 'analysis'} onClick={() => setActiveTab('analysis')} />
+          <TabButton label="Home" isActive={activeTab === 'home'} onClick={() => setActiveTab('home')} />
+          <TabButton label="AI Generate" isActive={activeTab === 'generate'} onClick={() => setActiveTab('generate')} />
+          <TabButton label="Interview" isActive={activeTab === 'interview'} onClick={() => setActiveTab('interview')} disabled={!currentPersona} />
+          <TabButton label="Batch" isActive={activeTab === 'batch'} onClick={() => setActiveTab('batch')} disabled={personas.length === 0} />
+          <TabButton label="History" isActive={activeTab === 'history'} onClick={() => setActiveTab('history')} />
+          <TabButton label="Analysis" isActive={activeTab === 'analysis'} onClick={() => setActiveTab('analysis')} />
         </div>
       </div>
 
@@ -568,7 +598,7 @@ export const VietnamInterview = () => {
             color: 'white',
             textAlign: 'center'
           }}>
-            <div style={{ fontSize: '48px', marginBottom: '16px' }}>🇻🇳</div>
+            <div style={{ fontSize: '28px', marginBottom: '16px', fontWeight: 700, color: 'rgba(255,255,255,0.9)' }}>VN</div>
             <h1 style={{ margin: '0 0 12px 0', fontSize: '28px', fontWeight: 700 }}>
               Vietnam Market Research
             </h1>
@@ -661,7 +691,7 @@ export const VietnamInterview = () => {
                   transition: 'all 0.2s'
                 }}
               >
-                <div style={{ fontSize: '24px', marginBottom: '8px' }}>🤖</div>
+                <div style={{ fontSize: '14px', marginBottom: '8px', fontWeight: 600, color: colors.primary }}>AI</div>
                 <div style={{ fontSize: '14px', fontWeight: 600, color: colors.textPrimary }}>AI Generate</div>
                 <div style={{ fontSize: '12px', color: colors.textMuted, marginTop: '4px' }}>生成模擬受訪者</div>
               </button>
@@ -679,7 +709,7 @@ export const VietnamInterview = () => {
                   transition: 'all 0.2s'
                 }}
               >
-                <div style={{ fontSize: '24px', marginBottom: '8px' }}>📢</div>
+                <div style={{ fontSize: '14px', marginBottom: '8px', fontWeight: 600, color: colors.info }}>BTH</div>
                 <div style={{ fontSize: '14px', fontWeight: 600, color: colors.textPrimary }}>Batch Interview</div>
                 <div style={{ fontSize: '12px', color: colors.textMuted, marginTop: '4px' }}>批量訪談多位受訪者</div>
               </button>
@@ -695,7 +725,7 @@ export const VietnamInterview = () => {
                   transition: 'all 0.2s'
                 }}
               >
-                <div style={{ fontSize: '24px', marginBottom: '8px' }}>📊</div>
+                <div style={{ fontSize: '14px', marginBottom: '8px', fontWeight: 600, color: colors.warning }}>RPT</div>
                 <div style={{ fontSize: '14px', fontWeight: 600, color: colors.textPrimary }}>Analysis</div>
                 <div style={{ fontSize: '12px', color: colors.textMuted, marginTop: '4px' }}>分析回答並產生報告</div>
               </button>
@@ -715,10 +745,10 @@ export const VietnamInterview = () => {
             </h2>
             <div style={{ display: 'flex', gap: '16px' }}>
               {[
-                { step: 1, icon: '🤖', title: 'Generate', desc: 'AI 生成受訪者 Personas' },
-                { step: 2, icon: '📢', title: 'Batch Interview', desc: '批量發送問題給多位受訪者' },
-                { step: 3, icon: '📊', title: 'Analyze', desc: 'AI 分析回答並產生圖表報告' },
-                { step: 4, icon: '📄', title: 'Export', desc: '匯出 PDF 研究報告' }
+                { step: 1, icon: '1', title: 'Generate', desc: 'AI 生成受訪者 Personas' },
+                { step: 2, icon: '2', title: 'Batch Interview', desc: '批量發送問題給多位受訪者' },
+                { step: 3, icon: '3', title: 'Analyze', desc: 'AI 分析回答並產生圖表報告' },
+                { step: 4, icon: '4', title: 'Export', desc: '匯出 PDF 研究報告' }
               ].map((item, idx) => (
                 <div key={idx} style={{ flex: 1, textAlign: 'center' }}>
                   <div style={{
@@ -731,7 +761,8 @@ export const VietnamInterview = () => {
                     alignItems: 'center',
                     justifyContent: 'center',
                     margin: '0 auto 12px',
-                    fontSize: '20px'
+                    fontSize: '16px',
+                    fontWeight: 700
                   }}>
                     {item.icon}
                   </div>
@@ -773,7 +804,7 @@ export const VietnamInterview = () => {
             boxShadow: `0 4px 16px ${colors.shadow}`
           }}>
             <h2 style={{ margin: '0 0 24px 0', color: colors.textPrimary, fontSize: '20px', fontWeight: 600 }}>
-              🇻🇳 Generate Vietnamese Interviewees / AI 生成越南受訪者
+              Generate Vietnamese Interviewees / AI 生成越南受訪者
             </h2>
 
             <div style={{ marginBottom: '20px' }}>
@@ -842,7 +873,7 @@ export const VietnamInterview = () => {
                   gap: '8px'
                 }}
               >
-                {loading ? '⏳ Generating...' : '🚀 Generate'}
+                {loading ? 'Generating...' : 'Generate'}
               </button>
             </div>
           </div>
@@ -882,7 +913,7 @@ export const VietnamInterview = () => {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div>
                 <span style={{ fontSize: '18px', fontWeight: 600, color: colors.textPrimary }}>
-                  🎤 {currentPersona.lastName} {currentPersona.gender === 'Male' ? '先生' : '小姐'}
+                  {currentPersona.lastName} {currentPersona.gender === 'Male' ? '先生' : '小姐'}
                 </span>
                 <span style={{ marginLeft: '12px', fontSize: '14px', color: colors.textMuted }}>
                   {currentPersona.occupation}, {currentPersona.age} tuổi
@@ -928,7 +959,7 @@ export const VietnamInterview = () => {
               alignItems: 'center',
               gap: '8px'
             }}>
-              💬 Ask Any Question / 輸入任何問題
+              Ask Any Question / 輸入任何問題
             </h3>
 
             {/* Topic Tag Input */}
@@ -940,7 +971,7 @@ export const VietnamInterview = () => {
                 fontWeight: 500,
                 color: colors.textSecondary
               }}>
-                🏷️ 主題標籤 / Topic Tag <span style={{ fontWeight: 400, color: colors.textMuted }}>(同標籤的問題會被分組分析)</span>
+                主題標籤 / Topic Tag <span style={{ fontWeight: 400, color: colors.textMuted }}>(同標籤的問題會被分組分析)</span>
               </label>
               <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
                 <input
@@ -1030,7 +1061,7 @@ export const VietnamInterview = () => {
               <textarea
                 value={currentAnswer}
                 onChange={(e) => setCurrentAnswer(e.target.value)}
-                placeholder={isThinking ? '🤔 AI 正在思考中...' : '點擊「AI 模擬回答」讓 AI 回答，或手動輸入回覆...'}
+                placeholder={isThinking ? 'AI 正在思考中...' : '點擊「AI 模擬回答」讓 AI 回答，或手動輸入回覆...'}
                 disabled={isThinking}
                 style={{
                   width: '100%',
@@ -1069,7 +1100,7 @@ export const VietnamInterview = () => {
                   boxShadow: `0 4px 12px ${colors.shadow}`
                 }}
               >
-                {isThinking ? '🤔 Thinking...' : '🤖 AI Simulate Response'}
+                {isThinking ? 'Thinking...' : 'AI Simulate Response'}
               </button>
 
               <div style={{ display: 'flex', gap: '12px' }}>
@@ -1107,7 +1138,7 @@ export const VietnamInterview = () => {
                     boxShadow: `0 4px 12px ${colors.shadow}`
                   }}
                 >
-                  💾 Save & Continue
+                  Save & Continue
                 </button>
               </div>
             </div>
@@ -1124,7 +1155,7 @@ export const VietnamInterview = () => {
               boxShadow: `0 4px 16px ${colors.shadow}`
             }}>
               <h3 style={{ margin: '0 0 16px 0', fontSize: '16px', color: colors.textPrimary }}>
-                📝 Previous Responses ({currentPersona.interviewHistory.length})
+                Previous Responses ({currentPersona.interviewHistory.length})
               </h3>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', maxHeight: '400px', overflowY: 'auto' }}>
                 {[...currentPersona.interviewHistory].reverse().map((record, idx) => (
@@ -1164,7 +1195,7 @@ export const VietnamInterview = () => {
             boxShadow: `0 4px 16px ${colors.shadow}`
           }}>
             <h2 style={{ margin: '0 0 24px 0', color: colors.textPrimary, fontSize: '20px', fontWeight: 600 }}>
-              📢 批量訪談 / Batch Interview
+              批量訪談 / Batch Interview
             </h2>
             <p style={{ margin: '0 0 20px 0', color: colors.textSecondary, fontSize: '14px' }}>
               選擇多位受訪者，讓他們同時回答同一個問題。回答會自動儲存到每位受訪者的訪談記錄中。
@@ -1200,7 +1231,7 @@ export const VietnamInterview = () => {
                   borderRadius: '12px',
                   color: colors.textMuted
                 }}>
-                  <div style={{ fontSize: '32px', marginBottom: '12px', opacity: 0.5 }}>👥</div>
+                  <div style={{ fontSize: '16px', marginBottom: '12px', opacity: 0.5, fontWeight: 600 }}>No Personas</div>
                   <div>尚無受訪者，請先在「AI Generate」生成受訪者</div>
                 </div>
               ) : (
@@ -1291,7 +1322,7 @@ export const VietnamInterview = () => {
                               e.currentTarget.style.background = 'transparent';
                             }}
                           >
-                            🗑️
+                            ×
                           </button>
                         </div>
                       </div>
@@ -1310,7 +1341,7 @@ export const VietnamInterview = () => {
                 fontWeight: 500,
                 color: colors.textSecondary
               }}>
-                🏷️ 主題標籤 / Topic Tag
+                主題標籤 / Topic Tag
               </label>
               <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
                 <input
@@ -1408,9 +1439,9 @@ export const VietnamInterview = () => {
               }}
             >
               {isBatchProcessing ? (
-                <>🔄 處理中 {batchProgress}% - {currentProcessingPersona || '準備中...'}</>
+                <>Processing {batchProgress}% - {currentProcessingPersona || 'Preparing...'}</>
               ) : (
-                <>📢 開始批量訪談 ({selectedPersonaIds.length} 人)</>
+                <>Start Batch Interview ({selectedPersonaIds.length} personas)</>
               )}
             </button>
           </div>
@@ -1427,7 +1458,7 @@ export const VietnamInterview = () => {
             }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
                 <h3 style={{ margin: 0, fontSize: '18px', color: colors.textPrimary }}>
-                  📝 批量訪談結果 ({batchResults.filter(r => r.success).length}/{batchResults.length} 成功)
+                  Batch Results ({batchResults.filter(r => r.success).length}/{batchResults.length} success)
                 </h3>
                 <button
                   onClick={() => {
@@ -1512,7 +1543,7 @@ export const VietnamInterview = () => {
             boxShadow: `0 4px 16px ${colors.shadow}`
           }}>
             <h2 style={{ margin: '0 0 24px 0', color: colors.textPrimary, fontSize: '20px', fontWeight: 600 }}>
-              📊 Summary Report / 總結報告
+              Summary Report / 總結報告
             </h2>
 
             {getAllQuestions().length === 0 && getAllTopicTags().length === 0 ? (
@@ -1521,7 +1552,7 @@ export const VietnamInterview = () => {
                 padding: '40px 20px',
                 color: colors.textMuted
               }}>
-                <div style={{ fontSize: '48px', marginBottom: '16px', opacity: 0.3 }}>📊</div>
+                <div style={{ fontSize: '16px', marginBottom: '16px', opacity: 0.5, fontWeight: 600 }}>No Data</div>
                 <div style={{ fontSize: '15px' }}>尚無訪談紀錄可分析。請先完成一些訪談。</div>
               </div>
             ) : (
@@ -1536,7 +1567,7 @@ export const VietnamInterview = () => {
                       fontWeight: 500,
                       color: colors.textPrimary
                     }}>
-                      🏷️ 按主題篩選 / Filter by Topic Tag
+                      按主題篩選 / Filter by Topic Tag
                     </label>
                     <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                       <button
@@ -1633,7 +1664,7 @@ export const VietnamInterview = () => {
                 {selectedQuestion && (
                   <div style={{ marginBottom: '24px' }}>
                     <h3 style={{ margin: '0 0 12px 0', fontSize: '16px', color: colors.textPrimary }}>
-                      📝 回答預覽 ({getResponsesForQuestion(selectedQuestion).length} 人)
+                      Response Preview ({getResponsesForQuestion(selectedQuestion).length} respondents)
                     </h3>
                     <div style={{
                       maxHeight: '300px',
@@ -1695,12 +1726,12 @@ export const VietnamInterview = () => {
                     gap: '8px'
                   }}
                 >
-                  {isAnalyzing ? '🔄 產出中...' : '🤖 AI 產出總結'}
+                  {isAnalyzing ? 'Generating...' : 'AI Generate Summary'}
                 </button>
 
                 {selectedQuestion && getResponsesForQuestion(selectedQuestion).length < 2 && (
                   <p style={{ marginTop: '12px', fontSize: '13px', color: colors.warning }}>
-                    ⚠️ 需要至少 2 位受訪者的回答才能進行分析
+                    需要至少 2 位受訪者的回答才能進行分析
                   </p>
                 )}
               </>
@@ -1719,7 +1750,7 @@ export const VietnamInterview = () => {
             }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
                 <h3 style={{ margin: 0, fontSize: '18px', color: colors.textPrimary }}>
-                  📈 總結報告 / Summary Report
+                  Summary Report / 總結報告
                 </h3>
                 {/* Export Buttons */}
                 <div style={{ display: 'flex', gap: '8px' }}>
@@ -1741,13 +1772,64 @@ export const VietnamInterview = () => {
                       gap: '6px'
                     }}
                   >
-                    📋 複製
+                    Copy
                   </button>
                   <button
                     onClick={async () => {
                       const responses = getResponsesForQuestion(selectedQuestion);
                       const timestamp = new Date().toISOString().split('T')[0];
                       const formattedDate = new Date().toLocaleDateString('zh-TW', { year: 'numeric', month: 'long', day: 'numeric' });
+
+                      // 截取圖表區域 (如果存在) - 逐個截取每個維度的圖表
+                      let chartsImageHtml = '';
+                      const chartsContainer = document.getElementById('charts-container');
+                      if (chartsContainer && classificationData && classificationData.dimensions.length > 0) {
+                        try {
+                          const html2canvas = (await import('html2canvas')).default;
+                          const chartCards = chartsContainer.querySelectorAll(':scope > div');
+                          const chartImages: string[] = [];
+
+                          for (const card of chartCards) {
+                            try {
+                              // 隱藏 details 元素（各受訪者分類結果）以避免截圖時被截斷
+                              const detailsElements = card.querySelectorAll('details');
+                              detailsElements.forEach(el => {
+                                (el as HTMLElement).style.display = 'none';
+                              });
+
+                              const canvas = await html2canvas(card as HTMLElement, {
+                                scale: 2,
+                                useCORS: true,
+                                backgroundColor: '#ffffff',
+                                logging: false
+                              });
+                              chartImages.push(canvas.toDataURL('image/png'));
+
+                              // 恢復 details 元素顯示
+                              detailsElements.forEach(el => {
+                                (el as HTMLElement).style.display = '';
+                              });
+                            } catch (err) {
+                              console.error('Failed to capture chart card:', err);
+                            }
+                          }
+
+                          if (chartImages.length > 0) {
+                            chartsImageHtml = `
+                              <h2 style="color: #1e3a5f; font-size: 13pt; margin-top: 30px; border-left: 4px solid #1e3a5f; padding-left: 12px;">
+                                圖表分析 | Data Visualization
+                              </h2>
+                              ${chartImages.map((img, idx) => `
+                                <div style="margin: 15px 0; page-break-inside: avoid;">
+                                  <img src="${img}" style="width: 100%; max-width: 550px; border: 1px solid #e2e8f0; border-radius: 8px; display: block; margin: 10px auto;" />
+                                </div>
+                              `).join('')}
+                            `;
+                          }
+                        } catch (e) {
+                          console.error('Failed to capture charts:', e);
+                        }
+                      }
 
                       // Create HTML content for PDF
                       const pdfContent = document.createElement('div');
@@ -1793,6 +1875,8 @@ export const VietnamInterview = () => {
     ${formatAnalysisForExport(analysisResult)}
   </div>
 
+  ${chartsImageHtml}
+
   <h2 style="color: #1e3a5f; font-size: 13pt; margin-top: 30px; border-left: 4px solid #1e3a5f; padding-left: 12px;">
     三、受訪者基本資料 | Respondent Profiles
   </h2>
@@ -1834,8 +1918,42 @@ export const VietnamInterview = () => {
   </div>
   `).join('')}
 
+  ${classificationData && classificationData.dimensions && classificationData.dimensions.length > 0 ? `
+  <div style="page-break-before: always;">
+    <div style="padding-top: 30px;">
+      <h2 style="color: #1e3a5f; font-size: 13pt; border-left: 4px solid #1e3a5f; padding-left: 12px; margin-bottom: 15px; margin-top: 0;">
+        附錄一、各受訪者分類結果 | Respondent Classification Details
+      </h2>
+    </div>
+    <p style="color: #64748b; font-size: 10px; margin-bottom: 15px;">
+      以下表格詳列每位受訪者在各分析維度的分類結果，供進一步研究參考。分類依據為 AI 根據受訪者回答內容進行的語意分析。
+    </p>
+    ${classificationData.dimensions.map((dim: { dimension_name: string; details: Array<{ personaName: string; category: string; reason: string }> }) => `
+    <div style="margin-bottom: 25px; page-break-inside: avoid;">
+      <h3 style="color: #475569; font-size: 11pt; margin-bottom: 10px; padding: 8px 12px; background: #f1f5f9; border-radius: 4px;">
+        ${dim.dimension_name}
+      </h3>
+      <table style="width: 100%; border-collapse: collapse; font-size: 10px;">
+        <tr style="background: #1e3a5f; color: white;">
+          <th style="padding: 8px 10px; border: 1px solid #1e3a5f; text-align: left; width: 30%;">受訪者</th>
+          <th style="padding: 8px 10px; border: 1px solid #1e3a5f; text-align: left; width: 25%;">分類結果</th>
+          <th style="padding: 8px 10px; border: 1px solid #1e3a5f; text-align: left; width: 45%;">分類依據</th>
+        </tr>
+        ${dim.details.map((detail: { personaName: string; category: string; reason: string }, idx: number) => `
+        <tr style="background: ${idx % 2 === 0 ? '#f8fafc' : 'white'};">
+          <td style="padding: 6px 10px; border: 1px solid #e2e8f0;">${detail.personaName}</td>
+          <td style="padding: 6px 10px; border: 1px solid #e2e8f0; font-weight: 500;">${detail.category}</td>
+          <td style="padding: 6px 10px; border: 1px solid #e2e8f0; color: #64748b;">${detail.reason || '-'}</td>
+        </tr>
+        `).join('')}
+      </table>
+    </div>
+    `).join('')}
+  </div>
+  ` : ''}
+
   <div style="margin-top: 35px; padding: 16px; background: #f8fafc; border-radius: 6px; page-break-inside: avoid; break-inside: avoid;">
-    <h3 style="color: #1e3a5f; font-size: 11pt; margin: 0 0 10px 0;">附錄：研究方法說明</h3>
+    <h3 style="color: #1e3a5f; font-size: 11pt; margin: 0 0 10px 0;">附錄${classificationData && classificationData.dimensions && classificationData.dimensions.length > 0 ? '二' : ''}：研究方法說明</h3>
     <p style="color: #64748b; font-size: 10px; line-height: 1.7; margin: 0 0 8px 0;">
       本研究採用半結構式深度訪談法，透過 AI 模擬技術生成具代表性的越南消費者 Persona，針對旅遊保險相關議題進行訪談，並以 AI 輔助分析技術彙整質性資料。
     </p>
@@ -1881,225 +1999,228 @@ export const VietnamInterview = () => {
                 </div>
               </div>
 
-              {/* 圖表視覺化 - 依據題型自動選擇圖表類型 */}
-              {classificationData && classificationData.categories.length > 0 && (
-                <div style={{
-                  background: 'white',
-                  borderRadius: '12px',
-                  padding: '20px',
-                  marginBottom: '20px',
-                  border: `1px solid ${colors.borderLight}`,
-                  boxShadow: `0 2px 8px ${colors.shadow}`
-                }}>
-                  <div style={{
-                    fontSize: '13px',
-                    fontWeight: 600,
-                    color: colors.textPrimary,
-                    marginBottom: '16px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px'
-                  }}>
-                    <span style={{ fontSize: '16px' }}>📊</span>
-                    回答分類統計
-                    <span style={{
-                      fontSize: '11px',
-                      color: colors.textMuted,
-                      fontWeight: 400,
-                      marginLeft: 'auto',
-                      padding: '2px 8px',
-                      background: colors.bgSecondary,
-                      borderRadius: '4px'
+              {/* 多維度圖表視覺化 */}
+              {classificationData && classificationData.dimensions.length > 0 && (
+                <div id="charts-container">
+                  {classificationData.dimensions.map((dimension, dimIdx) => (
+                    <div key={dimIdx} style={{
+                      background: 'white',
+                      borderRadius: '12px',
+                      padding: '20px',
+                      marginBottom: '20px',
+                      border: `1px solid ${colors.borderLight}`,
+                      boxShadow: `0 2px 8px ${colors.shadow}`
                     }}>
-                      {classificationData.recommendedChart === 'pie' ? '圓餅圖' :
-                       classificationData.recommendedChart === 'bar' ? '長條圖' : '橫條圖'}
-                    </span>
-                  </div>
-
-                  {/* 圓餅圖 */}
-                  {classificationData.recommendedChart === 'pie' && (
-                    <div style={{ display: 'flex', gap: '24px', alignItems: 'center' }}>
-                      <div style={{ width: '200px', height: '200px' }}>
-                        <ResponsiveContainer width="100%" height="100%">
-                          <PieChart>
-                            <Pie
-                              data={classificationData.categories}
-                              cx="50%"
-                              cy="50%"
-                              innerRadius={45}
-                              outerRadius={80}
-                              paddingAngle={2}
-                              dataKey="count"
-                              nameKey="name"
-                            >
-                              {classificationData.categories.map((entry, index) => (
-                                <Cell key={`cell-${index}`} fill={entry.color} />
-                              ))}
-                            </Pie>
-                            <Tooltip
-                              formatter={(value) => [`${value} 人`]}
-                              contentStyle={{
-                                borderRadius: '8px',
-                                border: 'none',
-                                boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
-                                fontSize: '12px'
-                              }}
-                            />
-                          </PieChart>
-                        </ResponsiveContainer>
+                      <div style={{
+                        fontSize: '13px',
+                        fontWeight: 600,
+                        color: colors.textPrimary,
+                        marginBottom: '16px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px'
+                      }}>
+                        {dimension.dimension_name}
+                        <span style={{
+                          fontSize: '11px',
+                          color: colors.textMuted,
+                          fontWeight: 400,
+                          marginLeft: 'auto',
+                          padding: '2px 8px',
+                          background: colors.bgSecondary,
+                          borderRadius: '4px'
+                        }}>
+                          {dimension.recommendedChart === 'pie' ? '圓餅圖' :
+                           dimension.recommendedChart === 'bar' ? '長條圖' : '橫條圖'}
+                        </span>
                       </div>
-                      {/* 圖例說明 */}
-                      <div style={{ flex: 1 }}>
-                        {classificationData.categories.map((cat, idx) => (
-                          <div key={idx} style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '10px',
-                            padding: '8px 12px',
-                            background: idx % 2 === 0 ? '#f8fafc' : 'white',
-                            borderRadius: '6px',
-                            marginBottom: '4px'
-                          }}>
-                            <div style={{
-                              width: '12px',
-                              height: '12px',
-                              borderRadius: '3px',
-                              background: cat.color,
-                              flexShrink: 0
-                            }} />
-                            <span style={{ flex: 1, fontSize: '13px', color: colors.textPrimary }}>
-                              {cat.name}
-                            </span>
-                            <span style={{
-                              fontSize: '13px',
-                              fontWeight: 600,
-                              color: colors.textPrimary
-                            }}>
-                              {cat.count} 人
-                            </span>
-                            <span style={{
-                              fontSize: '12px',
-                              color: colors.textMuted,
-                              minWidth: '45px',
-                              textAlign: 'right'
-                            }}>
-                              ({cat.percentage}%)
-                            </span>
+
+                      {/* 圓餅圖 */}
+                      {dimension.recommendedChart === 'pie' && (
+                        <div style={{ display: 'flex', gap: '24px', alignItems: 'center' }}>
+                          <div style={{ width: '200px', height: '200px' }}>
+                            <ResponsiveContainer width="100%" height="100%">
+                              <PieChart>
+                                <Pie
+                                  data={dimension.categories}
+                                  cx="50%"
+                                  cy="50%"
+                                  innerRadius={45}
+                                  outerRadius={80}
+                                  paddingAngle={2}
+                                  dataKey="count"
+                                  nameKey="name"
+                                >
+                                  {dimension.categories.map((entry: { color: string }, index: number) => (
+                                    <Cell key={`cell-${index}`} fill={entry.color} />
+                                  ))}
+                                </Pie>
+                                <Tooltip
+                                  formatter={(value) => [`${value} 人`]}
+                                  contentStyle={{
+                                    borderRadius: '8px',
+                                    border: 'none',
+                                    boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+                                    fontSize: '12px'
+                                  }}
+                                />
+                              </PieChart>
+                            </ResponsiveContainer>
                           </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* 垂直長條圖 */}
-                  {classificationData.recommendedChart === 'bar' && (
-                    <div style={{ width: '100%', height: '280px' }}>
-                      <ResponsiveContainer width="100%" height="100%">
-                        <BarChart
-                          data={classificationData.categories}
-                          margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
-                        >
-                          <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                          <XAxis
-                            dataKey="name"
-                            tick={{ fontSize: 12, fill: colors.textPrimary }}
-                            angle={-30}
-                            textAnchor="end"
-                            height={60}
-                          />
-                          <YAxis
-                            tick={{ fontSize: 12, fill: colors.textMuted }}
-                            allowDecimals={false}
-                          />
-                          <Tooltip
-                            formatter={(value) => [`${value} 人`]}
-                            contentStyle={{
-                              borderRadius: '8px',
-                              border: 'none',
-                              boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
-                              fontSize: '12px'
-                            }}
-                          />
-                          <Bar dataKey="count" radius={[4, 4, 0, 0]}>
-                            {classificationData.categories.map((entry, index) => (
-                              <Cell key={`cell-${index}`} fill={entry.color} />
+                          {/* 圖例說明 */}
+                          <div style={{ flex: 1 }}>
+                            {dimension.categories.map((cat: { name: string; count: number; percentage: number; color: string }, idx: number) => (
+                              <div key={idx} style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '10px',
+                                padding: '8px 12px',
+                                background: idx % 2 === 0 ? '#f8fafc' : 'white',
+                                borderRadius: '6px',
+                                marginBottom: '4px'
+                              }}>
+                                <div style={{
+                                  width: '12px',
+                                  height: '12px',
+                                  borderRadius: '3px',
+                                  background: cat.color,
+                                  flexShrink: 0
+                                }} />
+                                <span style={{ flex: 1, fontSize: '13px', color: colors.textPrimary }}>
+                                  {cat.name}
+                                </span>
+                                <span style={{
+                                  fontSize: '13px',
+                                  fontWeight: 600,
+                                  color: colors.textPrimary
+                                }}>
+                                  {cat.count} 人
+                                </span>
+                                <span style={{
+                                  fontSize: '12px',
+                                  color: colors.textMuted,
+                                  minWidth: '45px',
+                                  textAlign: 'right'
+                                }}>
+                                  ({cat.percentage}%)
+                                </span>
+                              </div>
                             ))}
-                          </Bar>
-                        </BarChart>
-                      </ResponsiveContainer>
-                    </div>
-                  )}
+                          </div>
+                        </div>
+                      )}
 
-                  {/* 水平橫條圖 */}
-                  {classificationData.recommendedChart === 'horizontal_bar' && (
-                    <div style={{ width: '100%', height: Math.max(200, classificationData.categories.length * 50) }}>
-                      <ResponsiveContainer width="100%" height="100%">
-                        <BarChart
-                          data={classificationData.categories}
-                          layout="vertical"
-                          margin={{ top: 10, right: 30, left: 100, bottom: 10 }}
-                        >
-                          <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                          <XAxis
-                            type="number"
-                            tick={{ fontSize: 12, fill: colors.textMuted }}
-                            allowDecimals={false}
-                          />
-                          <YAxis
-                            type="category"
-                            dataKey="name"
-                            tick={{ fontSize: 12, fill: colors.textPrimary }}
-                            width={90}
-                          />
-                          <Tooltip
-                            formatter={(value) => [`${value} 人`]}
-                            contentStyle={{
-                              borderRadius: '8px',
-                              border: 'none',
-                              boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
-                              fontSize: '12px'
-                            }}
-                          />
-                          <Bar dataKey="count" radius={[0, 4, 4, 0]}>
-                            {classificationData.categories.map((entry, index) => (
-                              <Cell key={`cell-${index}`} fill={entry.color} />
+                      {/* 垂直長條圖 */}
+                      {dimension.recommendedChart === 'bar' && (
+                        <div style={{ width: '100%', height: '280px' }}>
+                          <ResponsiveContainer width="100%" height="100%">
+                            <BarChart
+                              data={dimension.categories}
+                              margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
+                            >
+                              <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                              <XAxis
+                                dataKey="name"
+                                tick={{ fontSize: 12, fill: colors.textPrimary }}
+                                angle={-30}
+                                textAnchor="end"
+                                height={60}
+                              />
+                              <YAxis
+                                tick={{ fontSize: 12, fill: colors.textMuted }}
+                                allowDecimals={false}
+                              />
+                              <Tooltip
+                                formatter={(value) => [`${value} 人`]}
+                                contentStyle={{
+                                  borderRadius: '8px',
+                                  border: 'none',
+                                  boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+                                  fontSize: '12px'
+                                }}
+                              />
+                              <Bar dataKey="count" radius={[4, 4, 0, 0]}>
+                                {dimension.categories.map((entry: { color: string }, index: number) => (
+                                  <Cell key={`cell-${index}`} fill={entry.color} />
+                                ))}
+                              </Bar>
+                            </BarChart>
+                          </ResponsiveContainer>
+                        </div>
+                      )}
+
+                      {/* 水平橫條圖 */}
+                      {dimension.recommendedChart === 'horizontal_bar' && (
+                        <div style={{ width: '100%', height: Math.max(200, dimension.categories.length * 50) }}>
+                          <ResponsiveContainer width="100%" height="100%">
+                            <BarChart
+                              data={dimension.categories}
+                              layout="vertical"
+                              margin={{ top: 10, right: 30, left: 100, bottom: 10 }}
+                            >
+                              <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                              <XAxis
+                                type="number"
+                                tick={{ fontSize: 12, fill: colors.textMuted }}
+                                allowDecimals={false}
+                              />
+                              <YAxis
+                                type="category"
+                                dataKey="name"
+                                tick={{ fontSize: 12, fill: colors.textPrimary }}
+                                width={90}
+                              />
+                              <Tooltip
+                                formatter={(value) => [`${value} 人`]}
+                                contentStyle={{
+                                  borderRadius: '8px',
+                                  border: 'none',
+                                  boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+                                  fontSize: '12px'
+                                }}
+                              />
+                              <Bar dataKey="count" radius={[0, 4, 4, 0]}>
+                                {dimension.categories.map((entry: { color: string }, index: number) => (
+                                  <Cell key={`cell-${index}`} fill={entry.color} />
+                                ))}
+                              </Bar>
+                            </BarChart>
+                          </ResponsiveContainer>
+                        </div>
+                      )}
+
+                      {/* 分類詳情 - 可收合 */}
+                      {dimension.details.length > 0 && (
+                        <details style={{ marginTop: '16px', paddingTop: '16px', borderTop: `1px solid ${colors.borderLight}` }}>
+                          <summary style={{ fontSize: '12px', color: colors.textMuted, cursor: 'pointer', marginBottom: '8px' }}>
+                            各受訪者分類結果 ({dimension.details.length} 人)
+                          </summary>
+                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '8px' }}>
+                            {dimension.details.map((detail: { personaId: string; personaName: string; category: string; reason: string }, idx: number) => (
+                              <span key={idx} style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '4px',
+                                padding: '4px 10px',
+                                background: (dimension.categories.find((c: { name: string; color: string }) => c.name === detail.category)?.color || '#ccc') + '20',
+                                borderRadius: '12px',
+                                fontSize: '11px',
+                                color: colors.textPrimary
+                              }}>
+                                <span style={{
+                                  width: '6px',
+                                  height: '6px',
+                                  borderRadius: '50%',
+                                  background: dimension.categories.find((c: { name: string; color: string }) => c.name === detail.category)?.color || '#ccc'
+                                }} />
+                                {detail.personaName}
+                              </span>
                             ))}
-                          </Bar>
-                        </BarChart>
-                      </ResponsiveContainer>
+                          </div>
+                        </details>
+                      )}
                     </div>
-                  )}
-
-                  {/* 分類詳情 */}
-                  {classificationData.details.length > 0 && (
-                    <div style={{ marginTop: '16px', paddingTop: '16px', borderTop: `1px solid ${colors.borderLight}` }}>
-                      <div style={{ fontSize: '12px', color: colors.textMuted, marginBottom: '8px' }}>
-                        各受訪者分類結果：
-                      </div>
-                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
-                        {classificationData.details.map((detail, idx) => (
-                          <span key={idx} style={{
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            gap: '4px',
-                            padding: '4px 10px',
-                            background: classificationData.categories.find(c => c.name === detail.category)?.color + '20',
-                            borderRadius: '12px',
-                            fontSize: '11px',
-                            color: colors.textPrimary
-                          }}>
-                            <span style={{
-                              width: '6px',
-                              height: '6px',
-                              borderRadius: '50%',
-                              background: classificationData.categories.find(c => c.name === detail.category)?.color
-                            }} />
-                            {detail.personaName}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  )}
+                  ))}
                 </div>
               )}
 
@@ -2114,8 +2235,7 @@ export const VietnamInterview = () => {
                   textAlign: 'center',
                   color: colors.textMuted
                 }}>
-                  <div style={{ fontSize: '24px', marginBottom: '8px' }}>📊</div>
-                  <div style={{ fontSize: '13px' }}>正在分類回答，產生圖表中...</div>
+                  <div style={{ fontSize: '13px' }}>Classifying responses and generating charts...</div>
                 </div>
               )}
 
@@ -2129,12 +2249,22 @@ export const VietnamInterview = () => {
   );
 };
 
-// 格式化分析結果為專業 HTML（用於 PDF/Word 匯出）
+// 格式化分析結果為專業 HTML（用於 PDF/Word 匯出）- 使用莫蘭迪色系
 const formatAnalysisForExport = (content: string): string => {
   const lines = content.split('\n').filter(line => line.trim());
   let html = '';
   let currentSection = '';
   let listIndex = 0;
+
+  // 莫蘭迪色系 + 酒紅重點
+  const exportColors = {
+    headlineBg: '#6b8065',
+    findingBorder: '#8b9e85',
+    findingBg: '#f5f8f5',
+    actionBorder: '#8b5a5a',     // 莫蘭迪酒紅
+    actionBg: '#faf5f5',         // 淺酒紅背景
+    text: '#2d3e2d'
+  };
 
   for (const line of lines) {
     const trimmed = line.trim();
@@ -2142,30 +2272,30 @@ const formatAnalysisForExport = (content: string): string => {
     // 識別標題（移除 emoji）
     if (trimmed.startsWith('📌') || trimmed.includes('一句話總結')) {
       const text = trimmed.replace(/^📌\s*/, '').replace('一句話總結', '').trim();
-      html += `<div style="background: #1e3a5f; color: white; padding: 14px 18px; border-radius: 6px 6px 0 0; font-weight: 600; font-size: 13px; letter-spacing: 0.5px;">SUMMARY</div>`;
+      html += `<div style="background: ${exportColors.headlineBg}; color: white; padding: 14px 18px; border-radius: 6px 6px 0 0; font-weight: 600; font-size: 13px; letter-spacing: 0.5px;">SUMMARY</div>`;
       if (text) {
-        html += `<div style="background: #f1f5f9; padding: 14px 18px; font-size: 13px; line-height: 1.7; color: #1f2937; border-left: 3px solid #1e3a5f;">${text}</div>`;
+        html += `<div style="background: ${exportColors.findingBg}; padding: 14px 18px; font-size: 13px; line-height: 1.7; color: ${exportColors.text}; border-left: 3px solid ${exportColors.headlineBg};">${text}</div>`;
       }
     } else if (trimmed.startsWith('🔑') || trimmed.includes('關鍵發現')) {
       currentSection = 'findings';
       listIndex = 0;
-      html += `<div style="display: flex; align-items: center; gap: 8px; padding: 12px 0 8px 0; margin-top: 16px; border-bottom: 2px solid #3b82f6;"><span style="font-size: 12px; font-weight: 700; color: #3b82f6; letter-spacing: 1px; text-transform: uppercase;">KEY FINDINGS</span></div>`;
+      html += `<div style="display: flex; align-items: center; gap: 8px; padding: 12px 0 8px 0; margin-top: 16px; border-bottom: 2px solid ${exportColors.findingBorder};"><span style="font-size: 12px; font-weight: 700; color: ${exportColors.findingBorder}; letter-spacing: 1px; text-transform: uppercase;">KEY FINDINGS</span></div>`;
     } else if (trimmed.startsWith('💡') || trimmed.includes('行動建議')) {
       currentSection = 'recommendations';
       listIndex = 0;
-      html += `<div style="display: flex; align-items: center; gap: 8px; padding: 12px 0 8px 0; margin-top: 16px; border-bottom: 2px solid #ca8a04;"><span style="font-size: 12px; font-weight: 700; color: #ca8a04; letter-spacing: 1px; text-transform: uppercase;">RECOMMENDATIONS</span></div>`;
+      html += `<div style="display: flex; align-items: center; gap: 8px; padding: 12px 0 8px 0; margin-top: 16px; border-bottom: 2px solid ${exportColors.actionBorder};"><span style="font-size: 12px; font-weight: 700; color: ${exportColors.actionBorder}; letter-spacing: 1px; text-transform: uppercase;">RECOMMENDATIONS</span></div>`;
     } else if (/^\d+[\.、]/.test(trimmed)) {
       listIndex++;
       const text = trimmed.replace(/^\d+[\.、]\s*/, '');
       const isAction = currentSection === 'recommendations';
-      const bgColor = isAction ? '#fefce8' : '#f8fafc';
-      const borderColor = isAction ? '#ca8a04' : '#3b82f6';
-      html += `<div style="display: flex; align-items: flex-start; gap: 12px; padding: 10px 14px; background: ${bgColor}; border-left: 3px solid ${borderColor}; margin-top: 3px;"><span style="min-width: 20px; height: 20px; border-radius: 4px; background: ${borderColor}; color: white; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; flex-shrink: 0;">${listIndex}</span><span style="font-size: 13px; line-height: 1.6; color: #1f2937;">${text}</span></div>`;
+      const bgColor = isAction ? exportColors.actionBg : exportColors.findingBg;
+      const borderColor = isAction ? exportColors.actionBorder : exportColors.findingBorder;
+      html += `<div style="display: flex; align-items: flex-start; gap: 12px; padding: 10px 14px; background: ${bgColor}; border-left: 3px solid ${borderColor}; margin-top: 3px;"><span style="min-width: 20px; height: 20px; border-radius: 4px; background: ${borderColor}; color: white; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; flex-shrink: 0;">${listIndex}</span><span style="font-size: 13px; line-height: 1.6; color: ${exportColors.text};">${text}</span></div>`;
     } else if (html.includes('SUMMARY') && !html.includes('KEY FINDINGS')) {
       // Summary 內容
-      html += `<div style="background: #f1f5f9; padding: 14px 18px; font-size: 13px; line-height: 1.7; color: #1f2937; border-left: 3px solid #1e3a5f;">${trimmed}</div>`;
+      html += `<div style="background: ${exportColors.findingBg}; padding: 14px 18px; font-size: 13px; line-height: 1.7; color: ${exportColors.text}; border-left: 3px solid ${exportColors.headlineBg};">${trimmed}</div>`;
     } else {
-      html += `<div style="padding: 6px 14px; font-size: 13px; line-height: 1.5; color: #6b7280;">${trimmed}</div>`;
+      html += `<div style="padding: 6px 14px; font-size: 13px; line-height: 1.5; color: #5a6d5a;">${trimmed}</div>`;
     }
   }
 
@@ -2202,17 +2332,17 @@ const AnalysisResultDisplay = ({ content }: { content: string }) => {
     return acc;
   }, []);
 
-  // 專業配色 - 低調商務風格
+  // 專業配色 - 莫蘭迪綠色系 + 酒紅重點
   const proColors = {
-    headlineBg: '#1e3a5f',
+    headlineBg: '#6b8065',           // 莫蘭迪深綠
     headlineText: '#ffffff',
-    sectionTitle: '#1e3a5f',
-    findingBg: '#f8fafc',
-    findingBorder: '#3b82f6',
-    actionBg: '#fefce8',
-    actionBorder: '#ca8a04',
-    text: '#1f2937',
-    textMuted: '#6b7280'
+    sectionTitle: '#5a6d5a',
+    findingBg: 'rgba(139, 158, 133, 0.08)',  // 淺莫蘭迪綠背景
+    findingBorder: '#8b9e85',        // 莫蘭迪綠
+    actionBg: 'rgba(139, 90, 90, 0.06)',     // 淺酒紅背景
+    actionBorder: '#8b5a5a',         // 莫蘭迪酒紅
+    text: '#2d3e2d',
+    textMuted: '#5a6d5a'
   };
 
   // 計算列表編號
@@ -2428,7 +2558,7 @@ const GeneratedPersonaCard = ({ persona, onStartInterview }: { persona: VietnamP
           gap: '8px'
         }}
       >
-        🎤 Start Interview
+        Start Interview
       </button>
     </div>
   </div>
@@ -2447,6 +2577,17 @@ const HistoryTabContent = ({
   const [viewMode, setViewMode] = useState<'by-persona' | 'by-question'>('by-question');
   const [expandedQuestions, setExpandedQuestions] = useState<Set<string>>(new Set());
 
+  // 正規化問題文字，讓語義相似的問題能被歸為同一組
+  const normalizeQuestion = (question: string): string => {
+    return question
+      .replace(/？/g, '')  // 移除全形問號
+      .replace(/\?/g, '')  // 移除半形問號
+      .replace(/的時候/g, '時')  // 統一用詞
+      .replace(/是幾歲/g, '幾歲')  // 統一用詞
+      .replace(/\s+/g, '')  // 移除空白
+      .trim();
+  };
+
   // 收集所有問題和對應的回答
   const getQuestionGroups = () => {
     const groups: Map<string, Array<{
@@ -2454,13 +2595,25 @@ const HistoryTabContent = ({
       record: VietnamInterviewRecord;
     }>> = new Map();
 
+    // 用於追蹤正規化後的問題對應到的原始問題（取第一個出現的作為顯示用）
+    const normalizedToOriginal: Map<string, string> = new Map();
+
     personas.forEach(persona => {
       persona.interviewHistory?.forEach(record => {
-        const key = record.question;
-        if (!groups.has(key)) {
-          groups.set(key, []);
+        const normalized = normalizeQuestion(record.question);
+
+        // 如果這個正規化問題還沒有對應的原始問題，記錄下來
+        if (!normalizedToOriginal.has(normalized)) {
+          normalizedToOriginal.set(normalized, record.question);
         }
-        groups.get(key)!.push({ persona, record });
+
+        // 使用原始問題作為 key（保持顯示一致性）
+        const displayKey = normalizedToOriginal.get(normalized)!;
+
+        if (!groups.has(displayKey)) {
+          groups.set(displayKey, []);
+        }
+        groups.get(displayKey)!.push({ persona, record });
       });
     });
 
@@ -2492,7 +2645,7 @@ const HistoryTabContent = ({
         border: `1px solid ${colors.borderLight}`,
         color: colors.textMuted
       }}>
-        <div style={{ fontSize: '48px', marginBottom: '16px', opacity: 0.3 }}>📋</div>
+        <div style={{ fontSize: '16px', marginBottom: '16px', opacity: 0.5, fontWeight: 600 }}>No Records</div>
         <div style={{ fontSize: '15px' }}>尚無訪談記錄。請先生成受訪者並開始訪談。</div>
       </div>
     );
@@ -2513,7 +2666,7 @@ const HistoryTabContent = ({
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
           <span style={{ fontSize: '14px', color: colors.textSecondary }}>
-            👥 {personas.length} 位受訪者 • 💬 {totalResponses} 則回答 • ❓ {questionGroups.size} 個問題
+            {personas.length} personas • {totalResponses} responses • {questionGroups.size} questions
           </span>
         </div>
         <div style={{ display: 'flex', gap: '8px' }}>
@@ -2529,7 +2682,7 @@ const HistoryTabContent = ({
               cursor: 'pointer'
             }}
           >
-            📝 按問題
+            By Question
           </button>
           <button
             onClick={() => setViewMode('by-persona')}
@@ -2543,7 +2696,7 @@ const HistoryTabContent = ({
               cursor: 'pointer'
             }}
           >
-            👤 按受訪者
+            By Persona
           </button>
         </div>
       </div>
@@ -2583,7 +2736,7 @@ const HistoryTabContent = ({
                       color: colors.textPrimary,
                       lineHeight: '1.5'
                     }}>
-                      ❓ {question.length > 100 ? question.slice(0, 100) + '...' : question}
+                      Q: {question.length > 100 ? question.slice(0, 100) + '...' : question}
                     </div>
                     {topicTag && (
                       <span style={{
@@ -2595,7 +2748,7 @@ const HistoryTabContent = ({
                         borderRadius: '12px',
                         fontSize: '12px'
                       }}>
-                        🏷️ {topicTag}
+                        {topicTag}
                       </span>
                     )}
                   </div>
@@ -2802,7 +2955,7 @@ const HistoryCard = ({ persona, onContinue, onDelete }: { persona: VietnamPerson
               e.currentTarget.style.background = 'transparent';
             }}
           >
-            🗑️
+            ×
           </button>
         </div>
       </div>

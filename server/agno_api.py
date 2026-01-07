@@ -1468,7 +1468,7 @@ def api_delete_persona(persona_id: str):
 from vietnam_interview_agent import interview_vietnam_persona
 from vietnam_generator_agent import generate_vietnam_personas
 from vietnam_analysis_agent import analyze_interview_responses
-from vietnam_classifier_agent import classify_responses
+from vietnam_classifier_agent import classify_responses, classify_responses_multi_dimension
 import datetime
 
 VIETNAM_DB_FILE = Path("server/vietnam_personas.json")
@@ -1708,4 +1708,24 @@ def api_vietnam_classify(request: ClassifyRequest):
         return result
     except Exception as e:
         print(f"分類錯誤: {e}")
+        return JSONResponse({"error": str(e)}, status_code=500)
+
+
+class MultiClassifyRequest(BaseModel):
+    question: str
+    responses: List[Dict[str, Any]]
+
+
+@app.post("/api/vietnam_classify_multi")
+def api_vietnam_classify_multi(request: MultiClassifyRequest):
+    """多維度分類 - 自動識別問題中的多個面向，分別產生圖表"""
+    try:
+        print(f"📊 收到多維度分類請求: {request.question[:50]}... ({len(request.responses)} responses)")
+        result = classify_responses_multi_dimension(
+            request.question,
+            request.responses
+        )
+        return result
+    except Exception as e:
+        print(f"多維度分類錯誤: {e}")
         return JSONResponse({"error": str(e)}, status_code=500)
