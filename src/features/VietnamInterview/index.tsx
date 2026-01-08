@@ -320,6 +320,8 @@ export const VietnamInterview = () => {
   // 正規化問題文字，讓語義相似的問題能被歸為同一組
   const normalizeQuestion = (question: string): string => {
     return question
+      .replace(/^["「『"]+|["」』"]+$/g, '')  // 移除開頭結尾的引號
+      .replace(/["「『"」』"]/g, '')  // 移除所有引號
       .replace(/？/g, '')  // 移除全形問號
       .replace(/\?/g, '')  // 移除半形問號
       .replace(/的時候/g, '時')  // 統一用詞
@@ -2657,6 +2659,8 @@ const HistoryTabContent = ({
   // 正規化問題文字，讓語義相似的問題能被歸為同一組
   const normalizeQuestion = (question: string): string => {
     return question
+      .replace(/^["「『"]+|["」』"]+$/g, '')  // 移除開頭結尾的引號
+      .replace(/["「『"」』"]/g, '')  // 移除所有引號
       .replace(/？/g, '')  // 移除全形問號
       .replace(/\?/g, '')  // 移除半形問號
       .replace(/的時候/g, '時')  // 統一用詞
