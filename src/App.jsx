@@ -271,19 +271,16 @@ function App() {
           <nav style={{ display: 'flex', gap: '8px' }}>
             <NavButton
               label="Home"
-              icon="🏠"
               isActive={false}
               onClick={() => setCurrentPage('home')}
             />
             <NavButton
               label="Market Simulator"
-              icon="👥"
               isActive={currentPage === 'market'}
               onClick={() => setCurrentPage('market')}
             />
             <NavButton
               label="Vietnam Interview"
-              icon="🇻🇳"
               isActive={currentPage === 'vietnam'}
               onClick={() => setCurrentPage('vietnam')}
             />
@@ -301,7 +298,7 @@ function App() {
 }
 
 // Navigation Button Component
-const NavButton = ({ label, icon, isActive, onClick }) => (
+const NavButton = ({ label, isActive, onClick }) => (
   <button
     onClick={onClick}
     style={{
@@ -332,7 +329,6 @@ const NavButton = ({ label, icon, isActive, onClick }) => (
       }
     }}
   >
-    <span style={{ fontSize: '16px' }}>{icon}</span>
     {label}
   </button>
 );

@@ -21,7 +21,10 @@ from response_analyzer import load_all_responses
 # ===== 禁止/監控/好的開頭詞 =====
 BANNED_OPENINGS = {'其實', '嗯', '哦', '欸', '那時候'}
 MONITOR_OPENINGS = {'當時', '記得', '說實話', '大概', '怎麼說', '本來', '老實說', '就是', '是我', '我第一次'}
-GOOD_OPENINGS = {'說到這個', '唉', '你知道嗎', '講一個', '坦白說', '讓我想', '好，', '不知道', '這要從'}
+GOOD_OPENINGS = {
+    '說到這個', '唉', '你知道嗎', '講一個', '坦白說', '讓我想', '好，', '不知道', '這要從',
+    '去年', '有一次', '哎呀', '天啊', '我跟你說', '怎麼說呢', '老實講', '簡單說', '你猜'
+}
 
 ALL_OPENINGS = list(BANNED_OPENINGS) + list(MONITOR_OPENINGS) + list(GOOD_OPENINGS)
 
@@ -297,513 +300,293 @@ def analyze_time_trends(responses: List[Dict]) -> Dict[str, Any]:
 
 
 def generate_html_report(responses: List[Dict]) -> str:
-    """生成完整的 HTML 熱力圖報告"""
+    """生成簡潔的單頁儀表板報告"""
     opening_data = generate_opening_heatmap_data(responses)
-    question_diversity = generate_question_response_similarity_matrix(responses)
-    persona_analysis = analyze_persona_style(responses)
-    ngram_analysis = analyze_ngrams(responses, n=3)
-    bigram_analysis = analyze_ngrams(responses, n=2)
-    phrase_patterns = analyze_phrase_patterns(responses)
     time_trends = analyze_time_trends(responses)
 
-    # 計算開頭頻率
-    opening_freq = {}
-    for opening in ALL_OPENINGS:
-        count = opening_data['totals'].get(opening, 0)
-        opening_freq[opening] = {
-            'count': count,
-            'percentage': round(count / len(responses) * 100, 1) if responses else 0,
-            'status': 'banned' if opening in BANNED_OPENINGS else (
-                'monitor' if opening in MONITOR_OPENINGS else 'good'
-            )
-        }
+    # 計算關鍵指標
+    total = len(responses)
+    persona_count = len(set(r['persona_name'] for r in responses))
 
-    # 排序問題多樣性（低多樣性優先）
-    sorted_questions = sorted(
-        question_diversity.items(),
-        key=lambda x: x[1]['diversity_score']
-    )
+    # 禁止開頭使用統計
+    banned_counts = {op: 0 for op in BANNED_OPENINGS}
+    good_counts = {op: 0 for op in GOOD_OPENINGS}
+
+    for resp in responses:
+        opening = resp['answer'].strip()[:20]
+        for op in BANNED_OPENINGS:
+            if op in opening:
+                banned_counts[op] += 1
+        for op in GOOD_OPENINGS:
+            if op in opening:
+                good_counts[op] += 1
+
+    total_banned = sum(banned_counts.values())
+    total_good = sum(good_counts.values())
+    banned_rate = round(total_banned / total * 100, 1) if total > 0 else 0
+    good_rate = round(total_good / total * 100, 1) if total > 0 else 0
+
+    # 排序
+    sorted_banned = sorted(banned_counts.items(), key=lambda x: x[1], reverse=True)
+    sorted_good = sorted(good_counts.items(), key=lambda x: x[1], reverse=True)
+
+    # 時間趨勢
+    trend_html = ""
+    if 'error' not in time_trends:
+        improvement = time_trends['improvement']['banned_opening_change']
+        trend_icon = "📈" if improvement > 0 else "📉"
+        trend_color = "#22c55e" if improvement > 0 else "#ef4444"
+        trend_html = f"""
+            <div style="background: {'#f0fdf4' if improvement > 0 else '#fef2f2'}; padding: 12px 16px; border-radius: 8px; margin-top: 16px;">
+                <span style="color: {trend_color}; font-weight: 600;">{trend_icon} {'改善' if improvement > 0 else '惡化'} {abs(improvement)}%</span>
+                <span style="color: #64748b; margin-left: 8px;">vs 前期</span>
+            </div>
+        """
 
     html = f"""<!DOCTYPE html>
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>回答多樣性熱力圖分析</title>
+    <title>回答多樣性儀表板</title>
     <style>
-        * {{ box-sizing: border-box; }}
+        * {{ box-sizing: border-box; margin: 0; padding: 0; }}
         body {{
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #1a1a2e;
-            color: #eee;
-            padding: 20px;
-            max-width: 1600px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 24px;
+        }}
+        .dashboard {{
+            max-width: 900px;
             margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+            overflow: hidden;
         }}
-        h1 {{ color: #00d9ff; text-align: center; }}
-        h2 {{ color: #ff6b6b; border-bottom: 2px solid #ff6b6b; padding-bottom: 10px; margin-top: 40px; }}
-        h3 {{ color: #ffd93d; margin-top: 25px; }}
-
-        .stats-grid {{
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 15px;
-            margin-bottom: 30px;
-        }}
-        .stat-card {{
-            background: #16213e;
-            border-radius: 12px;
-            padding: 20px;
+        .header {{
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            color: white;
+            padding: 32px;
             text-align: center;
         }}
-        .stat-value {{
-            font-size: 2.2em;
-            font-weight: bold;
-            color: #00d9ff;
+        .header h1 {{
+            font-size: 1.5em;
+            font-weight: 600;
+            margin-bottom: 8px;
         }}
-        .stat-value.warning {{ color: #ff6b6b; }}
-        .stat-value.good {{ color: #4ecdc4; }}
-        .stat-label {{
-            color: #888;
-            margin-top: 5px;
+        .header p {{
+            color: #94a3b8;
             font-size: 0.9em;
         }}
-
-        .heatmap-container {{
-            background: #16213e;
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 30px;
-            overflow-x: auto;
+        .content {{
+            padding: 32px;
         }}
 
-        .opening-bar {{
-            display: flex;
-            align-items: center;
-            margin: 8px 0;
-        }}
-        .opening-label {{
-            width: 100px;
-            font-weight: bold;
-        }}
-        .opening-label.banned {{ color: #ff6b6b; }}
-        .opening-label.monitor {{ color: #ffd93d; }}
-        .opening-label.good {{ color: #4ecdc4; }}
-        .opening-bar-fill {{
-            height: 28px;
-            border-radius: 4px;
-            display: flex;
-            align-items: center;
-            padding-left: 10px;
-            color: #000;
-            font-weight: bold;
-            font-size: 0.9em;
-        }}
-        .bar-high {{ background: linear-gradient(90deg, #ff6b6b, #ff8e8e); }}
-        .bar-medium {{ background: linear-gradient(90deg, #ffd93d, #ffe066); }}
-        .bar-low {{ background: linear-gradient(90deg, #4ecdc4, #7ee8e0); }}
-
-        .table-container {{
-            overflow-x: auto;
-        }}
-        table {{
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 15px;
-            font-size: 0.9em;
-        }}
-        th, td {{
-            padding: 10px 12px;
-            text-align: left;
-            border-bottom: 1px solid #333;
-        }}
-        th {{
-            background: #0f3460;
-            color: #00d9ff;
-            white-space: nowrap;
-        }}
-        tr:hover {{
-            background: #1f4068;
-        }}
-
-        .score-badge {{
-            display: inline-block;
-            padding: 4px 10px;
-            border-radius: 12px;
-            font-weight: bold;
-            font-size: 0.85em;
-        }}
-        .score-low {{ background: #ff6b6b; color: #000; }}
-        .score-medium {{ background: #ffd93d; color: #000; }}
-        .score-high {{ background: #4ecdc4; color: #000; }}
-
-        .insight-box {{
-            background: linear-gradient(135deg, #0f3460, #16213e);
-            border-left: 4px solid #ff6b6b;
-            padding: 20px;
-            margin: 20px 0;
-            border-radius: 0 12px 12px 0;
-        }}
-        .insight-box h4 {{ color: #ff6b6b; margin-top: 0; }}
-
-        .recommendation {{
-            background: linear-gradient(135deg, #1a4d1a, #16213e);
-            border-left: 4px solid #4ecdc4;
-            padding: 20px;
-            margin: 20px 0;
-            border-radius: 0 12px 12px 0;
-        }}
-        .recommendation h4 {{ color: #4ecdc4; margin-top: 0; }}
-
-        .trend-box {{
-            background: linear-gradient(135deg, #2d1b4e, #16213e);
-            border-left: 4px solid #9d4edd;
-            padding: 20px;
-            margin: 20px 0;
-            border-radius: 0 12px 12px 0;
-        }}
-        .trend-box h4 {{ color: #9d4edd; margin-top: 0; }}
-
-        .ngram-cloud {{
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            padding: 15px;
-        }}
-        .ngram-tag {{
-            padding: 6px 12px;
-            border-radius: 16px;
-            font-size: 0.85em;
-        }}
-        .ngram-hot {{ background: #ff6b6b; color: #000; }}
-        .ngram-warm {{ background: #ffd93d; color: #000; }}
-        .ngram-cool {{ background: #4ecdc4; color: #000; }}
-
-        .persona-grid {{
+        /* 主要指標 */
+        .metrics {{
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 15px;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-bottom: 32px;
         }}
-        .persona-card {{
-            background: #0f3460;
+        .metric {{
+            text-align: center;
+            padding: 20px;
+            background: #f8fafc;
             border-radius: 12px;
-            padding: 15px;
         }}
-        .persona-name {{
-            font-size: 1.1em;
-            font-weight: bold;
-            color: #00d9ff;
-            margin-bottom: 10px;
+        .metric-value {{
+            font-size: 2.5em;
+            font-weight: 700;
+            color: #1e293b;
         }}
-        .persona-stat {{
+        .metric-value.bad {{ color: #dc2626; }}
+        .metric-value.ok {{ color: #f59e0b; }}
+        .metric-value.good {{ color: #16a34a; }}
+        .metric-label {{
+            color: #64748b;
+            font-size: 0.85em;
+            margin-top: 4px;
+        }}
+
+        /* 區塊標題 */
+        .section-title {{
+            font-size: 1em;
+            font-weight: 600;
+            color: #1e293b;
+            margin: 24px 0 16px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }}
+
+        /* 問題列表 */
+        .problem-list {{
+            background: #fef2f2;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 24px;
+        }}
+        .problem-item {{
             display: flex;
             justify-content: space-between;
-            margin: 5px 0;
-            font-size: 0.9em;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #fecaca;
         }}
-        .persona-stat-label {{ color: #888; }}
-        .persona-stat-value {{ font-weight: bold; }}
+        .problem-item:last-child {{ border-bottom: none; }}
+        .problem-word {{
+            font-weight: 600;
+            color: #991b1b;
+        }}
+        .problem-count {{
+            background: #dc2626;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }}
 
-        .two-column {{
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
+        /* 好的開頭 */
+        .good-list {{
+            background: #f0fdf4;
+            border-radius: 12px;
+            padding: 20px;
         }}
-        @media (max-width: 900px) {{
-            .two-column {{ grid-template-columns: 1fr; }}
-        }}
-
-        .nav-tabs {{
+        .good-item {{
             display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #bbf7d0;
         }}
-        .nav-tab {{
-            padding: 10px 20px;
-            background: #16213e;
-            border: none;
-            border-radius: 8px;
-            color: #888;
-            cursor: pointer;
+        .good-item:last-child {{ border-bottom: none; }}
+        .good-word {{
+            font-weight: 600;
+            color: #166534;
+        }}
+        .good-count {{
+            background: #16a34a;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }}
+
+        /* 建議 */
+        .suggestion {{
+            background: #eff6ff;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 24px;
+        }}
+        .suggestion-title {{
+            font-weight: 600;
+            color: #1e40af;
+            margin-bottom: 12px;
+        }}
+        .suggestion-text {{
+            color: #1e3a8a;
             font-size: 0.9em;
+            line-height: 1.6;
         }}
-        .nav-tab:hover {{ background: #1f4068; color: #eee; }}
-        .nav-tab.active {{ background: #0f3460; color: #00d9ff; }}
+
+        .footer {{
+            text-align: center;
+            padding: 20px;
+            color: #94a3b8;
+            font-size: 0.8em;
+            border-top: 1px solid #e2e8f0;
+        }}
     </style>
 </head>
 <body>
-    <h1>📊 回答多樣性熱力圖分析</h1>
-    <p style="text-align: center; color: #888;">Generated: {datetime.now().strftime('%Y-%m-%d %H:%M')}</p>
-
-    <div class="stats-grid">
-        <div class="stat-card">
-            <div class="stat-value">{len(responses)}</div>
-            <div class="stat-label">總回答數</div>
+    <div class="dashboard">
+        <div class="header">
+            <h1>回答多樣性儀表板</h1>
+            <p>{datetime.now().strftime('%Y-%m-%d %H:%M')} · {total} 則回答 · {persona_count} 位受訪者</p>
         </div>
-        <div class="stat-card">
-            <div class="stat-value">{len(set(r['persona_name'] for r in responses))}</div>
-            <div class="stat-label">受訪者數</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-value">{len(question_diversity)}</div>
-            <div class="stat-label">不同問題數</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-value{' warning' if opening_freq.get('其實', {}).get('percentage', 0) > 20 else ''}">{opening_freq.get('其實', {}).get('percentage', 0):.1f}%</div>
-            <div class="stat-label">🚫「其實」開頭</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-value{' warning' if opening_freq.get('嗯', {}).get('percentage', 0) > 15 else ''}">{opening_freq.get('嗯', {}).get('percentage', 0):.1f}%</div>
-            <div class="stat-label">🚫「嗯」開頭</div>
-        </div>
-    </div>
-"""
 
-    # ===== 時間趨勢 =====
-    if 'error' not in time_trends:
-        improvement = time_trends['improvement']['banned_opening_change']
-        improvement_class = 'good' if improvement > 0 else 'warning'
-        html += f"""
-    <div class="trend-box">
-        <h4>📈 時間趨勢分析</h4>
-        <p>資料期間: {time_trends['date_range']['start']} ~ {time_trends['date_range']['end']}</p>
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-value">{time_trends['early_period']['banned_opening_rate']}%</div>
-                <div class="stat-label">前期禁止開頭率<br>({time_trends['early_period']['count']} 則)</div>
+        <div class="content">
+            <!-- 主要指標 -->
+            <div class="metrics">
+                <div class="metric">
+                    <div class="metric-value{' bad' if banned_rate > 30 else ' ok' if banned_rate > 15 else ''}">{banned_rate}%</div>
+                    <div class="metric-label">禁止開頭使用率</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value{' good' if good_rate > 10 else ''}">{good_rate}%</div>
+                    <div class="metric-label">好開頭使用率</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value">{total}</div>
+                    <div class="metric-label">總回答數</div>
+                </div>
             </div>
-            <div class="stat-card">
-                <div class="stat-value">{time_trends['later_period']['banned_opening_rate']}%</div>
-                <div class="stat-label">後期禁止開頭率<br>({time_trends['later_period']['count']} 則)</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value {improvement_class}">{'+' if improvement > 0 else ''}{improvement}%</div>
-                <div class="stat-label">{'改善幅度 ✓' if improvement > 0 else '惡化幅度 ✗'}</div>
-            </div>
-        </div>
-    </div>
+
+            {trend_html}
+
+            <!-- 禁止開頭統計 -->
+            <div class="section-title">🚫 禁止開頭（需要減少）</div>
+            <div class="problem-list">
 """
 
-    # ===== 開頭用語分析 =====
-    html += """
-    <h2>🔤 開頭用語頻率分析</h2>
-    <div class="heatmap-container">
-        <p style="color: #888;">🚫 紅色 = 已禁止 | ⚠️ 黃色 = 監控中 | ✅ 綠色 = 好的開頭</p>
-"""
-
-    sorted_openings = sorted(opening_freq.items(), key=lambda x: x[1]['count'], reverse=True)
-    for opening, data in sorted_openings:
-        if data['count'] == 0:
-            continue
-        pct = data['percentage']
-        status = data['status']
-        bar_class = 'bar-high' if status == 'banned' else ('bar-medium' if status == 'monitor' else 'bar-low')
-        label_class = status
-        width = min(pct * 3, 100)
-
-        html += f"""
-        <div class="opening-bar">
-            <div class="opening-label {label_class}">「{opening}」</div>
-            <div class="opening-bar-fill {bar_class}" style="width: {width}%;">
-                {data['count']} 次 ({pct}%)
-            </div>
-        </div>
-"""
-
-    html += """
-    </div>
-"""
-
-    # ===== N-gram 詞頻雲 =====
-    html += """
-    <h2>🔠 常見詞組分析 (N-gram)</h2>
-    <div class="two-column">
-        <div class="heatmap-container">
-            <h3>開頭常見 3-gram</h3>
-            <div class="ngram-cloud">
-"""
-    for ngram, count in ngram_analysis['top_openings'][:15]:
-        tag_class = 'ngram-hot' if count > 20 else ('ngram-warm' if count > 10 else 'ngram-cool')
-        html += f'<span class="ngram-tag {tag_class}">{ngram} ({count})</span>\n'
-
-    html += """
-            </div>
-        </div>
-        <div class="heatmap-container">
-            <h3>結尾常見 3-gram</h3>
-            <div class="ngram-cloud">
-"""
-    for ngram, count in ngram_analysis['top_endings'][:15]:
-        tag_class = 'ngram-hot' if count > 20 else ('ngram-warm' if count > 10 else 'ngram-cool')
-        html += f'<span class="ngram-tag {tag_class}">{ngram} ({count})</span>\n'
-
-    html += """
-            </div>
-        </div>
-    </div>
-"""
-
-    # ===== 短語模式 =====
-    if phrase_patterns:
-        html += """
-    <div class="heatmap-container">
-        <h3>常見短語模式</h3>
-        <div class="table-container">
-            <table>
-                <thead><tr><th>模式</th><th>出現次數</th><th>佔比</th></tr></thead>
-                <tbody>
-"""
-        for pattern, count in list(phrase_patterns.items())[:10]:
-            pct = round(count / len(responses) * 100, 1)
-            html += f"<tr><td>{pattern}</td><td>{count}</td><td>{pct}%</td></tr>\n"
-
-        html += """
-                </tbody>
-            </table>
-        </div>
-    </div>
-"""
-
-    # ===== Persona 個別分析 =====
-    html += """
-    <h2>👤 Persona 個別分析</h2>
-    <div class="persona-grid">
-"""
-    # 按禁止開頭數量排序（問題最大的在前面）
-    sorted_personas = sorted(
-        persona_analysis.items(),
-        key=lambda x: x[1]['banned_opening_count'],
-        reverse=True
-    )
-
-    for persona_name, data in sorted_personas[:12]:
-        banned_rate = round(data['banned_opening_count'] / max(data['response_count'], 1) * 100, 1)
-        good_rate = round(data['good_opening_count'] / max(data['response_count'], 1) * 100, 1)
-        badge_class = 'score-low' if banned_rate > 50 else ('score-medium' if banned_rate > 30 else 'score-high')
-
-        html += f"""
-        <div class="persona-card">
-            <div class="persona-name">{persona_name}</div>
-            <div class="persona-stat">
-                <span class="persona-stat-label">回答數</span>
-                <span class="persona-stat-value">{data['response_count']}</span>
-            </div>
-            <div class="persona-stat">
-                <span class="persona-stat-label">平均長度</span>
-                <span class="persona-stat-value">{data['avg_length']} 字</span>
-            </div>
-            <div class="persona-stat">
-                <span class="persona-stat-label">🚫 禁止開頭使用率</span>
-                <span class="persona-stat-value"><span class="score-badge {badge_class}">{banned_rate}%</span></span>
-            </div>
-            <div class="persona-stat">
-                <span class="persona-stat-label">✅ 好開頭使用率</span>
-                <span class="persona-stat-value">{good_rate}%</span>
-            </div>
-            <div class="persona-stat">
-                <span class="persona-stat-label">正/負情感比</span>
-                <span class="persona-stat-value">{data['sentiment_ratio']}</span>
-            </div>
-            <div class="persona-stat">
-                <span class="persona-stat-label">用字豐富度</span>
-                <span class="persona-stat-value">{data['unique_char_count']} 字</span>
-            </div>
-        </div>
-"""
-
-    html += """
-    </div>
-"""
-
-    # ===== 問題多樣性排名 =====
-    html += """
-    <h2>📋 問題回答多樣性排名</h2>
-    <div class="heatmap-container">
-        <p style="color: #888;">多樣性分數越低 = 回答越相似（需要改進）</p>
-        <div class="table-container">
-            <table>
-                <thead>
-                    <tr>
-                        <th>問題</th>
-                        <th>回答數</th>
-                        <th>平均相似度</th>
-                        <th>多樣性分數</th>
-                    </tr>
-                </thead>
-                <tbody>
-"""
-
-    for question, data in sorted_questions[:15]:
-        score = data['diversity_score']
-        score_class = 'score-low' if score < 40 else ('score-medium' if score < 60 else 'score-high')
-
-        html += f"""
-                    <tr>
-                        <td>{question}...</td>
-                        <td>{data['response_count']}</td>
-                        <td>{data['avg_similarity']}%</td>
-                        <td><span class="score-badge {score_class}">{score}</span></td>
-                    </tr>
-"""
-
-    html += """
-                </tbody>
-            </table>
-        </div>
-    </div>
-"""
-
-    # ===== 重複回答 =====
-    html += """
-    <h2>🔄 完全相同的回答</h2>
-    <div class="heatmap-container">
-        <p style="color: #ff6b6b;">這些回答完全相同，表示可能有緩存問題或 prompt 不夠隨機</p>
-"""
-
-    answer_hash = defaultdict(list)
-    for resp in responses:
-        key = resp['answer'][:100]
-        answer_hash[key].append(resp)
-
-    duplicates = [(k, v) for k, v in answer_hash.items() if len(v) > 1]
-
-    if duplicates:
-        html += "<ul>\n"
-        for key, resps in duplicates[:10]:
-            personas = [r['persona_name'] for r in resps]
-            question = resps[0]['question'][:40]
+    for word, count in sorted_banned:
+        if count > 0:
+            pct = round(count / total * 100, 1)
             html += f"""
-            <li>
-                <strong>問題:</strong> {question}...<br>
-                <strong>受訪者:</strong> {', '.join(personas)}<br>
-                <strong>回答預覽:</strong> {key}...
-            </li>
-"""
-        html += "</ul>\n"
-    else:
-        html += "<p style='color: #4ecdc4;'>✅ 未發現完全相同的回答</p>\n"
-
-    html += """
-    </div>
+                <div class="problem-item">
+                    <span class="problem-word">「{word}」</span>
+                    <span class="problem-count">{count} 次 ({pct}%)</span>
+                </div>
 """
 
-    # ===== 改進建議 =====
     html += """
-    <div class="recommendation">
-        <h4>💡 改進建議</h4>
-        <ol>
-            <li><strong>減少固定開頭</strong>：在 prompt 中明確禁止「其實」「嗯」等高頻開頭詞</li>
-            <li><strong>增加開頭變化</strong>：提供更多樣的開頭模板讓 AI 選擇</li>
-            <li><strong>強化個性差異</strong>：不同 persona 應有明顯不同的說話風格</li>
-            <li><strong>檢查緩存機制</strong>：相似度 100% 的回答可能是緩存問題</li>
-            <li><strong>持續監控</strong>：定期重新執行此報告，追蹤改進效果</li>
-        </ol>
-    </div>
+            </div>
 
-    <footer style="text-align: center; color: #666; margin-top: 40px; padding: 20px;">
-        Generated by Response Diversity Analyzer v2.0
-    </footer>
+            <!-- 好的開頭統計 -->
+            <div class="section-title">✅ 好開頭（繼續保持）</div>
+            <div class="good-list">
+"""
+
+    for word, count in sorted_good:
+        if count > 0:
+            pct = round(count / total * 100, 1)
+            html += f"""
+                <div class="good-item">
+                    <span class="good-word">「{word}」</span>
+                    <span class="good-count">{count} 次 ({pct}%)</span>
+                </div>
+"""
+
+    if total_good == 0:
+        html += """
+                <div style="color: #64748b; text-align: center; padding: 20px;">
+                    尚未偵測到好的開頭用語
+                </div>
+"""
+
+    html += """
+            </div>
+
+            <!-- 建議 -->
+            <div class="suggestion">
+                <div class="suggestion-title">💡 下一步</div>
+                <div class="suggestion-text">
+                    重新生成訪談內容後，再次執行此報告檢查改善效果。<br>
+                    目標：禁止開頭使用率 < 10%，好開頭使用率 > 20%
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            Response Diversity Analyzer v3.0
+        </div>
+    </div>
 </body>
 </html>
 """
