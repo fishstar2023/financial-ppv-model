@@ -84,6 +84,15 @@ export const VietnamInterview = () => {
   const [batchProgress, setBatchProgress] = useState(0);
   const [currentProcessingPersona, setCurrentProcessingPersona] = useState<string>('');
 
+  // 語義問題分組狀態
+  // questionToCanonical: 將任何問題映射到其「代表問題」
+  // canonicalQuestions: 所有的「代表問題」列表（去重後）
+  const [semanticMapping, setSemanticMapping] = useState<{
+    questionToCanonical: Record<string, string>;
+    canonicalQuestions: string[];
+  }>({ questionToCanonical: {}, canonicalQuestions: [] });
+  const [isLoadingSemanticGroups, setIsLoadingSemanticGroups] = useState(false);
+
   // 載入歷史資料
   useEffect(() => {
     loadPersonas();
@@ -100,6 +109,74 @@ export const VietnamInterview = () => {
       console.error('Failed to load personas:', e);
     }
   };
+
+  // 載入語義問題分組
+  const loadSemanticGroups = async (allQuestions: string[]) => {
+    if (allQuestions.length === 0) {
+      setSemanticMapping({ questionToCanonical: {}, canonicalQuestions: [] });
+      return;
+    }
+
+    setIsLoadingSemanticGroups(true);
+    try {
+      const res = await fetch('http://localhost:8787/api/vietnam_semantic_group', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ questions: allQuestions, threshold: 0.72 })
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        // API returns: { groups: {...}, mapping: {...}, total_questions, total_groups }
+        const canonicals = Object.keys(data.groups || {});
+        setSemanticMapping({
+          questionToCanonical: data.mapping || {},
+          canonicalQuestions: canonicals
+        });
+        console.log(`🔍 [Semantic] Grouped ${allQuestions.length} questions into ${canonicals.length} groups`);
+      } else {
+        console.error('Failed to load semantic groups:', res.status);
+        // Fallback: 使用原始問題
+        const fallbackMapping: Record<string, string> = {};
+        allQuestions.forEach(q => { fallbackMapping[q] = q; });
+        setSemanticMapping({
+          questionToCanonical: fallbackMapping,
+          canonicalQuestions: allQuestions
+        });
+      }
+    } catch (e) {
+      console.error('Failed to load semantic groups:', e);
+      // Fallback: 使用原始問題
+      const fallbackMapping: Record<string, string> = {};
+      allQuestions.forEach(q => { fallbackMapping[q] = q; });
+      setSemanticMapping({
+        questionToCanonical: fallbackMapping,
+        canonicalQuestions: allQuestions
+      });
+    } finally {
+      setIsLoadingSemanticGroups(false);
+    }
+  };
+
+  // 當 personas 改變時，重新計算語義分組
+  useEffect(() => {
+    // 收集所有問題
+    const allQuestions: string[] = [];
+    const seen = new Set<string>();
+    personas.forEach(p => {
+      p.interviewHistory?.forEach(record => {
+        if (record.question && !seen.has(record.question)) {
+          seen.add(record.question);
+          allQuestions.push(record.question);
+        }
+      });
+    });
+
+    // 只有當有問題時才呼叫 API
+    if (allQuestions.length > 0) {
+      loadSemanticGroups(allQuestions);
+    }
+  }, [personas]);
 
   const savePersona = async (persona: VietnamPersona) => {
     try {
@@ -332,18 +409,37 @@ export const VietnamInterview = () => {
 
   // 取得所有問題列表（從所有受訪者的訪談紀錄中）
   // 如果有選擇主題標籤，則只顯示該主題的問題
-  // 會將語義相似的問題合併為同一個選項
+  // 會將語義相似的問題合併為同一個選項（使用 AI 語義比對）
   const getAllQuestions = (): string[] => {
-    // 用於追蹤正規化後的問題對應到的原始問題
+    // 如果有語義分組資料，使用它
+    if (semanticMapping.canonicalQuestions.length > 0) {
+      // 根據主題標籤篩選
+      if (selectedTopicTag) {
+        // 找出在選定主題下有回答的「代表問題」
+        const relevantCanonicals = new Set<string>();
+        personas.forEach(p => {
+          p.interviewHistory.forEach(record => {
+            if (record.question && record.topicTag === selectedTopicTag) {
+              const canonical = semanticMapping.questionToCanonical[record.question];
+              if (canonical) {
+                relevantCanonicals.add(canonical);
+              }
+            }
+          });
+        });
+        return Array.from(relevantCanonicals);
+      }
+      return semanticMapping.canonicalQuestions;
+    }
+
+    // Fallback: 使用基礎正規化（當語義分組尚未載入時）
     const normalizedToOriginal: Map<string, string> = new Map();
 
     personas.forEach(p => {
       p.interviewHistory.forEach(record => {
         if (record.question) {
-          // 如果有選擇主題標籤，只顯示該主題的問題
           if (!selectedTopicTag || record.topicTag === selectedTopicTag) {
             const normalized = normalizeQuestion(record.question);
-            // 只保留第一個出現的原始問題作為顯示用
             if (!normalizedToOriginal.has(normalized)) {
               normalizedToOriginal.set(normalized, record.question);
             }
@@ -356,16 +452,39 @@ export const VietnamInterview = () => {
   };
 
   // 取得特定問題的所有回答（支援主題標籤篩選）
-  // 會自動匹配語義相似的問題
+  // 會自動匹配語義相似的問題（使用 AI 語義比對）
   const getResponsesForQuestion = (question: string) => {
     const responses: Array<{ persona: VietnamPersona; answer: string; topicTag?: string }> = [];
+
+    // 如果有語義分組資料，使用它來匹配
+    if (Object.keys(semanticMapping.questionToCanonical).length > 0) {
+      // 找出目標問題的代表問題
+      const targetCanonical = semanticMapping.questionToCanonical[question] || question;
+
+      personas.forEach(persona => {
+        persona.interviewHistory.forEach(record => {
+          // 比較語義分組後的代表問題
+          const recordCanonical = semanticMapping.questionToCanonical[record.question];
+          if (recordCanonical === targetCanonical || record.question === targetCanonical) {
+            if (!selectedTopicTag || record.topicTag === selectedTopicTag) {
+              responses.push({
+                persona,
+                answer: record.answer,
+                topicTag: record.topicTag
+              });
+            }
+          }
+        });
+      });
+      return responses;
+    }
+
+    // Fallback: 使用基礎正規化
     const targetNormalized = normalizeQuestion(question);
 
     personas.forEach(persona => {
       persona.interviewHistory.forEach(record => {
-        // 比較正規化後的問題
         if (normalizeQuestion(record.question) === targetNormalized) {
-          // 如果有選擇主題標籤，只顯示該主題的回答
           if (!selectedTopicTag || record.topicTag === selectedTopicTag) {
             responses.push({
               persona,
@@ -1682,6 +1801,7 @@ export const VietnamInterview = () => {
                   }}>
                     選擇要分析的問題 / Select Question to Analyze
                     {selectedTopicTag && <span style={{ fontWeight: 400, color: colors.textMuted }}> (已篩選: {selectedTopicTag})</span>}
+                    {isLoadingSemanticGroups && <span style={{ fontWeight: 400, color: colors.info, marginLeft: '8px' }}>🔍 語義分析中...</span>}
                   </label>
                   <select
                     value={selectedQuestion}
@@ -1689,6 +1809,7 @@ export const VietnamInterview = () => {
                       setSelectedQuestion(e.target.value);
                       setAnalysisResult('');
                     }}
+                    disabled={isLoadingSemanticGroups}
                     style={{
                       width: '100%',
                       padding: '14px 18px',
@@ -1696,12 +1817,12 @@ export const VietnamInterview = () => {
                       borderRadius: '12px',
                       fontSize: '15px',
                       outline: 'none',
-                      background: 'rgba(255, 255, 255, 0.6)',
+                      background: isLoadingSemanticGroups ? 'rgba(245, 248, 243, 0.9)' : 'rgba(255, 255, 255, 0.6)',
                       color: colors.textPrimary,
-                      cursor: 'pointer'
+                      cursor: isLoadingSemanticGroups ? 'wait' : 'pointer'
                     }}
                   >
-                    <option value="">-- 選擇問題 --</option>
+                    <option value="">{isLoadingSemanticGroups ? '-- 載入語義分組中... --' : '-- 選擇問題 --'}</option>
                     {getAllQuestions().map((q, idx) => {
                       const responseCount = getResponsesForQuestion(q).length;
                       return (

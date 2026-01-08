@@ -1729,3 +1729,51 @@ def api_vietnam_classify_multi(request: MultiClassifyRequest):
     except Exception as e:
         print(f"多維度分類錯誤: {e}")
         return JSONResponse({"error": str(e)}, status_code=500)
+
+
+# ========== Semantic Question Matching API ==========
+from vietnam_semantic_matcher import group_similar_questions
+
+
+class SemanticGroupRequest(BaseModel):
+    questions: List[str]
+    threshold: float = 0.85
+
+
+@app.post("/api/vietnam_semantic_group")
+def api_vietnam_semantic_group(request: SemanticGroupRequest):
+    """
+    語義問題分組 - 將相似問題合併為同一組
+
+    Returns:
+        {
+            "groups": {
+                "canonical_question": ["similar_q1", "similar_q2", ...],
+                ...
+            },
+            "mapping": {
+                "original_question": "canonical_question",
+                ...
+            }
+        }
+    """
+    try:
+        print(f"🔍 收到語義分組請求: {len(request.questions)} questions, threshold={request.threshold}")
+
+        groups = group_similar_questions(request.questions, request.threshold)
+
+        # 建立反向映射：每個原始問題 -> 對應的代表問題
+        mapping = {}
+        for canonical, similar_list in groups.items():
+            for q in similar_list:
+                mapping[q] = canonical
+
+        return {
+            "groups": groups,
+            "mapping": mapping,
+            "total_questions": len(request.questions),
+            "total_groups": len(groups)
+        }
+    except Exception as e:
+        print(f"語義分組錯誤: {e}")
+        return JSONResponse({"error": str(e)}, status_code=500)
