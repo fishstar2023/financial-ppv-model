@@ -132,6 +132,49 @@ def interview_vietnam_persona(
         "You're on your PHONE, not a computer",
     ]
 
+    # ===== 新增：回答立場多樣化 =====
+    # 對旅遊險的整體態度（不是每個人都正面看待）
+    insurance_attitudes = [
+        "POSITIVE: You genuinely believe travel insurance is essential and worth every penny",
+        "SKEPTICAL: You think most travel insurance is a waste of money, but bought it anyway 'just in case'",
+        "RELUCTANT: You only buy it because someone (family/company) requires or pressures you",
+        "INDIFFERENT: You don't really care about insurance, it's just a checkbox to tick",
+        "NEGATIVE EXPERIENCE: You had a BAD claim experience and are now very distrustful",
+        "CONVERT: You used to not care, but one incident changed your mind completely",
+        "COMPARISON SHOPPER: You always hunt for the cheapest option, never loyal to any brand",
+        "BRAND LOYAL: You stick to one brand/channel because switching is too troublesome",
+        "OVERTHINKING: You spend too much time researching and comparing, often end up confused",
+        "IMPULSE: You buy whatever is convenient at the moment without much thought",
+    ]
+
+    # 溝通風格（說話方式）
+    speaking_styles = [
+        "VERBOSE: You tend to give long, detailed explanations with many tangents",
+        "CONCISE: You prefer short, direct answers without elaboration",
+        "STORYTELLER: You always frame things as stories with beginning, middle, end",
+        "ANALYTICAL: You like to break things down into pros/cons, numbers, comparisons",
+        "EMOTIONAL: You express strong feelings and reactions in your answers",
+        "RESERVED: You're a bit shy and give cautious, measured responses",
+        "HUMOROUS: You tend to make jokes or find funny angles in situations",
+        "COMPLAINER: You naturally focus on problems and things that went wrong",
+        "DIPLOMATIC: You try to be balanced and see both sides of everything",
+        "BLUNT: You say exactly what you think without sugarcoating",
+    ]
+
+    # 過去經驗類型（不是每個人都有正面經驗）
+    past_experiences = [
+        "SMOOTH: All your past insurance purchases went smoothly, no issues",
+        "CLAIM DENIED: You once had a claim rejected and it left a bad impression",
+        "NEVER USED: You've bought insurance many times but never actually needed it",
+        "SAVED BY INSURANCE: Insurance saved you from a major financial loss once",
+        "SCAMMED: You were once tricked by a fake or misleading insurance product",
+        "COMPLICATED CLAIM: Getting reimbursed was so complicated you almost gave up",
+        "FAMILY PRESSURE: Your family always buys insurance for you, you've never done it yourself",
+        "WORK COVERED: Your company usually handles travel insurance, you're unfamiliar with buying",
+        "FORGOT ONCE: You forgot to buy insurance once and thankfully nothing happened",
+        "REGRET: You once skipped insurance and something went wrong - learned the hard way",
+    ]
+
     # ===== 新增：敘事風格多樣化 =====
     # 回答開頭風格（打破「嗯，我第一次...」的公式）
     opening_styles = [
@@ -175,6 +218,11 @@ def interview_vietnam_persona(
     reaction_style = reaction_styles[(hash_val // 10000) % len(reaction_styles)]
     personal_context = personal_contexts[(hash_val // 1000000) % len(personal_contexts)]
 
+    # 新增立場/態度選擇
+    insurance_attitude = insurance_attitudes[(hash_val // 3) % len(insurance_attitudes)]
+    speaking_style = speaking_styles[(hash_val // 11) % len(speaking_styles)]
+    past_experience = past_experiences[(hash_val // 19) % len(past_experiences)]
+
     # 新增敘事風格選擇
     opening_style = opening_styles[(hash_val // 7) % len(opening_styles)]
     structure_style = structure_styles[(hash_val // 13) % len(structure_styles)]
@@ -189,7 +237,16 @@ def interview_vietnam_persona(
         background,
         history_summary,
         "",
-        "# YOUR UNIQUE PERSONALITY FOR THIS BROWSING SESSION:",
+        "# 🎭 YOUR CORE PERSONALITY (MUST STAY IN CHARACTER):",
+        "",
+        f"**Your attitude toward insurance**: {insurance_attitude}",
+        f"**Your past experience**: {past_experience}",
+        f"**Your speaking style**: {speaking_style}",
+        "",
+        "⚠️ IMPORTANT: Your answers should REFLECT these traits. If you're skeptical, show it.",
+        "If you had a bad experience, let it color your views. Be CONSISTENT with your character.",
+        "",
+        "# YOUR BROWSING PERSONALITY:",
         f"- Starting behavior: {starting_point}",
         f"- Main focus: {focus_point}",
         f"- Reaction style: {reaction_style}",
@@ -209,6 +266,8 @@ def interview_vietnam_persona(
         "- ❌ '總之...' or '這次經驗讓我學到...' as ending - CLICHÉ",
         "- ❌ '值得/很值得' as final judgment - OVERUSED",
         "- ❌ Generic positive conclusions - FEELS FAKE",
+        "- ❌ Always praising insurance - UNREALISTIC (many people are skeptical!)",
+        "- ❌ Saying '這是一個很好的問題' or similar - UNNATURAL",
         "",
         "# ✅ WHAT MAKES A GOOD RESPONSE:",
         "",
@@ -217,6 +276,8 @@ def interview_vietnam_persona(
         "- Show your PERSONALITY through word choice and rhythm",
         "- Let some thoughts be INCOMPLETE or CONTRADICTORY - that's real",
         "- Use FILLER WORDS naturally: '就是...', '然後...', '對啊...', '怎麼說呢...'",
+        "- Include NEGATIVE opinions if your character would have them",
+        "- Express UNCERTAINTY - real people don't have all the answers",
         "",
         "# RESPONSE LANGUAGE AND STYLE:",
         "",
@@ -226,6 +287,12 @@ def interview_vietnam_persona(
         "- You are Vietnamese living in Vietnam - reference Vietnamese context (VND, local places)",
         "- Give detailed answers (4-6 sentences) with specific observations",
         "- Share genuine emotions and opinions, not generic comments",
+        "",
+        "# DIVERSITY EXAMPLES (different types of responses):",
+        "- Skeptic: '說實話我覺得保險公司都在賺這個錢...但是不買又怕萬一...'",
+        "- Bad experience: '上次理賠搞了三個月，我到現在還在生氣...'",
+        "- Indifferent: '其實我也沒怎麼研究，反正便宜的隨便買一個就好...'",
+        "- Overthinking: '我比較了五家公司，看到最後頭都昏了，條款都差不多...'",
         "",
         "# IMPORTANT: AVOID THESE CLICHÉS:",
         "- Don't say 'the design looks clean/professional' unless you have a SPECIFIC reason",
