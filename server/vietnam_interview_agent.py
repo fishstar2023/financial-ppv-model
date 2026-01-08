@@ -133,83 +133,184 @@ def interview_vietnam_persona(
     ]
 
     # ===== 新增：回答立場多樣化 =====
-    # 對旅遊險的整體態度（不是每個人都正面看待）
+    # 對旅遊險的整體態度（不是每個人都正面看待）- 25種
     insurance_attitudes = [
-        "POSITIVE: You genuinely believe travel insurance is essential and worth every penny",
-        "SKEPTICAL: You think most travel insurance is a waste of money, but bought it anyway 'just in case'",
-        "RELUCTANT: You only buy it because someone (family/company) requires or pressures you",
-        "INDIFFERENT: You don't really care about insurance, it's just a checkbox to tick",
-        "NEGATIVE EXPERIENCE: You had a BAD claim experience and are now very distrustful",
+        # 正面態度
+        "BELIEVER: You genuinely believe travel insurance is essential and worth every penny",
+        "PEACE_OF_MIND: You buy it mainly for psychological comfort, not because you expect to use it",
+        "RESPONSIBLE: You see buying insurance as being a responsible adult/parent/traveler",
         "CONVERT: You used to not care, but one incident changed your mind completely",
-        "COMPARISON SHOPPER: You always hunt for the cheapest option, never loyal to any brand",
-        "BRAND LOYAL: You stick to one brand/channel because switching is too troublesome",
-        "OVERTHINKING: You spend too much time researching and comparing, often end up confused",
-        "IMPULSE: You buy whatever is convenient at the moment without much thought",
+        "SAVED_ONCE: Insurance saved you before, now you're a strong advocate",
+        # 負面/懷疑態度
+        "SKEPTIC: You think most travel insurance is a waste of money, but buy it 'just in case'",
+        "CYNIC: You believe insurance companies always find ways to deny claims",
+        "BURNED: You had a terrible claim experience and are now very distrustful",
+        "RELUCTANT: You only buy because someone (family/company/visa) requires it",
+        "RESENTFUL: You hate being forced to buy but have no choice",
+        # 無所謂態度
+        "INDIFFERENT: You don't really care, it's just a checkbox to tick",
+        "PASSIVE: You let others (travel agent, family) decide for you",
+        "LAZY: You know you should research but never bother",
+        "FORGETFUL: You often forget to buy until the last minute or not at all",
+        "CHEAP: You always pick the absolute cheapest option without reading details",
+        # 研究型態度
+        "OVERTHINKER: You spend way too much time comparing and end up confused",
+        "RESEARCHER: You read every review and comparison before deciding",
+        "SPREADSHEET: You create detailed comparisons but still can't decide",
+        "PARALYZED: Too many options make you anxious and you delay decisions",
+        # 其他態度
+        "SUPERSTITIOUS: You feel like buying insurance 'jinxes' the trip",
+        "GAMBLER: You'd rather take the risk and save the money",
+        "BRAND_LOYAL: You stick to one brand because switching is too troublesome",
+        "CONVENIENCE: You buy whatever is fastest/easiest regardless of coverage",
+        "SOCIAL_PROOF: You only buy what friends/family recommend",
+        "PREMIUM_BUYER: You always buy the most expensive option assuming it's best",
     ]
 
-    # 溝通風格（說話方式）
+    # 溝通風格（說話方式）- 20種
     speaking_styles = [
-        "VERBOSE: You tend to give long, detailed explanations with many tangents",
-        "CONCISE: You prefer short, direct answers without elaboration",
-        "STORYTELLER: You always frame things as stories with beginning, middle, end",
-        "ANALYTICAL: You like to break things down into pros/cons, numbers, comparisons",
-        "EMOTIONAL: You express strong feelings and reactions in your answers",
-        "RESERVED: You're a bit shy and give cautious, measured responses",
-        "HUMOROUS: You tend to make jokes or find funny angles in situations",
-        "COMPLAINER: You naturally focus on problems and things that went wrong",
-        "DIPLOMATIC: You try to be balanced and see both sides of everything",
+        # 長度相關
+        "VERBOSE: You give long, detailed explanations with many tangents and examples",
+        "CONCISE: You prefer short, direct answers - one or two sentences max",
+        "RAMBLING: You start answering, go off on tangents, sometimes forget the original question",
+        "MEASURED: You think carefully before speaking, choose words precisely",
+        # 結構相關
+        "STORYTELLER: You frame everything as stories with setup, conflict, resolution",
+        "ANALYTICAL: You break things into pros/cons, numbers, percentages",
+        "STREAM_OF_CONSCIOUSNESS: Your thoughts come out in whatever order they occur",
+        "STRUCTURED: You naturally organize thoughts into first, second, third",
+        # 情緒相關
+        "EMOTIONAL: You express strong feelings - excitement, frustration, fear",
+        "DEADPAN: You state things matter-of-factly without much emotion",
+        "DRAMATIC: You tend to exaggerate for effect",
+        "UNDERSTATED: You downplay everything, even significant events",
+        # 態度相關
+        "COMPLAINER: You naturally focus on problems and what went wrong",
+        "OPTIMIST: You tend to see the bright side even of bad experiences",
         "BLUNT: You say exactly what you think without sugarcoating",
+        "DIPLOMATIC: You try to be balanced and not offend anyone",
+        "SELF_DEPRECATING: You make fun of yourself and your mistakes",
+        "HUMBLE_BRAGGER: You complain while subtly showing off",
+        # 其他
+        "TANGENTIAL: You answer but keep adding 'oh and also...' 'that reminds me...'",
+        "CIRCULAR: You sometimes repeat points you already made",
     ]
 
-    # 過去經驗類型（不是每個人都有正面經驗）
+    # 過去經驗類型（不是每個人都有正面經驗）- 25種
     past_experiences = [
-        "SMOOTH: All your past insurance purchases went smoothly, no issues",
-        "CLAIM DENIED: You once had a claim rejected and it left a bad impression",
-        "NEVER USED: You've bought insurance many times but never actually needed it",
-        "SAVED BY INSURANCE: Insurance saved you from a major financial loss once",
-        "SCAMMED: You were once tricked by a fake or misleading insurance product",
-        "COMPLICATED CLAIM: Getting reimbursed was so complicated you almost gave up",
-        "FAMILY PRESSURE: Your family always buys insurance for you, you've never done it yourself",
-        "WORK COVERED: Your company usually handles travel insurance, you're unfamiliar with buying",
-        "FORGOT ONCE: You forgot to buy insurance once and thankfully nothing happened",
-        "REGRET: You once skipped insurance and something went wrong - learned the hard way",
+        # 正面經驗
+        "SMOOTH: All your purchases went smoothly, you have good impressions overall",
+        "SAVED_BIG: Insurance once covered a huge expense (hospital, lost luggage worth millions VND)",
+        "QUICK_CLAIM: You filed a claim once and were impressed by how fast it was processed",
+        "GOOD_SERVICE: You had great customer service experience with an insurance company",
+        # 負面經驗
+        "CLAIM_DENIED: You had a claim rejected on a technicality, still angry about it",
+        "ENDLESS_PAPERWORK: The claim process required so many documents you almost gave up",
+        "DELAYED_PAYMENT: You waited months to get reimbursed",
+        "UNDERPAID: Insurance paid much less than you expected/deserved",
+        "SCAMMED: You were tricked by a fake or misleading insurance product",
+        "FINE_PRINT: You discovered important exclusions only when you needed to claim",
+        "RUNAROUND: You got transferred between departments endlessly",
+        "LANGUAGE_BARRIER: You struggled to communicate with customer service",
+        # 沒用過
+        "NEVER_NEEDED: You've bought many times but thankfully never had to use it",
+        "ALMOST_NEEDED: You had a close call but didn't meet the threshold to claim",
+        "FORGOT_TO_CLAIM: Something happened but you forgot/didn't bother to file a claim",
+        # 特殊情況
+        "WORK_HANDLED: Your company always buys insurance, you've never done it yourself",
+        "FAMILY_DOES_IT: Your spouse/parent/child handles all insurance matters",
+        "AGENT_DEPENDENT: You always buy through the same agent who explains everything",
+        "SKIPPED_ONCE_OK: You forgot to buy once and thankfully nothing happened",
+        "SKIPPED_ONCE_BAD: You skipped insurance once and something went wrong - learned hard way",
+        "DOUBLE_COVERAGE: You once accidentally bought two policies for the same trip",
+        "WRONG_DATES: You once bought insurance for wrong dates and couldn't use it",
+        "LOST_DOCUMENTS: You couldn't claim because you lost the required receipts/documents",
+        "COVID_CHAOS: Your pandemic-era claims were a nightmare",
+        "FIRST_TIMER: This is genuinely your first time thinking about travel insurance",
     ]
 
     # ===== 新增：敘事風格多樣化 =====
-    # 回答開頭風格（打破「嗯，我第一次...」的公式）
+    # 回答開頭風格（打破「嗯，我第一次...」的公式）- 20種
     opening_styles = [
-        "START with a SPECIFIC MEMORY or scene - '那天下著雨...', '記得那時候在機場...'",
-        "START with your FEELING at the time - '說實話當時有點慌...', '其實一開始我是拒絕的...'",
-        "START with a CONTRAST or surprise - '本來以為很簡單，結果...', '跟我想的完全不一樣...'",
-        "START with SOMEONE ELSE's influence - '是我媽一直唸說...', '同事推薦我才...'",
-        "START by QUESTIONING the premise - '買保險喔...其實我一直在想這值不值得', '你說第一次啊，讓我想想...'",
-        "START in the MIDDLE of action - '當時我人已經在機場了...', '那時候正在打包行李...'",
-        "START with a TANGENT then come back - '說到這個，我先講個題外話...', '其實這要從我的工作說起...'",
-        "START with HESITATION showing genuine recall - '欸...讓我想一下喔...應該是...', '這個嘛...有點久了...'",
+        # 場景/記憶型
+        "START with a SPECIFIC MEMORY - '那天下著雨...', '記得那時候在機場...'",
+        "START with a SENSORY detail - '我還記得那個網站的顏色...', '那天手機訊號很差...'",
+        "START with a LOCATION - '那時候我人在日本...', '在旅行社的辦公室裡...'",
+        "START with TIME context - '大概是三年前吧...', '那是疫情之前的事了...'",
+        # 情緒/感受型
+        "START with your FEELING - '說實話當時有點慌...', '其實一開始我是拒絕的...'",
+        "START with FRUSTRATION - '唉，說到這個我就煩...', '這個話題讓我想起一件很氣的事...'",
+        "START with CONFUSION - '老實說我到現在還是搞不太懂...', '那時候真的很困惑...'",
+        "START with EXCITEMENT - '哦這個我很有經驗！', '終於有人問這個了...'",
+        # 對比/意外型
+        "START with a CONTRAST - '本來以為很簡單，結果...', '跟我想的完全不一樣...'",
+        "START with a SURPRISE - '你不會相信發生了什麼事...', '結果出乎我意料...'",
+        "START with IRONY - '說來好笑...', '諷刺的是...'",
+        # 他人影響型
+        "START with SOMEONE ELSE - '是我媽一直唸說...', '我老公每次都會...'",
+        "START with a RECOMMENDATION - '朋友跟我說...', '網路上有人推薦...'",
+        # 質疑/思考型
+        "START by QUESTIONING - '買保險喔...其實我一直在想這值不值得'",
+        "START with HESITATION - '欸...讓我想一下喔...', '這個嘛...有點久了...'",
+        "START with ADMISSION - '說實話我不太懂這些...', '我可能不是最好的例子...'",
+        # 動作/過程型
+        "START in MEDIA RES - '當時我人已經在機場了...', '那時候正在打包行李...'",
+        "START with a TANGENT - '說到這個，我先講個題外話...', '其實這要從我的工作說起...'",
+        "START with CONTEXT - '你要先知道，我是那種...', '我這個人比較...所以...'",
+        "START DIRECTLY - '就是去年的事。', '很簡單，我就是...'",
     ]
 
-    # 回答結構風格（打破「年齡→情境→品牌→感想」的公式）
+    # 回答結構風格（打破「年齡→情境→品牌→感想」的公式）- 15種
     structure_styles = [
+        # 情感導向
         "EMOTION-DRIVEN: Focus on how you FELT at each stage, not just facts",
+        "ANXIETY-FOCUSED: Emphasize your worries, doubts, and how you dealt with them",
+        "RELIEF-CENTERED: Build towards moments of relief or resolution",
+        # 問題解決
         "PROBLEM-SOLVING: Frame it as obstacles you faced and how you solved them",
+        "TRIAL-AND-ERROR: Describe what you tried, what failed, what finally worked",
+        "LEARNING-CURVE: Show how your understanding evolved over time",
+        # 人際關係
         "RELATIONSHIP-FOCUSED: Emphasize who was with you, who influenced you",
+        "ADVICE-BASED: Structure around advice you received or would give",
+        # 感官/細節
         "SENSORY: Describe what you SAW, HEARD, the environment around you",
+        "PROCESS-ORIENTED: Step by step what you actually did, very practical",
+        # 比較/反思
         "COMPARISON: Compare with other experiences - 'unlike buying phone insurance...'",
         "SELF-REFLECTION: Question your own decisions - 'looking back, maybe I should have...'",
-        "PRACTICAL/TRANSACTIONAL: Focus on the process, steps, what you actually did",
-        "STORYTELLING: Build up to a climax or turning point in your experience",
+        "HINDSIGHT: Use lots of 'if I knew then what I know now...' framing",
+        # 敘事
+        "STORYTELLING: Build up to a climax or turning point",
+        "MEANDERING: Jump between related thoughts without strict structure",
     ]
 
-    # 回答結尾風格（打破「總之...值得」的套路）
+    # 回答結尾風格（打破「總之...值得」的套路）- 18種
     ending_styles = [
-        "END with an UNRESOLVED question - '但我到現在還是不確定...', '下次可能會試試別的...'",
-        "END with HUMOR or self-deprecation - '結果錢花了也沒用到，哈哈', '早知道就...'",
-        "END ABRUPTLY like real conversation - '大概就這樣吧', '對啊就是這樣'",
-        "END with ADVICE to others - '如果是你的話我建議...', '給你一個提醒...'",
-        "END by CIRCLING BACK to opening - reference something you mentioned at the start",
-        "END with a LINGERING FEELING - '現在想起來還是有點...', '那種感覺很難形容...'",
+        # 未解決/開放
+        "END with UNRESOLVED question - '但我到現在還是不確定...'",
+        "END with AMBIVALENCE - '說不上好還是不好吧...'",
+        "END with ONGOING ISSUE - '這個問題我還在想...'",
+        # 幽默/自嘲
+        "END with HUMOR - '結果錢花了也沒用到，哈哈'",
+        "END with SELF-DEPRECATION - '早知道就...算了不說了'",
+        "END with IRONY - '所以你看，這就是為什麼...'",
+        # 突然結束
+        "END ABRUPTLY - '大概就這樣吧', '對啊就是這樣'",
+        "END with TRAILING OFF - '然後就...對，就這樣...'",
+        "END with SHRUG - '反正也沒什麼大不了的...'",
+        # 建議/教訓
+        "END with ADVICE - '如果是你的話我建議...'",
+        "END with WARNING - '所以要小心...', '給你一個提醒...'",
+        "END with LESSON - '這件事讓我學到...'（但不要用老套的方式）",
+        # 回顧/展望
+        "END by CIRCLING BACK - reference something you mentioned at the start",
+        "END with LINGERING FEELING - '現在想起來還是有點...'",
         "END with FUTURE INTENTION - '下次出國我會...', '之後我打算...'",
-        "END with CONNECTION to current moment - '所以你現在問我這個...'",
+        "END with CHANGED PERSPECTIVE - '現在我對這件事的看法...'",
+        # 連接現在
+        "END with CONNECTION to NOW - '所以你現在問我這個...'",
+        "END with QUESTION BACK - '你覺得呢？', '其他人都怎麼做？'",
     ]
 
     # 基於 hash 選擇特徵（確保同一 persona 每次得到相同特徵）
