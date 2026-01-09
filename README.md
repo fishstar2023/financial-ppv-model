@@ -33,12 +33,16 @@ A comprehensive market research tool that generates diverse synthetic personas a
 ### Backend (Python + FastAPI + Agno)
 ```
 server/
-├── agno_api.py              # FastAPI server with PPV endpoints
-├── generator_agent.py       # Persona generation with diversity prompt
-├── impersonation_agent.py   # Dynamic personality-driven chat agent
-├── extraction_agent.py      # PPV extraction from conversation logs
-├── ppv_schema.py           # Pydantic schemas (Big5, Risk, Values)
-└── personas.json           # Persistent persona database
+├── agno_api.py                    # FastAPI server with PPV endpoints
+├── generator_agent.py             # Persona generation with diversity prompt
+├── vietnam_interview_agent.py     # PPV-driven interview simulation
+├── ppv_extreme_generator.py       # PPV extreme test case generator
+├── ppv_diversity_monitor.py       # Diversity metrics monitoring
+├── test_ppv_interview_stability.py # PPV testing suite
+├── impersonation_agent.py         # Dynamic personality-driven chat agent
+├── extraction_agent.py            # PPV extraction from conversation logs
+├── ppv_schema.py                  # Pydantic schemas (Big5, Risk, Values)
+└── personas.json                  # Persistent persona database
 ```
 
 **Key Technologies**:
@@ -170,6 +174,57 @@ Open your browser and navigate to: **http://127.0.0.1:5176**
 - **Larger Typography**: Progressive font scaling (15px → 40px) for accessibility
 - **Simplified Backstories**: Concise 2-sentence format focusing on demographics + key traits
 - **Responsive Design**: Adaptive grid layout (min 320px cards)
+
+---
+
+## 🧠 PPV Diversity Control System
+
+### Overview
+
+The PPV (Persona Personality Variables) system ensures AI-generated interview responses are diverse and consistent with persona settings.
+
+### Key PPV Dimensions
+
+| Dimension | Range | Effect |
+|-----------|-------|--------|
+| `language_style.verbosity` | 0-100 | Controls response length (68-499 chars) |
+| `language_style.emotion_expression` | 0-100 | Controls emotion word count (0-5 words) |
+| `language_style.formality` | 0-100 | Controls formal vs casual language |
+| `language_style.directness` | 0-100 | Controls direct vs indirect expression |
+| `big5.neuroticism` | 0-100 | Controls anxiety/worry expression |
+| `big5.extraversion` | 0-100 | Controls talkative vs reserved style |
+| `risk_profile.overall` | 0-100 | Controls cautious vs risk-taking attitude |
+
+### Diversity Metrics
+
+- **Pearson Correlation**: 0.987 (verbosity ↔ response length)
+- **Coefficient of Variation**: 48-64% (response length diversity)
+- **PPV Consistency Score**: 81% average (response matches persona settings)
+
+### Testing Commands
+
+```bash
+# Verbosity correlation test (0→100 gradient)
+python server/test_ppv_interview_stability.py -m correlation
+
+# Full diversity analysis (extreme personas)
+python server/test_ppv_interview_stability.py -m diversity
+
+# Multi-dimension cross test (verbosity × emotion)
+python server/test_ppv_interview_stability.py -m cross
+
+# Diagonal extremes (all high/low)
+python server/test_ppv_interview_stability.py -m diagonal
+```
+
+### Extreme Test Personas
+
+| Persona | V | F | E | N | Risk | Expected Behavior |
+|---------|---|---|---|---|------|-------------------|
+| All High | 95 | 95 | 95 | 95 | 95 | Long, emotional, anxious |
+| All Low | 5 | 5 | 5 | 5 | 5 | Short, flat, cautious |
+| Extrovert-Impulsive | 85 | 20 | 90 | 20 | 90 | Talkative, casual, bold |
+| Introvert-Cautious | 25 | 85 | 20 | 75 | 10 | Brief, formal, worried |
 
 ---
 

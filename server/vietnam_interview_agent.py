@@ -336,6 +336,64 @@ def interview_vietnam_persona(
     directness = language_style.get('directness', 50)
     emotion_expression = language_style.get('emotion_expression', 50)
 
+    # 取得其他 PPV 維度
+    big5 = persona.get('big5', {})
+    neuroticism = big5.get('neuroticism', 50)
+    extraversion = big5.get('extraversion', 50)
+    openness = big5.get('openness', 50)
+    agreeableness = big5.get('agreeableness', 50)
+    conscientiousness = big5.get('conscientiousness', 50)
+
+    risk_profile = persona.get('risk_profile', {})
+    risk_overall = risk_profile.get('overall', 50)
+
+    # ===== Big5 人格特質控制 =====
+    # Neuroticism 影響焦慮/擔心程度
+    if neuroticism >= 70:
+        neuroticism_style = f"""HIGH NEUROTICISM (N={neuroticism}/100):
+- 表達時帶有明顯的焦慮和擔心
+- 使用「擔心」「怕」「萬一」「不確定」「好像會出問題」
+- 對事情傾向於往壞處想
+- 語氣中帶有不安感"""
+    elif neuroticism <= 30:
+        neuroticism_style = f"""LOW NEUROTICISM (N={neuroticism}/100):
+- 表達平靜、穩定，不容易緊張
+- 很少使用擔心、害怕等詞彙
+- 對事情樂觀或無所謂
+- 語氣輕鬆自在"""
+    else:
+        neuroticism_style = "MODERATE NEUROTICISM: 正常程度的擔心，不特別焦慮也不特別放鬆"
+
+    # Extraversion 影響互動風格
+    if extraversion >= 70:
+        extraversion_style = f"""HIGH EXTRAVERSION (E={extraversion}/100):
+- 熱情、主動分享、愛聊天
+- 會主動延伸話題，問問題
+- 語氣活潑，像在跟朋友聊天"""
+    elif extraversion <= 30:
+        extraversion_style = f"""LOW EXTRAVERSION (E={extraversion}/100):
+- 內向、話少、被動回答
+- 不會主動延伸話題
+- 回答簡短，不愛多說"""
+    else:
+        extraversion_style = "MODERATE EXTRAVERSION: 正常社交程度"
+
+    # ===== Risk Profile 控制 =====
+    if risk_overall >= 70:
+        risk_style = f"""HIGH RISK TOLERANCE (risk={risk_overall}/100):
+- 對風險持開放態度，不太在意保障
+- 使用「反正」「無所謂」「不會那麼倒霉」「賭一下」
+- 可能覺得保險是浪費錢
+- 語氣中帶有自信和不在乎"""
+    elif risk_overall <= 30:
+        risk_style = f"""LOW RISK TOLERANCE (risk={risk_overall}/100):
+- 非常謹慎，重視安全保障
+- 使用「安全」「保險起見」「小心」「確保」「萬一」
+- 會仔細研究保障內容
+- 語氣中帶有謹慎和擔憂"""
+    else:
+        risk_style = "MODERATE RISK TOLERANCE: 正常風險態度"
+
     # 正式程度影響用詞
     if formality >= 70:
         formality_style = "FORMAL: 用詞較正式，避免太口語化的表達，如「您」而非「你」，較少使用網路用語"
@@ -352,13 +410,28 @@ def interview_vietnam_persona(
     else:
         directness_style = "BALANCED: 適度直接，會先鋪墊再說重點"
 
-    # 情緒表達影響語氣
+    # 情緒表達影響語氣 - 強化控制
+    # 計算目標情緒詞數量（emotion_expression 0→100 映射到 0→5 個）
+    target_emotion_words_min = max(0, int((emotion_expression - 20) / 20))  # 0-4
+    target_emotion_words_max = max(1, int(emotion_expression / 20))  # 1-5
+
     if emotion_expression >= 70:
-        emotion_style = "EXPRESSIVE: 情緒豐富，多用感嘆詞「哇」「天啊」「超...」，語氣起伏大"
+        emotion_style = f"""HIGHLY EXPRESSIVE (emotion={emotion_expression}/100):
+- 必須使用 {target_emotion_words_min}-{target_emotion_words_max} 個情緒詞/感嘆詞
+- 建議使用：「哇」「天啊」「超...」「真的假的」「傻眼」「哎呀」「嚇死我」「開心」「煩死了」
+- 語氣要有明顯的高低起伏
+- 可以用誇張的表達方式"""
     elif emotion_expression <= 30:
-        emotion_style = "RESERVED: 情緒內斂，平鋪直敘，很少用感嘆詞，語調平穩"
+        emotion_style = f"""EMOTIONALLY RESERVED (emotion={emotion_expression}/100):
+- ⚠️ 最多只能用 0-1 個情緒詞
+- ❌ 禁止使用：「哇」「天啊」「超」「哎呀」「傻眼」等感嘆詞
+- 用平淡、陳述性的語氣
+- 像在報告事實，不帶個人感情色彩
+- 用詞如：「就是」「然後」「結果」「後來」"""
     else:
-        emotion_style = "MODERATE: 適度表達情緒，偶爾用感嘆詞"
+        emotion_style = f"""MODERATE EMOTION (emotion={emotion_expression}/100):
+- 使用 1-2 個情緒詞
+- 適度表達，不要太平淡也不要太誇張"""
 
     # 根據 verbosity 設定回答長度指引（連續縮放描述）
     # 計算目標字數範圍（verbosity 0→100 映射到 40→500 字）
@@ -477,6 +550,12 @@ def interview_vietnam_persona(
         f"**Formality**: {formality_style}",
         f"**Directness**: {directness_style}",
         f"**Emotion**: {emotion_style}",
+        "",
+        "# 🧠 YOUR PERSONALITY TRAITS (MUST REFLECT IN RESPONSE!):",
+        "",
+        f"{neuroticism_style}",
+        f"{extraversion_style}",
+        f"{risk_style}",
         "",
         length_instruction,
         "",

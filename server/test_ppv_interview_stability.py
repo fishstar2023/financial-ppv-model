@@ -611,6 +611,188 @@ def run_ppv_driven_test(
     return results
 
 
+def run_diversity_analysis_test():
+    """
+    全面測試 PPV 對回答多樣性的影響
+
+    分析維度：
+    1. 回答長度多樣性 (CV)
+    2. 開頭詞多樣性 (unique openers)
+    3. 情緒表達多樣性
+    4. PPV 一致性分數
+    5. 極端程度表現
+    """
+    print("=" * 70)
+    print("PPV 多樣性與極端程度全面分析")
+    print("=" * 70)
+
+    if not os.getenv("OPENAI_API_KEY"):
+        print("\n❌ 錯誤: 未設定 OPENAI_API_KEY")
+        return None
+
+    # 使用對角極端 personas（最能展示差異）
+    test_personas = generate_diagonal_extremes()
+
+    q_data = TEST_QUESTIONS[0]
+    results = []
+
+    for persona_name, persona in test_personas:
+        ls = persona.get("language_style", {})
+        big5 = persona.get("big5", {})
+        risk = persona.get("risk_profile", {})
+
+        print(f"\n{'─' * 60}")
+        print(f"測試: {persona_name}")
+        print(f"  V={ls.get('verbosity', 'N/A')}, F={ls.get('formality', 'N/A')}, "
+              f"E={ls.get('emotion_expression', 'N/A')}")
+        print(f"  Neuroticism={big5.get('neuroticism', 'N/A')}, Risk={risk.get('overall', 'N/A')}")
+
+        try:
+            response = interview_vietnam_persona(
+                persona=persona,
+                question=q_data["question"],
+                sub_questions=q_data.get("sub_questions", [])
+            )
+
+            analysis = analyze_response(response, persona_name, persona)
+
+            results.append({
+                "persona_name": persona_name,
+                "ppv": {
+                    "verbosity": ls.get("verbosity"),
+                    "formality": ls.get("formality"),
+                    "emotion_expression": ls.get("emotion_expression"),
+                    "neuroticism": big5.get("neuroticism"),
+                    "risk_overall": risk.get("overall"),
+                },
+                "response": response,
+                "analysis": analysis
+            })
+
+            # 顯示分析結果
+            print(f"\n  📊 回答分析:")
+            print(f"     長度: {analysis['length']} chars, {analysis['sentence_count']} 句")
+            print(f"     情緒詞: {analysis['emotion_count']}, 負面詞: {analysis['negative_count']}")
+            print(f"     不確定詞: {analysis['uncertainty_count']}, 自信詞: {analysis['confidence_count']}")
+            print(f"     開頭: \"{analysis['first_10_chars']}...\"")
+
+            if "ppv_consistency" in analysis:
+                ppv_con = analysis["ppv_consistency"]
+                print(f"\n  🎯 PPV 一致性: {ppv_con['score']:.0%} ({ppv_con['passed']}/{ppv_con['passed']+ppv_con['failed']})")
+                for check in ppv_con["checks"]:
+                    print(f"     {check}")
+
+        except Exception as e:
+            print(f"  ❌ 錯誤: {str(e)}")
+
+    # 計算整體統計
+    if len(results) >= 2:
+        import statistics
+
+        print("\n" + "=" * 70)
+        print("多樣性分析總結")
+        print("=" * 70)
+
+        # 1. 長度多樣性
+        lengths = [r["analysis"]["length"] for r in results]
+        mean_len = statistics.mean(lengths)
+        std_len = statistics.stdev(lengths) if len(lengths) > 1 else 0
+        cv_len = (std_len / mean_len * 100) if mean_len > 0 else 0
+
+        print(f"\n📏 回答長度多樣性:")
+        print(f"   範圍: {min(lengths)} - {max(lengths)} chars")
+        print(f"   平均: {mean_len:.0f}, 標準差: {std_len:.0f}")
+        print(f"   變異係數: {cv_len:.1f}%")
+        if cv_len > 30:
+            print(f"   ✅ 長度多樣性良好")
+        else:
+            print(f"   ⚠️ 長度多樣性不足")
+
+        # 2. 開頭詞多樣性
+        openers = [r["analysis"]["first_10_chars"] for r in results]
+        unique_openers = len(set(openers))
+        opener_diversity = unique_openers / len(openers) * 100
+
+        print(f"\n🔤 開頭詞多樣性:")
+        print(f"   唯一開頭: {unique_openers}/{len(openers)}")
+        print(f"   多樣性: {opener_diversity:.0f}%")
+        for i, opener in enumerate(openers):
+            print(f"   {i+1}. \"{opener}...\"")
+        if opener_diversity >= 75:
+            print(f"   ✅ 開頭詞多樣性良好")
+        else:
+            print(f"   ⚠️ 開頭詞重複過多")
+
+        # 3. 情緒表達多樣性
+        emotion_counts = [r["analysis"]["emotion_count"] for r in results]
+        emotion_range = max(emotion_counts) - min(emotion_counts)
+
+        print(f"\n😊 情緒表達多樣性:")
+        print(f"   情緒詞數範圍: {min(emotion_counts)} - {max(emotion_counts)}")
+        print(f"   範圍差: {emotion_range}")
+        for r in results:
+            name = r["persona_name"].replace("對角極端: ", "")
+            emo = r["ppv"]["emotion_expression"]
+            count = r["analysis"]["emotion_count"]
+            print(f"   {name}: E={emo} → {count} 個情緒詞")
+
+        # 4. PPV 一致性總分
+        consistency_scores = [
+            r["analysis"].get("ppv_consistency", {}).get("score", 0)
+            for r in results
+        ]
+        avg_consistency = statistics.mean(consistency_scores) if consistency_scores else 0
+
+        print(f"\n🎯 PPV 一致性總分:")
+        print(f"   平均一致性: {avg_consistency:.0%}")
+        for r in results:
+            name = r["persona_name"].replace("對角極端: ", "")
+            score = r["analysis"].get("ppv_consistency", {}).get("score", 0)
+            print(f"   {name}: {score:.0%}")
+
+        # 5. 極端程度分析
+        print(f"\n⚡ 極端程度分析:")
+
+        # 找出全高和全低的結果
+        all_high = next((r for r in results if "全高" in r["persona_name"]), None)
+        all_low = next((r for r in results if "全低" in r["persona_name"]), None)
+
+        if all_high and all_low:
+            len_diff = all_high["analysis"]["length"] - all_low["analysis"]["length"]
+            emo_diff = all_high["analysis"]["emotion_count"] - all_low["analysis"]["emotion_count"]
+
+            print(f"   全高 vs 全低:")
+            print(f"   • 長度差異: {len_diff:+d} chars ({all_high['analysis']['length']} vs {all_low['analysis']['length']})")
+            print(f"   • 情緒詞差異: {emo_diff:+d} ({all_high['analysis']['emotion_count']} vs {all_low['analysis']['emotion_count']})")
+
+            if len_diff > 200:
+                print(f"   ✅ 極端 verbosity 有顯著效果")
+            else:
+                print(f"   ⚠️ 極端 verbosity 效果不明顯")
+
+        # 整體評分
+        print(f"\n{'=' * 70}")
+        print("整體評估")
+        print("=" * 70)
+
+        score = 0
+        if cv_len > 30: score += 25
+        if opener_diversity >= 75: score += 25
+        if emotion_range >= 2: score += 25
+        if avg_consistency >= 0.5: score += 25
+
+        print(f"\n🏆 多樣性總分: {score}/100")
+
+        if score >= 75:
+            print("   ✅ PPV 系統運作良好，多樣性表現優秀")
+        elif score >= 50:
+            print("   ⚠️ PPV 系統有效，但部分維度需要改進")
+        else:
+            print("   ❌ PPV 系統需要調整，多樣性不足")
+
+    return results
+
+
 def run_verbosity_correlation_test():
     """
     專門測試 verbosity 值與回答長度的相關性
@@ -861,7 +1043,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="PPV 極端案例訪談測試")
     parser.add_argument(
         "--mode", "-m",
-        choices=["original", "ppv_driven", "verbosity_gradient", "cross", "diagonal", "correlation"],
+        choices=["original", "ppv_driven", "verbosity_gradient", "cross", "diagonal", "correlation", "diversity"],
         default="ppv_driven",
         help="""測試模式:
             original: 原始手動定義的極端 personas
@@ -869,7 +1051,8 @@ if __name__ == "__main__":
             verbosity_gradient: verbosity 梯度測試 (0→100)
             cross: 多維度交叉測試
             diagonal: 對角極端測試
-            correlation: verbosity 相關性分析"""
+            correlation: verbosity 相關性分析
+            diversity: 多樣性與極端程度全面分析"""
     )
     parser.add_argument(
         "--runs", "-r",
@@ -914,3 +1097,6 @@ if __name__ == "__main__":
 
     elif args.mode == "correlation":
         run_verbosity_correlation_test()
+
+    elif args.mode == "diversity":
+        run_diversity_analysis_test()
