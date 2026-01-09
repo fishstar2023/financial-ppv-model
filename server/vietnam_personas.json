@@ -69,13 +69,128 @@
         "answer": "說到這個，我這個人啊，平時忙得不可開交，作為一個軟體工程師，總會想擺脫一下工作壓力嘛。所以每年都會和太太出國旅行一次，就當是生活的調劑吧！我們通常會選擇去胡志明市周邊的國家，像是泰國、柬埔寨或者馬來西亞，因為這些地方飛行時間比較短，也不至於讓人旅途疲憊，還能省下一筆路費去嚐嚐美食什麼的，哈哈。\n\n我們特別喜歡自助旅行，這樣可以隨心所欲地改變行程，去深入探索一些不太旅遊化的小鎮，體驗當地的風土人情。上次啊，我們在柬埔寨找了一家當地的小餐館，菜真是超好吃，當下就覺得之前所有的攻略都是值得的！\n\n至於預算，每次旅行大概是一到兩個禮拜，預算範圍大約是兩到三千萬越南盾。雖然有時候會稍微超支點，但隨手買個小紀念品，或者多吃頓當地佳餚，總是讓人感覺值回票價。至於借款，老實說，我們還沒因旅行借過款，因為平時都會提前做些小規劃，比如分期儲蓄，這樣就不至於因為旅費壓力而影響整個旅程。\n\n這樣的旅行習慣讓我覺得特別自在，反正怎麼說呢，旅行就是要累並快樂著對吧？結果每次都覺得花得好像多了一點，哈哈！",
         "timestamp": "2026-01-08T06:03:03.093Z",
         "topicTag": "旅遊習慣（測試）"
+      },
+      {
+        "sectionId": "batch",
+        "questionId": "batch_1767923420185_Nguyễn先生",
+        "question": "影響你購買保險的因素是什麼",
+        "answer": "這個問題讓我想起了幾年前，我第一次購買旅遊保險的經驗。坦白說，我當時其實是抱著一種「買個心安」的心態去買的。作為一個軟體工程師，總是習慣把事情規劃周全，保險這件事，怎麼說呢，就像是給自己一個心理上的保障，雖然總希望永遠用不上。\n\n影響我購買保險的因素，第一就是公司的信譽和設計。你知道嗎，我這個人比較在意公司的名聲和網站的設計，因為網站的好壞多少反映了他們的專業程度。有些網站設計得簡單漂亮，讓我覺得這家公司比較靠譜，這樣我就會更願意相信他們所提供的服務。\n\n然後，就是保險的價格和涵蓋範圍。如果價格太高，我可能就不會考慮，但如果太便宜呢，有時會擔心涵蓋不夠全面。選擇保險時，我會特別關注是否涵蓋醫療和意外事件，因為這些才是最切身的保障。不過說實話，每次選保險都覺得像在挑賭注，結果錢花了也沒用到，哈哈。希望下次有更好的工具或服務能幫我更輕鬆做選擇呢。",
+        "timestamp": "2026-01-09T01:50:20.185Z",
+        "topicTag": "購買決策"
       }
     ],
     "currentSectionIndex": 0,
     "currentQuestionIndex": 0,
     "isCompleted": false,
     "createdAt": "2026-01-06T16:25:29.439963",
-    "updatedAt": "2026-01-08T06:03:03.093Z"
+    "updatedAt": "2026-01-09T01:50:20.185Z",
+    "version": "v1.0",
+    "source_summary": {
+      "dialogue": 0.2,
+      "questionnaire": 0.5,
+      "behavior": 0.2
+    },
+    "big5": {
+      "openness": 21,
+      "conscientiousness": 37,
+      "extraversion": 45,
+      "agreeableness": 63,
+      "neuroticism": 41
+    },
+    "schwartz_values": {
+      "Security": 64,
+      "Conformity": 42,
+      "Benevolence": 71,
+      "Self-Direction": 76,
+      "Tradition": 47
+    },
+    "moral_foundations": {
+      "Care": 67,
+      "Fairness": 32,
+      "Loyalty": 73,
+      "Authority": 61,
+      "Sanctity": 50
+    },
+    "risk_profile": {
+      "overall": 67,
+      "financial": 16,
+      "ethical": 62,
+      "confidence": 0.93,
+      "social": 67,
+      "health": 84
+    },
+    "decision_style": {
+      "primary": "intuitive",
+      "secondary": "rational",
+      "risk_seeking": 69,
+      "info_processing": "satisficer",
+      "social_preference": "delegator"
+    },
+    "meta": {
+      "base_model": "gpt-4o-mini",
+      "temperature": 0.7,
+      "prompt_version": "v2.1",
+      "schema_validation": "pass"
+    },
+    "hexaco": {
+      "honesty_humility": 55,
+      "emotionality": 53,
+      "extraversion": 36,
+      "agreeableness": 53,
+      "conscientiousness": 30,
+      "openness": 11
+    },
+    "disc": {
+      "dominance": 48,
+      "influence": 46,
+      "steadiness": 49,
+      "conscientiousness": 39
+    },
+    "mbti": {
+      "E_I": -5,
+      "S_N": -74,
+      "T_F": -7,
+      "J_P": -11
+    },
+    "enneagram": {
+      "primary_type": 9,
+      "wing": 8,
+      "instinct": "sp"
+    },
+    "time_preference": {
+      "discount_rate": 22,
+      "planning_horizon": "medium_term",
+      "present_vs_future": -18
+    },
+    "regulatory_focus": {
+      "promotion": 22,
+      "prevention": 63
+    },
+    "language_style": {
+      "formality": 39,
+      "directness": 31,
+      "verbosity": 48,
+      "emotionality": 58,
+      "technicality": 32
+    },
+    "emotion_profile": {
+      "baseline_positivity": 50,
+      "emotional_volatility": 43,
+      "stress_tolerance": 55,
+      "empathy": 59
+    },
+    "social_profile": {
+      "trust_propensity": 74,
+      "social_confidence": 35,
+      "conflict_style": "avoiding",
+      "influence_susceptibility": 76
+    },
+    "behavioral_indicators": {
+      "decision_speed": 53,
+      "information_seeking": 39,
+      "social_proof_reliance": 79,
+      "price_sensitivity": 26
+    }
   },
   {
     "id": "Trần小姐",
@@ -149,13 +264,128 @@
         "answer": "講一個我自己的經驗好了，那一次啊，我在去東京的飛機上，坐在靠窗的位子，那個夜空真的是清澈得讓人有點出神。因為工作的緣故，我常常要去新加坡、香港這些地方，差不多一年會有四五趟的出差行程，通常是待上一個星期左右。預算上呢，因為公司會給一些補助，所以大概我自己會準備個兩千到三千萬越盾吧。\n\n然後我啊，相對於跟團，我比較喜歡自助旅行，這樣可以自由安排時間，想去哪裡就去哪裡，沒有太多拘束感。多數時候我是一個人旅行，享受那種獨處的時光。但是有時也會找一些朋友或同事一起，尤其是當想要去一些特別的活動或高端餐廳時，有人分享那種喜悅嘛。\n\n至於旅遊借款，怎麼說呢，我沒有過這樣的經驗。可能是因為我這個人習慣提前規劃好行程和資金。而且，世界那麼大，我還有很多地方沒去過耶！不過啊，說不定下次會嘗試一些不一樣的旅行方式，比如說跟團看看，可能會有新的體會吧！對旅行的熱愛，就是這樣不斷地探索與嘗試新事物。",
         "timestamp": "2026-01-08T06:03:11.807Z",
         "topicTag": "旅遊習慣（測試）"
+      },
+      {
+        "sectionId": "batch",
+        "questionId": "batch_1767923429623_Trần小姐",
+        "question": "影響你購買保險的因素是什麼",
+        "answer": "你知道嗎，我本來對保險一直抱著懷疑的態度。像我這種常出國的人，保險就像是一個必需品，特別是公司出差的時候必須要有才行。唉，這些保險條款對我來說簡直像是外星文字，看了我只覺得頭暈。因此，我一直都是透過我固定的一個保險代辦員來協助我，因為她總是能夠用比較簡單、貼心的方式來解釋那些複雜的內容。\n\n然後呢，品牌的選擇上，跟家人、朋友推薦的有關係，像是Bao Viet還有AIA，我都用過，他們的服務對我來說算是滿安心的。還有一個很重要的因素，就是我需要知道這保險涵蓋到一定範圍的冒險活動啦，像潛水、攀岩這些，畢竟我也是有點愛冒險的人呀！\n\n我覺得下次再出國，我一定還是會找那位代辦員幫忙，至少她可以讓我在繁瑣的條款中稍微輕鬆一點，這樣我就可以更安心地去享受旅途喔。對我來說，有一點點安全感真的很重要呢！",
+        "timestamp": "2026-01-09T01:50:29.623Z",
+        "topicTag": "購買決策"
       }
     ],
     "currentSectionIndex": 0,
     "currentQuestionIndex": 0,
     "isCompleted": false,
     "createdAt": "2026-01-06T16:25:29.444806",
-    "updatedAt": "2026-01-08T06:03:11.807Z"
+    "updatedAt": "2026-01-09T01:50:29.623Z",
+    "version": "v1.0",
+    "source_summary": {
+      "dialogue": 0.3,
+      "questionnaire": 0.5,
+      "behavior": 0.1
+    },
+    "big5": {
+      "openness": 51,
+      "conscientiousness": 56,
+      "extraversion": 79,
+      "agreeableness": 64,
+      "neuroticism": 78
+    },
+    "schwartz_values": {
+      "Self-Direction": 60,
+      "Tradition": 49,
+      "Achievement": 48,
+      "Benevolence": 78,
+      "Hedonism": 77
+    },
+    "moral_foundations": {
+      "Care": 89,
+      "Fairness": 55,
+      "Loyalty": 25,
+      "Authority": 25,
+      "Sanctity": 53
+    },
+    "risk_profile": {
+      "overall": 69,
+      "financial": 90,
+      "ethical": 53,
+      "confidence": 0.59,
+      "social": 51,
+      "health": 87
+    },
+    "decision_style": {
+      "primary": "rational",
+      "secondary": "dependent",
+      "risk_seeking": 45,
+      "info_processing": "satisficer",
+      "social_preference": "collaborative"
+    },
+    "meta": {
+      "base_model": "gpt-4o-mini",
+      "temperature": 0.7,
+      "prompt_version": "v2.1",
+      "schema_validation": "pass"
+    },
+    "hexaco": {
+      "honesty_humility": 67,
+      "emotionality": 73,
+      "extraversion": 70,
+      "agreeableness": 62,
+      "conscientiousness": 52,
+      "openness": 63
+    },
+    "disc": {
+      "dominance": 47,
+      "influence": 75,
+      "steadiness": 14,
+      "conscientiousness": 55
+    },
+    "mbti": {
+      "E_I": 66,
+      "S_N": 26,
+      "T_F": -26,
+      "J_P": -4
+    },
+    "enneagram": {
+      "primary_type": 5,
+      "wing": 4,
+      "instinct": "so"
+    },
+    "time_preference": {
+      "discount_rate": 44,
+      "planning_horizon": "long_term",
+      "present_vs_future": 64
+    },
+    "regulatory_focus": {
+      "promotion": 78,
+      "prevention": 77
+    },
+    "language_style": {
+      "formality": 34,
+      "directness": 36,
+      "verbosity": 79,
+      "emotionality": 95,
+      "technicality": 47
+    },
+    "emotion_profile": {
+      "baseline_positivity": 83,
+      "emotional_volatility": 80,
+      "stress_tolerance": 22,
+      "empathy": 68
+    },
+    "social_profile": {
+      "trust_propensity": 49,
+      "social_confidence": 94,
+      "conflict_style": "compromising",
+      "influence_susceptibility": 40
+    },
+    "behavioral_indicators": {
+      "decision_speed": 74,
+      "information_seeking": 48,
+      "social_proof_reliance": 85,
+      "price_sensitivity": 24
+    }
   },
   {
     "id": "Lê小姐",
@@ -269,13 +499,128 @@
         "answer": "唉，這個問題讓我想起我的旅遊偏好呢，我這個人喜歡自助旅行，因為比較有自由度，可以自己決定去哪裡、怎麼玩。基本上，我每年都會嘗試至少去一個亞洲國家，通常是短途的旅程，比如泰國、新加坡之類的，這樣費用比較合理嘛，大概會在VND 20,000,000到VND 30,000,000之間。\n\n旅行的時間不會太長，通常在七到十天左右，這樣才能好好放鬆一下。至於旅伴嘛，我不太喜歡獨旅，通常會找上幾個好朋友一起去，因為這樣能一起分享美好的經歷，也比較安全。而且，和朋友在一起的時候，就算旅途中出了什麼小意外，也會變成一種有趣的回憶。\n\n說到借錢旅遊這件事，我從來沒這樣做過。我就是喜歡提早計畫，確保所有的開銷都在掌控之中。覺得欠債會讓旅行壓力變大，這樣反而失去旅遊本來的樂趣吧，所以我都是靠自己的存款，好讓每次旅行都能無憂無慮，享受在異國的每一分每一秒呢。總之，我就是想說，自在的旅行才是真正的享受。",
         "timestamp": "2026-01-08T06:03:38.592Z",
         "topicTag": "旅遊習慣（測試）"
+      },
+      {
+        "sectionId": "batch",
+        "questionId": "batch_1767923440435_Lê小姐",
+        "question": "影響你購買保險的因素是什麼",
+        "answer": "唉，這個問題讓我想起我第一次買保險的時候，真是頭痛啊。那時候其實我最在意的就是理賠流程的方便程度，因為如果在海外遇到突發狀況，沒說明書能輕鬆搞定，那就糟糕了。我一向是個愛計劃的人，可是發現很多保險公司的條款讀起來就跟看似乎是天書一樣複雜，搞不清楚到底哪些情況會賠。\n\n選擇保險的時候，我會先問身邊有經驗的朋友，他們的推薦對我很有影響嘛，因為實地經驗總是最可靠的。其實，最讓我糾結的是，價格當然也是一個考量因素，學生嘛，預算有限，要在保護和花費之間取個平衡不是容易的事。最終，我通常會選擇能在線上方便購買的保險，像透過手機App這種，讓我隨時都能查詢和購買，更適合我這種愛用手機的習慣。\n\n最後，說不上好還是不好吧，只能說選保險的過程真是讓人心累，有點麻煩呢！",
+        "timestamp": "2026-01-09T01:50:40.435Z",
+        "topicTag": "購買決策"
       }
     ],
     "currentSectionIndex": 0,
     "currentQuestionIndex": 0,
     "isCompleted": false,
     "createdAt": "2026-01-06T15:05:10.788559",
-    "updatedAt": "2026-01-08T06:03:38.592Z"
+    "updatedAt": "2026-01-09T01:50:40.435Z",
+    "version": "v1.0",
+    "source_summary": {
+      "dialogue": 0.3,
+      "questionnaire": 0.4,
+      "behavior": 0.2
+    },
+    "big5": {
+      "openness": 50,
+      "conscientiousness": 75,
+      "extraversion": 18,
+      "agreeableness": 59,
+      "neuroticism": 40
+    },
+    "schwartz_values": {
+      "Security": 35,
+      "Hedonism": 57,
+      "Self-Direction": 73,
+      "Tradition": 76,
+      "Universalism": 86
+    },
+    "moral_foundations": {
+      "Care": 72,
+      "Fairness": 74,
+      "Loyalty": 46,
+      "Authority": 23,
+      "Sanctity": 47
+    },
+    "risk_profile": {
+      "overall": 54,
+      "financial": 51,
+      "ethical": 55,
+      "confidence": 0.74,
+      "social": 68,
+      "health": 55
+    },
+    "decision_style": {
+      "primary": "spontaneous",
+      "secondary": "dependent",
+      "risk_seeking": 57,
+      "info_processing": "maximizer",
+      "social_preference": "collaborative"
+    },
+    "meta": {
+      "base_model": "gpt-4o-mini",
+      "temperature": 0.7,
+      "prompt_version": "v2.1",
+      "schema_validation": "pass"
+    },
+    "hexaco": {
+      "honesty_humility": 49,
+      "emotionality": 55,
+      "extraversion": 19,
+      "agreeableness": 48,
+      "conscientiousness": 76,
+      "openness": 41
+    },
+    "disc": {
+      "dominance": 32,
+      "influence": 16,
+      "steadiness": 53,
+      "conscientiousness": 73
+    },
+    "mbti": {
+      "E_I": -48,
+      "S_N": -11,
+      "T_F": -31,
+      "J_P": 54
+    },
+    "enneagram": {
+      "primary_type": 8,
+      "wing": 7,
+      "instinct": "sp"
+    },
+    "time_preference": {
+      "discount_rate": 87,
+      "planning_horizon": "long_term",
+      "present_vs_future": -79
+    },
+    "regulatory_focus": {
+      "promotion": 64,
+      "prevention": 70
+    },
+    "language_style": {
+      "formality": 34,
+      "directness": 56,
+      "verbosity": 32,
+      "emotionality": 46,
+      "technicality": 35
+    },
+    "emotion_profile": {
+      "baseline_positivity": 28,
+      "emotional_volatility": 42,
+      "stress_tolerance": 74,
+      "empathy": 56
+    },
+    "social_profile": {
+      "trust_propensity": 79,
+      "social_confidence": 20,
+      "conflict_style": "compromising",
+      "influence_susceptibility": 32
+    },
+    "behavioral_indicators": {
+      "decision_speed": 78,
+      "information_seeking": 52,
+      "social_proof_reliance": 66,
+      "price_sensitivity": 49
+    }
   },
   {
     "id": "Phạm先生",
@@ -390,13 +735,128 @@
         "answer": "唉，我這個人每次想到旅行就覺得既期待又緊張。我通常會和社團的朋友們一起利用寒暑假出國，像去年我們去了泰國和新加坡。出國的次數也不算多，每年大概兩三次吧，畢竟學生嘛，學業還是要顧！每次旅行大概五到七天，預算通常是在500到1000美元之間，真的是把日常打工賺的錢省下來，用在這些短暫的冒險。\n\n我們這種半自助的旅行模式真的是又省錢又能看到不少，因為有時候還是會安排一些固定行程，但也很喜歡留點時間讓自己自由探索。這感覺就像是，有個安全網讓你能夠放心踏出去但又不被束縛。旅伴嘛，通常就是社團的朋友們，大家一起旅行總是很開心，也比較能互相照顧。\n\n至於借款來旅行，我目前還沒有這方面的經驗。靠打工攢下來的錢再加上一點父母的支持，夠用就好，不想給自己太多的經濟壓力嘛。但有時候也會想，要是有更多錢就更好可以去遠一點的地方看看。總之，期待每次旅程，但還是得精打細算啦。哈哈！",
         "timestamp": "2026-01-08T06:03:55.281Z",
         "topicTag": "旅遊習慣（測試）"
+      },
+      {
+        "sectionId": "batch",
+        "questionId": "batch_1767923450804_Phạm先生",
+        "question": "影響你購買保險的因素是什麼",
+        "answer": "你知道嗎，我本來以為買保險就是個很簡單的事情，但實際上還真不是這樣。對我來說，影響我購買保險的最大因素其實是安全感，尤其是在出國旅行時，總要有個萬無一失的後盾嘛。不過，不是說想買就立刻買的，因為保險這玩意兒條款超多，看得人頭昏眼花，尤其是那些關於承保範圍的細節。\n\n另外，我會比較在意是否有包含一些特殊的情況，像是最近疫情嘛，我特別關心這方面的保障。還有就是，價格也是一個重要考量，畢竟我還是個學生，得省著點用。然後，有時候朋友的經驗分享也會影響我的決定，就像上次我一個朋友提到他在某家保險公司理賠上遇到了大麻煩，這些都會讓我更加謹慎地選擇。\n\n最後，雖然說每家公司都會把自己說得多好多好，但經過之前的經驗，我現在都是先習慣性滾到網站底部看看他們公司的資訊再說，總覺得這樣才能有個比較全面的了解。結果一圈下來，還真讓人覺得頭疼，哈哈！",
+        "timestamp": "2026-01-09T01:50:50.804Z",
+        "topicTag": "購買決策"
       }
     ],
     "currentSectionIndex": 0,
     "currentQuestionIndex": 0,
     "isCompleted": false,
     "createdAt": "2026-01-06T15:05:10.789067",
-    "updatedAt": "2026-01-08T06:03:55.281Z"
+    "updatedAt": "2026-01-09T01:50:50.804Z",
+    "version": "v1.0",
+    "source_summary": {
+      "dialogue": 0.3,
+      "questionnaire": 0.5,
+      "behavior": 0.4
+    },
+    "big5": {
+      "openness": 35,
+      "conscientiousness": 59,
+      "extraversion": 56,
+      "agreeableness": 51,
+      "neuroticism": 68
+    },
+    "schwartz_values": {
+      "Stimulation": 77,
+      "Power": 35,
+      "Self-Direction": 63,
+      "Achievement": 63,
+      "Security": 65
+    },
+    "moral_foundations": {
+      "Care": 38,
+      "Fairness": 48,
+      "Loyalty": 73,
+      "Authority": 29,
+      "Sanctity": 24
+    },
+    "risk_profile": {
+      "overall": 80,
+      "financial": 78,
+      "ethical": 69,
+      "confidence": 0.92,
+      "social": 81,
+      "health": 83
+    },
+    "decision_style": {
+      "primary": "rational",
+      "secondary": "spontaneous",
+      "risk_seeking": 26,
+      "info_processing": "satisficer",
+      "social_preference": "delegator"
+    },
+    "meta": {
+      "base_model": "gpt-4o-mini",
+      "temperature": 0.7,
+      "prompt_version": "v2.1",
+      "schema_validation": "pass"
+    },
+    "hexaco": {
+      "honesty_humility": 71,
+      "emotionality": 54,
+      "extraversion": 56,
+      "agreeableness": 66,
+      "conscientiousness": 52,
+      "openness": 28
+    },
+    "disc": {
+      "dominance": 55,
+      "influence": 64,
+      "steadiness": 35,
+      "conscientiousness": 49
+    },
+    "mbti": {
+      "E_I": 23,
+      "S_N": -13,
+      "T_F": -8,
+      "J_P": 27
+    },
+    "enneagram": {
+      "primary_type": 6,
+      "wing": 7,
+      "instinct": "so"
+    },
+    "time_preference": {
+      "discount_rate": 32,
+      "planning_horizon": "long_term",
+      "present_vs_future": 17
+    },
+    "regulatory_focus": {
+      "promotion": 28,
+      "prevention": 64
+    },
+    "language_style": {
+      "formality": 38,
+      "directness": 35,
+      "verbosity": 51,
+      "emotionality": 68,
+      "technicality": 28
+    },
+    "emotion_profile": {
+      "baseline_positivity": 67,
+      "emotional_volatility": 53,
+      "stress_tolerance": 31,
+      "empathy": 56
+    },
+    "social_profile": {
+      "trust_propensity": 58,
+      "social_confidence": 50,
+      "conflict_style": "compromising",
+      "influence_susceptibility": 36
+    },
+    "behavioral_indicators": {
+      "decision_speed": 69,
+      "information_seeking": 57,
+      "social_proof_reliance": 57,
+      "price_sensitivity": 34
+    }
   },
   {
     "id": "Huỳnh先生",
@@ -468,13 +928,128 @@
         "answer": "說到旅遊習慣，其實有點搞笑。我和家人每年大概會出國一次，主要是亞洲國家，比較近嘛，像是台灣或者日本。這些地方交通時間短，我這把年紀坐飛機太久不適應。我們通常玩一到兩週，預算大概是花掉一億越南盾左右，但總是會超出，哈哈，不是有那麼回事嗎？然後，我們比較喜歡自由行，這樣不必跟團到處跑，雖然得自己查資料，弄得頭大。不過呢，我覺得這也是準備旅遊的一部分，很有趣。\n\n至於旅伴嘛，當然是和家人一起。能有時間和他們一起旅遊增進感情，也是退休後期盼的一件事。關於旅遊借款，哈哈，那真是讓我不敢想的事情。我覺得旅遊還是在自己負擔範圍內比較安心，絕對不會因為一趟旅行欠下債務，那可真是太瘋狂了！你說呢？結果錢花了也沒用到，對吧？哈哈！",
         "timestamp": "2026-01-08T06:04:04.926Z",
         "topicTag": "旅遊習慣（測試）"
+      },
+      {
+        "sectionId": "batch",
+        "questionId": "batch_1767923458676_Huỳnh先生",
+        "question": "影響你購買保險的因素是什麼",
+        "answer": "唉，這個問題讓我想起當時在機場，我突然感覺到有點不安，因為意識到自己沒有旅遊保險。你知道嗎，事到臨頭才想起這事，我這個年紀跑來跑去也真是折磨。當時我就在胡志明市機場，說真的，我也沒做什麼研究，主要是圖方便，隨便挑個櫃檯就問了。\n\n坦白說，影響我選擇保險的最大因素其實就是價格。老實講，我不想花太多錢，因為心裡還是對這些東西抱持懷疑態度，覺得保險公司就這樣賺錢吧？但不買又會擔心出事，真是兩難。結果還是選了最便宜的那個，想說至少有個心理安慰。買完後，我心裡還是有個小聲音在說：這真的有用嗎？哈哈，結果錢花了也沒用到，還好啦，至少這趟旅行平平安安的。",
+        "timestamp": "2026-01-09T01:50:58.676Z",
+        "topicTag": "購買決策"
       }
     ],
     "currentSectionIndex": 0,
     "currentQuestionIndex": 0,
     "isCompleted": false,
     "createdAt": "2026-01-06T16:25:29.450597",
-    "updatedAt": "2026-01-08T06:04:04.926Z"
+    "updatedAt": "2026-01-09T01:50:58.676Z",
+    "version": "v1.0",
+    "source_summary": {
+      "dialogue": 0.3,
+      "questionnaire": 0.5,
+      "behavior": 0.1
+    },
+    "big5": {
+      "openness": 51,
+      "conscientiousness": 72,
+      "extraversion": 47,
+      "agreeableness": 37,
+      "neuroticism": 29
+    },
+    "schwartz_values": {
+      "Benevolence": 78,
+      "Security": 58,
+      "Tradition": 80,
+      "Achievement": 36,
+      "Conformity": 39
+    },
+    "moral_foundations": {
+      "Care": 76,
+      "Fairness": 36,
+      "Loyalty": 71,
+      "Authority": 11,
+      "Sanctity": 36
+    },
+    "risk_profile": {
+      "overall": 25,
+      "financial": 31,
+      "ethical": 39,
+      "confidence": 0.52,
+      "social": 31,
+      "health": 27
+    },
+    "decision_style": {
+      "primary": "intuitive",
+      "secondary": "rational",
+      "risk_seeking": 60,
+      "info_processing": "satisficer",
+      "social_preference": "collaborative"
+    },
+    "meta": {
+      "base_model": "gpt-4o-mini",
+      "temperature": 0.7,
+      "prompt_version": "v2.1",
+      "schema_validation": "pass"
+    },
+    "hexaco": {
+      "honesty_humility": 53,
+      "emotionality": 31,
+      "extraversion": 52,
+      "agreeableness": 22,
+      "conscientiousness": 80,
+      "openness": 62
+    },
+    "disc": {
+      "dominance": 48,
+      "influence": 45,
+      "steadiness": 69,
+      "conscientiousness": 82
+    },
+    "mbti": {
+      "E_I": -18,
+      "S_N": -13,
+      "T_F": 11,
+      "J_P": 64
+    },
+    "enneagram": {
+      "primary_type": 9,
+      "wing": 1,
+      "instinct": "sp"
+    },
+    "time_preference": {
+      "discount_rate": 50,
+      "planning_horizon": "medium_term",
+      "present_vs_future": 69
+    },
+    "regulatory_focus": {
+      "promotion": 62,
+      "prevention": 90
+    },
+    "language_style": {
+      "formality": 60,
+      "directness": 48,
+      "verbosity": 67,
+      "emotionality": 52,
+      "technicality": 36
+    },
+    "emotion_profile": {
+      "baseline_positivity": 42,
+      "emotional_volatility": 35,
+      "stress_tolerance": 65,
+      "empathy": 46
+    },
+    "social_profile": {
+      "trust_propensity": 36,
+      "social_confidence": 48,
+      "conflict_style": "competing",
+      "influence_susceptibility": 34
+    },
+    "behavioral_indicators": {
+      "decision_speed": 74,
+      "information_seeking": 52,
+      "social_proof_reliance": 39,
+      "price_sensitivity": 89
+    }
   },
   {
     "id": "Hoàng小姐",
@@ -554,7 +1129,114 @@
     "currentQuestionIndex": 0,
     "isCompleted": false,
     "createdAt": "2026-01-06T16:25:29.452399",
-    "updatedAt": "2026-01-08T06:04:13.992Z"
+    "updatedAt": "2026-01-08T06:04:13.992Z",
+    "version": "v1.0",
+    "source_summary": {
+      "dialogue": 0.3,
+      "questionnaire": 0.6,
+      "behavior": 0.2
+    },
+    "big5": {
+      "openness": 53,
+      "conscientiousness": 36,
+      "extraversion": 60,
+      "agreeableness": 73,
+      "neuroticism": 15
+    },
+    "schwartz_values": {
+      "Security": 76,
+      "Tradition": 48,
+      "Self-Direction": 87,
+      "Benevolence": 41,
+      "Universalism": 52
+    },
+    "moral_foundations": {
+      "Care": 62,
+      "Fairness": 24,
+      "Loyalty": 48,
+      "Authority": 67,
+      "Sanctity": 19
+    },
+    "risk_profile": {
+      "overall": 95,
+      "financial": 39,
+      "ethical": 39,
+      "confidence": 0.93,
+      "social": 90,
+      "health": 88
+    },
+    "decision_style": {
+      "primary": "spontaneous",
+      "secondary": "avoidant",
+      "risk_seeking": 71,
+      "info_processing": "maximizer",
+      "social_preference": "autonomous"
+    },
+    "meta": {
+      "base_model": "gpt-4o-mini",
+      "temperature": 0.7,
+      "prompt_version": "v2.1",
+      "schema_validation": "pass"
+    },
+    "hexaco": {
+      "honesty_humility": 86,
+      "emotionality": 11,
+      "extraversion": 54,
+      "agreeableness": 77,
+      "conscientiousness": 31,
+      "openness": 51
+    },
+    "disc": {
+      "dominance": 13,
+      "influence": 50,
+      "steadiness": 89,
+      "conscientiousness": 33
+    },
+    "mbti": {
+      "E_I": 34,
+      "S_N": 19,
+      "T_F": -30,
+      "J_P": -47
+    },
+    "enneagram": {
+      "primary_type": 8,
+      "wing": 7,
+      "instinct": "sx"
+    },
+    "time_preference": {
+      "discount_rate": 70,
+      "planning_horizon": "long_term",
+      "present_vs_future": -52
+    },
+    "regulatory_focus": {
+      "promotion": 48,
+      "prevention": 54
+    },
+    "language_style": {
+      "formality": 58,
+      "directness": 20,
+      "verbosity": 49,
+      "emotionality": 28,
+      "technicality": 40
+    },
+    "emotion_profile": {
+      "baseline_positivity": 74,
+      "emotional_volatility": 15,
+      "stress_tolerance": 77,
+      "empathy": 74
+    },
+    "social_profile": {
+      "trust_propensity": 58,
+      "social_confidence": 63,
+      "conflict_style": "avoiding",
+      "influence_susceptibility": 77
+    },
+    "behavioral_indicators": {
+      "decision_speed": 79,
+      "information_seeking": 48,
+      "social_proof_reliance": 85,
+      "price_sensitivity": 20
+    }
   },
   {
     "id": "Võ先生",
@@ -676,7 +1358,114 @@
     "currentQuestionIndex": 0,
     "isCompleted": false,
     "createdAt": "2026-01-06T11:19:59.380462",
-    "updatedAt": "2026-01-08T06:04:22.692Z"
+    "updatedAt": "2026-01-08T06:04:22.692Z",
+    "version": "v1.0",
+    "source_summary": {
+      "dialogue": 0.4,
+      "questionnaire": 0.4,
+      "behavior": 0.2
+    },
+    "big5": {
+      "openness": 54,
+      "conscientiousness": 35,
+      "extraversion": 78,
+      "agreeableness": 32,
+      "neuroticism": 48
+    },
+    "schwartz_values": {
+      "Stimulation": 30,
+      "Tradition": 46,
+      "Conformity": 75,
+      "Security": 85,
+      "Benevolence": 75
+    },
+    "moral_foundations": {
+      "Care": 77,
+      "Fairness": 79,
+      "Loyalty": 25,
+      "Authority": 47,
+      "Sanctity": 19
+    },
+    "risk_profile": {
+      "overall": 75,
+      "financial": 45,
+      "ethical": 56,
+      "confidence": 0.52,
+      "social": 59,
+      "health": 85
+    },
+    "decision_style": {
+      "primary": "rational",
+      "secondary": "intuitive",
+      "risk_seeking": 25,
+      "info_processing": "satisficer",
+      "social_preference": "autonomous"
+    },
+    "meta": {
+      "base_model": "gpt-4o-mini",
+      "temperature": 0.7,
+      "prompt_version": "v2.1",
+      "schema_validation": "pass"
+    },
+    "hexaco": {
+      "honesty_humility": 25,
+      "emotionality": 64,
+      "extraversion": 81,
+      "agreeableness": 35,
+      "conscientiousness": 42,
+      "openness": 66
+    },
+    "disc": {
+      "dominance": 82,
+      "influence": 70,
+      "steadiness": 45,
+      "conscientiousness": 37
+    },
+    "mbti": {
+      "E_I": 63,
+      "S_N": 6,
+      "T_F": 46,
+      "J_P": -24
+    },
+    "enneagram": {
+      "primary_type": 6,
+      "wing": 7,
+      "instinct": "sx"
+    },
+    "time_preference": {
+      "discount_rate": 17,
+      "planning_horizon": "medium_term",
+      "present_vs_future": 28
+    },
+    "regulatory_focus": {
+      "promotion": 54,
+      "prevention": 40
+    },
+    "language_style": {
+      "formality": 57,
+      "directness": 82,
+      "verbosity": 95,
+      "emotionality": 68,
+      "technicality": 43
+    },
+    "emotion_profile": {
+      "baseline_positivity": 72,
+      "emotional_volatility": 59,
+      "stress_tolerance": 54,
+      "empathy": 36
+    },
+    "social_profile": {
+      "trust_propensity": 28,
+      "social_confidence": 85,
+      "conflict_style": "competing",
+      "influence_susceptibility": 61
+    },
+    "behavioral_indicators": {
+      "decision_speed": 90,
+      "information_seeking": 55,
+      "social_proof_reliance": 33,
+      "price_sensitivity": 20
+    }
   },
   {
     "id": "Đỗ小姐",
@@ -819,7 +1608,114 @@
     "currentQuestionIndex": 0,
     "isCompleted": false,
     "createdAt": "2026-01-06T11:19:59.380800",
-    "updatedAt": "2026-01-08T06:04:29.899Z"
+    "updatedAt": "2026-01-08T06:04:29.899Z",
+    "version": "v1.0",
+    "source_summary": {
+      "dialogue": 0.4,
+      "questionnaire": 0.3,
+      "behavior": 0.1
+    },
+    "big5": {
+      "openness": 10,
+      "conscientiousness": 37,
+      "extraversion": 10,
+      "agreeableness": 48,
+      "neuroticism": 24
+    },
+    "schwartz_values": {
+      "Universalism": 69,
+      "Self-Direction": 74,
+      "Stimulation": 88,
+      "Power": 73,
+      "Security": 55
+    },
+    "moral_foundations": {
+      "Care": 21,
+      "Fairness": 43,
+      "Loyalty": 36,
+      "Authority": 52,
+      "Sanctity": 45
+    },
+    "risk_profile": {
+      "overall": 45,
+      "financial": 16,
+      "ethical": 95,
+      "confidence": 0.9,
+      "social": 66,
+      "health": 37
+    },
+    "decision_style": {
+      "primary": "analytical",
+      "secondary": "dependent",
+      "risk_seeking": 49,
+      "info_processing": "satisficer",
+      "social_preference": "autonomous"
+    },
+    "meta": {
+      "base_model": "gpt-4o-mini",
+      "temperature": 0.7,
+      "prompt_version": "v2.1",
+      "schema_validation": "pass"
+    },
+    "hexaco": {
+      "honesty_humility": 37,
+      "emotionality": 15,
+      "extraversion": 19,
+      "agreeableness": 56,
+      "conscientiousness": 32,
+      "openness": 13
+    },
+    "disc": {
+      "dominance": 52,
+      "influence": 1,
+      "steadiness": 67,
+      "conscientiousness": 40
+    },
+    "mbti": {
+      "E_I": -66,
+      "S_N": -68,
+      "T_F": -7,
+      "J_P": -46
+    },
+    "enneagram": {
+      "primary_type": 2,
+      "wing": 1,
+      "instinct": "so"
+    },
+    "time_preference": {
+      "discount_rate": 35,
+      "planning_horizon": "short_term",
+      "present_vs_future": 53
+    },
+    "regulatory_focus": {
+      "promotion": 20,
+      "prevention": 59
+    },
+    "language_style": {
+      "formality": 64,
+      "directness": 69,
+      "verbosity": 20,
+      "emotionality": 36,
+      "technicality": 23
+    },
+    "emotion_profile": {
+      "baseline_positivity": 20,
+      "emotional_volatility": 29,
+      "stress_tolerance": 67,
+      "empathy": 49
+    },
+    "social_profile": {
+      "trust_propensity": 65,
+      "social_confidence": 20,
+      "conflict_style": "competing",
+      "influence_susceptibility": 73
+    },
+    "behavioral_indicators": {
+      "decision_speed": 55,
+      "information_seeking": 35,
+      "social_proof_reliance": 79,
+      "price_sensitivity": 55
+    }
   },
   {
     "id": "Phan先生",
@@ -891,7 +1787,114 @@
     "currentQuestionIndex": 0,
     "isCompleted": false,
     "createdAt": "2026-01-06T16:25:29.454229",
-    "updatedAt": "2026-01-08T06:04:38.711Z"
+    "updatedAt": "2026-01-08T06:04:38.711Z",
+    "version": "v1.0",
+    "source_summary": {
+      "dialogue": 0.3,
+      "questionnaire": 0.3,
+      "behavior": 0.3
+    },
+    "big5": {
+      "openness": 59,
+      "conscientiousness": 83,
+      "extraversion": 68,
+      "agreeableness": 73,
+      "neuroticism": 48
+    },
+    "schwartz_values": {
+      "Universalism": 33,
+      "Achievement": 39,
+      "Hedonism": 72,
+      "Security": 81,
+      "Benevolence": 82
+    },
+    "moral_foundations": {
+      "Care": 21,
+      "Fairness": 71,
+      "Loyalty": 70,
+      "Authority": 59,
+      "Sanctity": 46
+    },
+    "risk_profile": {
+      "overall": 82,
+      "financial": 69,
+      "ethical": 79,
+      "confidence": 0.9,
+      "social": 57,
+      "health": 70
+    },
+    "decision_style": {
+      "primary": "dependent",
+      "secondary": "spontaneous",
+      "risk_seeking": 31,
+      "info_processing": "satisficer",
+      "social_preference": "delegator"
+    },
+    "meta": {
+      "base_model": "gpt-4o-mini",
+      "temperature": 0.7,
+      "prompt_version": "v2.1",
+      "schema_validation": "pass"
+    },
+    "hexaco": {
+      "honesty_humility": 60,
+      "emotionality": 59,
+      "extraversion": 63,
+      "agreeableness": 87,
+      "conscientiousness": 77,
+      "openness": 70
+    },
+    "disc": {
+      "dominance": 40,
+      "influence": 75,
+      "steadiness": 46,
+      "conscientiousness": 78
+    },
+    "mbti": {
+      "E_I": 34,
+      "S_N": 20,
+      "T_F": -57,
+      "J_P": 80
+    },
+    "enneagram": {
+      "primary_type": 2,
+      "wing": 3,
+      "instinct": "sx"
+    },
+    "time_preference": {
+      "discount_rate": 83,
+      "planning_horizon": "medium_term",
+      "present_vs_future": -45
+    },
+    "regulatory_focus": {
+      "promotion": 69,
+      "prevention": 95
+    },
+    "language_style": {
+      "formality": 47,
+      "directness": 31,
+      "verbosity": 55,
+      "emotionality": 55,
+      "technicality": 54
+    },
+    "emotion_profile": {
+      "baseline_positivity": 81,
+      "emotional_volatility": 38,
+      "stress_tolerance": 56,
+      "empathy": 77
+    },
+    "social_profile": {
+      "trust_propensity": 90,
+      "social_confidence": 80,
+      "conflict_style": "collaborating",
+      "influence_susceptibility": 20
+    },
+    "behavioral_indicators": {
+      "decision_speed": 74,
+      "information_seeking": 71,
+      "social_proof_reliance": 85,
+      "price_sensitivity": 20
+    }
   },
   {
     "id": "Đặng小姐",
@@ -1016,7 +2019,114 @@
     "currentQuestionIndex": 0,
     "isCompleted": false,
     "createdAt": "2026-01-06T11:19:59.381844",
-    "updatedAt": "2026-01-08T06:04:47.335Z"
+    "updatedAt": "2026-01-08T06:04:47.335Z",
+    "version": "v1.0",
+    "source_summary": {
+      "dialogue": 0.4,
+      "questionnaire": 0.3,
+      "behavior": 0.3
+    },
+    "big5": {
+      "openness": 63,
+      "conscientiousness": 58,
+      "extraversion": 61,
+      "agreeableness": 47,
+      "neuroticism": 27
+    },
+    "schwartz_values": {
+      "Security": 82,
+      "Conformity": 85,
+      "Power": 71,
+      "Tradition": 87,
+      "Benevolence": 41
+    },
+    "moral_foundations": {
+      "Care": 71,
+      "Fairness": 57,
+      "Loyalty": 33,
+      "Authority": 24,
+      "Sanctity": 47
+    },
+    "risk_profile": {
+      "overall": 20,
+      "financial": 41,
+      "ethical": 65,
+      "confidence": 0.67,
+      "social": 26,
+      "health": 40
+    },
+    "decision_style": {
+      "primary": "intuitive",
+      "secondary": "avoidant",
+      "risk_seeking": 42,
+      "info_processing": "satisficer",
+      "social_preference": "delegator"
+    },
+    "meta": {
+      "base_model": "gpt-4o-mini",
+      "temperature": 0.7,
+      "prompt_version": "v2.1",
+      "schema_validation": "pass"
+    },
+    "hexaco": {
+      "honesty_humility": 34,
+      "emotionality": 26,
+      "extraversion": 58,
+      "agreeableness": 46,
+      "conscientiousness": 53,
+      "openness": 54
+    },
+    "disc": {
+      "dominance": 40,
+      "influence": 58,
+      "steadiness": 83,
+      "conscientiousness": 64
+    },
+    "mbti": {
+      "E_I": 8,
+      "S_N": 28,
+      "T_F": 24,
+      "J_P": 32
+    },
+    "enneagram": {
+      "primary_type": 7,
+      "wing": 6,
+      "instinct": "so"
+    },
+    "time_preference": {
+      "discount_rate": 20,
+      "planning_horizon": "short_term",
+      "present_vs_future": -9
+    },
+    "regulatory_focus": {
+      "promotion": 69,
+      "prevention": 58
+    },
+    "language_style": {
+      "formality": 58,
+      "directness": 61,
+      "verbosity": 80,
+      "emotionality": 20,
+      "technicality": 64
+    },
+    "emotion_profile": {
+      "baseline_positivity": 80,
+      "emotional_volatility": 30,
+      "stress_tolerance": 77,
+      "empathy": 59
+    },
+    "social_profile": {
+      "trust_propensity": 49,
+      "social_confidence": 68,
+      "conflict_style": "competing",
+      "influence_susceptibility": 39
+    },
+    "behavioral_indicators": {
+      "decision_speed": 90,
+      "information_seeking": 60,
+      "social_proof_reliance": 62,
+      "price_sensitivity": 71
+    }
   },
   {
     "id": "Phạm小姐",
@@ -1087,7 +2197,114 @@
     "currentQuestionIndex": 0,
     "isCompleted": false,
     "createdAt": "2026-01-06T16:25:29.448853",
-    "updatedAt": "2026-01-08T06:04:57.088Z"
+    "updatedAt": "2026-01-08T06:04:57.088Z",
+    "version": "v1.0",
+    "source_summary": {
+      "dialogue": 0.2,
+      "questionnaire": 0.6,
+      "behavior": 0.3
+    },
+    "big5": {
+      "openness": 95,
+      "conscientiousness": 82,
+      "extraversion": 95,
+      "agreeableness": 66,
+      "neuroticism": 49
+    },
+    "schwartz_values": {
+      "Tradition": 48,
+      "Benevolence": 36,
+      "Achievement": 73,
+      "Power": 87,
+      "Universalism": 85
+    },
+    "moral_foundations": {
+      "Care": 23,
+      "Fairness": 61,
+      "Loyalty": 18,
+      "Authority": 15,
+      "Sanctity": 22
+    },
+    "risk_profile": {
+      "overall": 22,
+      "financial": 10,
+      "ethical": 79,
+      "confidence": 0.92,
+      "social": 28,
+      "health": 10
+    },
+    "decision_style": {
+      "primary": "dependent",
+      "secondary": "intuitive",
+      "risk_seeking": 31,
+      "info_processing": "maximizer",
+      "social_preference": "collaborative"
+    },
+    "meta": {
+      "base_model": "gpt-4o-mini",
+      "temperature": 0.7,
+      "prompt_version": "v2.1",
+      "schema_validation": "pass"
+    },
+    "hexaco": {
+      "honesty_humility": 47,
+      "emotionality": 56,
+      "extraversion": 94,
+      "agreeableness": 60,
+      "conscientiousness": 75,
+      "openness": 85
+    },
+    "disc": {
+      "dominance": 32,
+      "influence": 94,
+      "steadiness": 51,
+      "conscientiousness": 78
+    },
+    "mbti": {
+      "E_I": 88,
+      "S_N": 79,
+      "T_F": -39,
+      "J_P": 61
+    },
+    "enneagram": {
+      "primary_type": 6,
+      "wing": 7,
+      "instinct": "sx"
+    },
+    "time_preference": {
+      "discount_rate": 62,
+      "planning_horizon": "long_term",
+      "present_vs_future": 59
+    },
+    "regulatory_focus": {
+      "promotion": 95,
+      "prevention": 81
+    },
+    "language_style": {
+      "formality": 45,
+      "directness": 33,
+      "verbosity": 86,
+      "emotionality": 56,
+      "technicality": 95
+    },
+    "emotion_profile": {
+      "baseline_positivity": 95,
+      "emotional_volatility": 37,
+      "stress_tolerance": 57,
+      "empathy": 66
+    },
+    "social_profile": {
+      "trust_propensity": 73,
+      "social_confidence": 95,
+      "conflict_style": "accommodating",
+      "influence_susceptibility": 20
+    },
+    "behavioral_indicators": {
+      "decision_speed": 90,
+      "information_seeking": 81,
+      "social_proof_reliance": 62,
+      "price_sensitivity": 88
+    }
   },
   {
     "id": "Trần先生",
@@ -1189,7 +2406,114 @@
     "currentQuestionIndex": 0,
     "isCompleted": false,
     "createdAt": "2026-01-06T15:05:10.788002",
-    "updatedAt": "2026-01-08T06:05:04.945Z"
+    "updatedAt": "2026-01-08T06:05:04.945Z",
+    "version": "v1.0",
+    "source_summary": {
+      "dialogue": 0.4,
+      "questionnaire": 0.4,
+      "behavior": 0.2
+    },
+    "big5": {
+      "openness": 62,
+      "conscientiousness": 61,
+      "extraversion": 17,
+      "agreeableness": 79,
+      "neuroticism": 70
+    },
+    "schwartz_values": {
+      "Power": 72,
+      "Self-Direction": 31,
+      "Tradition": 40,
+      "Benevolence": 33,
+      "Universalism": 67
+    },
+    "moral_foundations": {
+      "Care": 44,
+      "Fairness": 26,
+      "Loyalty": 51,
+      "Authority": 26,
+      "Sanctity": 14
+    },
+    "risk_profile": {
+      "overall": 45,
+      "financial": 60,
+      "ethical": 74,
+      "confidence": 0.52,
+      "social": 60,
+      "health": 45
+    },
+    "decision_style": {
+      "primary": "spontaneous",
+      "secondary": "rational",
+      "risk_seeking": 71,
+      "info_processing": "satisficer",
+      "social_preference": "autonomous"
+    },
+    "meta": {
+      "base_model": "gpt-4o-mini",
+      "temperature": 0.7,
+      "prompt_version": "v2.1",
+      "schema_validation": "pass"
+    },
+    "hexaco": {
+      "honesty_humility": 86,
+      "emotionality": 93,
+      "extraversion": 10,
+      "agreeableness": 90,
+      "conscientiousness": 63,
+      "openness": 66
+    },
+    "disc": {
+      "dominance": 18,
+      "influence": 32,
+      "steadiness": 21,
+      "conscientiousness": 62
+    },
+    "mbti": {
+      "E_I": -68,
+      "S_N": 34,
+      "T_F": -69,
+      "J_P": 13
+    },
+    "enneagram": {
+      "primary_type": 8,
+      "wing": 7,
+      "instinct": "so"
+    },
+    "time_preference": {
+      "discount_rate": 88,
+      "planning_horizon": "medium_term",
+      "present_vs_future": -76
+    },
+    "regulatory_focus": {
+      "promotion": 72,
+      "prevention": 80
+    },
+    "language_style": {
+      "formality": 52,
+      "directness": 20,
+      "verbosity": 37,
+      "emotionality": 66,
+      "technicality": 52
+    },
+    "emotion_profile": {
+      "baseline_positivity": 20,
+      "emotional_volatility": 71,
+      "stress_tolerance": 40,
+      "empathy": 94
+    },
+    "social_profile": {
+      "trust_propensity": 90,
+      "social_confidence": 20,
+      "conflict_style": "avoiding",
+      "influence_susceptibility": 38
+    },
+    "behavioral_indicators": {
+      "decision_speed": 71,
+      "information_seeking": 59,
+      "social_proof_reliance": 78,
+      "price_sensitivity": 67
+    }
   },
   {
     "id": "Lê先生",
@@ -1255,7 +2579,114 @@
     "currentQuestionIndex": 0,
     "isCompleted": false,
     "createdAt": "2026-01-06T16:25:29.446929",
-    "updatedAt": "2026-01-08T06:05:12.395Z"
+    "updatedAt": "2026-01-08T06:05:12.395Z",
+    "version": "v1.0",
+    "source_summary": {
+      "dialogue": 0.3,
+      "questionnaire": 0.5,
+      "behavior": 0.2
+    },
+    "big5": {
+      "openness": 56,
+      "conscientiousness": 38,
+      "extraversion": 41,
+      "agreeableness": 75,
+      "neuroticism": 43
+    },
+    "schwartz_values": {
+      "Benevolence": 82,
+      "Achievement": 33,
+      "Power": 59,
+      "Conformity": 84,
+      "Universalism": 80
+    },
+    "moral_foundations": {
+      "Care": 62,
+      "Fairness": 31,
+      "Loyalty": 56,
+      "Authority": 56,
+      "Sanctity": 22
+    },
+    "risk_profile": {
+      "overall": 76,
+      "financial": 95,
+      "ethical": 57,
+      "confidence": 0.59,
+      "social": 67,
+      "health": 90
+    },
+    "decision_style": {
+      "primary": "rational",
+      "secondary": "dependent",
+      "risk_seeking": 33,
+      "info_processing": "satisficer",
+      "social_preference": "delegator"
+    },
+    "meta": {
+      "base_model": "gpt-4o-mini",
+      "temperature": 0.7,
+      "prompt_version": "v2.1",
+      "schema_validation": "pass"
+    },
+    "hexaco": {
+      "honesty_humility": 71,
+      "emotionality": 66,
+      "extraversion": 42,
+      "agreeableness": 88,
+      "conscientiousness": 48,
+      "openness": 48
+    },
+    "disc": {
+      "dominance": 29,
+      "influence": 44,
+      "steadiness": 50,
+      "conscientiousness": 48
+    },
+    "mbti": {
+      "E_I": -33,
+      "S_N": 27,
+      "T_F": -31,
+      "J_P": -42
+    },
+    "enneagram": {
+      "primary_type": 6,
+      "wing": 5,
+      "instinct": "so"
+    },
+    "time_preference": {
+      "discount_rate": 23,
+      "planning_horizon": "medium_term",
+      "present_vs_future": 17
+    },
+    "regulatory_focus": {
+      "promotion": 60,
+      "prevention": 41
+    },
+    "language_style": {
+      "formality": 40,
+      "directness": 34,
+      "verbosity": 34,
+      "emotionality": 38,
+      "technicality": 73
+    },
+    "emotion_profile": {
+      "baseline_positivity": 32,
+      "emotional_volatility": 52,
+      "stress_tolerance": 70,
+      "empathy": 89
+    },
+    "social_profile": {
+      "trust_propensity": 60,
+      "social_confidence": 42,
+      "conflict_style": "collaborating",
+      "influence_susceptibility": 52
+    },
+    "behavioral_indicators": {
+      "decision_speed": 74,
+      "information_seeking": 43,
+      "social_proof_reliance": 85,
+      "price_sensitivity": 38
+    }
   },
   {
     "id": "Hoàng先生",
@@ -1337,7 +2768,114 @@
     "currentQuestionIndex": 0,
     "isCompleted": false,
     "createdAt": "2026-01-06T16:21:06.173432",
-    "updatedAt": "2026-01-08T06:05:24.904Z"
+    "updatedAt": "2026-01-08T06:05:24.904Z",
+    "version": "v1.0",
+    "source_summary": {
+      "dialogue": 0.3,
+      "questionnaire": 0.3,
+      "behavior": 0.3
+    },
+    "big5": {
+      "openness": 25,
+      "conscientiousness": 37,
+      "extraversion": 63,
+      "agreeableness": 24,
+      "neuroticism": 82
+    },
+    "schwartz_values": {
+      "Stimulation": 52,
+      "Power": 69,
+      "Hedonism": 57,
+      "Universalism": 56,
+      "Tradition": 85
+    },
+    "moral_foundations": {
+      "Care": 49,
+      "Fairness": 38,
+      "Loyalty": 71,
+      "Authority": 33,
+      "Sanctity": 50
+    },
+    "risk_profile": {
+      "overall": 91,
+      "financial": 75,
+      "ethical": 54,
+      "confidence": 0.8,
+      "social": 90,
+      "health": 79
+    },
+    "decision_style": {
+      "primary": "rational",
+      "secondary": "spontaneous",
+      "risk_seeking": 47,
+      "info_processing": "satisficer",
+      "social_preference": "delegator"
+    },
+    "meta": {
+      "base_model": "gpt-4o-mini",
+      "temperature": 0.7,
+      "prompt_version": "v2.1",
+      "schema_validation": "pass"
+    },
+    "hexaco": {
+      "honesty_humility": 23,
+      "emotionality": 71,
+      "extraversion": 62,
+      "agreeableness": 35,
+      "conscientiousness": 41,
+      "openness": 19
+    },
+    "disc": {
+      "dominance": 67,
+      "influence": 73,
+      "steadiness": 23,
+      "conscientiousness": 46
+    },
+    "mbti": {
+      "E_I": 7,
+      "S_N": -50,
+      "T_F": 48,
+      "J_P": -12
+    },
+    "enneagram": {
+      "primary_type": 6,
+      "wing": 7,
+      "instinct": "so"
+    },
+    "time_preference": {
+      "discount_rate": 56,
+      "planning_horizon": "short_term",
+      "present_vs_future": 43
+    },
+    "regulatory_focus": {
+      "promotion": 44,
+      "prevention": 57
+    },
+    "language_style": {
+      "formality": 69,
+      "directness": 78,
+      "verbosity": 69,
+      "emotionality": 95,
+      "technicality": 20
+    },
+    "emotion_profile": {
+      "baseline_positivity": 72,
+      "emotional_volatility": 86,
+      "stress_tolerance": 25,
+      "empathy": 43
+    },
+    "social_profile": {
+      "trust_propensity": 32,
+      "social_confidence": 68,
+      "conflict_style": "compromising",
+      "influence_susceptibility": 63
+    },
+    "behavioral_indicators": {
+      "decision_speed": 67,
+      "information_seeking": 25,
+      "social_proof_reliance": 47,
+      "price_sensitivity": 20
+    }
   },
   {
     "id": "Nguyễn小姐",
@@ -1435,7 +2973,114 @@
     "currentQuestionIndex": 0,
     "isCompleted": false,
     "createdAt": "2026-01-06T15:05:10.786238",
-    "updatedAt": "2026-01-08T06:05:39.239Z"
+    "updatedAt": "2026-01-08T06:05:39.239Z",
+    "version": "v1.0",
+    "source_summary": {
+      "dialogue": 0.3,
+      "questionnaire": 0.3,
+      "behavior": 0.1
+    },
+    "big5": {
+      "openness": 39,
+      "conscientiousness": 95,
+      "extraversion": 83,
+      "agreeableness": 71,
+      "neuroticism": 95
+    },
+    "schwartz_values": {
+      "Security": 44,
+      "Self-Direction": 87,
+      "Power": 60,
+      "Conformity": 37,
+      "Benevolence": 36
+    },
+    "moral_foundations": {
+      "Care": 45,
+      "Fairness": 40,
+      "Loyalty": 63,
+      "Authority": 31,
+      "Sanctity": 25
+    },
+    "risk_profile": {
+      "overall": 45,
+      "financial": 66,
+      "ethical": 65,
+      "confidence": 0.78,
+      "social": 22,
+      "health": 32
+    },
+    "decision_style": {
+      "primary": "dependent",
+      "secondary": "avoidant",
+      "risk_seeking": 31,
+      "info_processing": "satisficer",
+      "social_preference": "collaborative"
+    },
+    "meta": {
+      "base_model": "gpt-4o-mini",
+      "temperature": 0.7,
+      "prompt_version": "v2.1",
+      "schema_validation": "pass"
+    },
+    "hexaco": {
+      "honesty_humility": 80,
+      "emotionality": 100,
+      "extraversion": 78,
+      "agreeableness": 83,
+      "conscientiousness": 100,
+      "openness": 44
+    },
+    "disc": {
+      "dominance": 18,
+      "influence": 92,
+      "steadiness": 6,
+      "conscientiousness": 100
+    },
+    "mbti": {
+      "E_I": 75,
+      "S_N": -46,
+      "T_F": -27,
+      "J_P": 100
+    },
+    "enneagram": {
+      "primary_type": 9,
+      "wing": 1,
+      "instinct": "so"
+    },
+    "time_preference": {
+      "discount_rate": 75,
+      "planning_horizon": "medium_term",
+      "present_vs_future": -60
+    },
+    "regulatory_focus": {
+      "promotion": 29,
+      "prevention": 95
+    },
+    "language_style": {
+      "formality": 48,
+      "directness": 23,
+      "verbosity": 81,
+      "emotionality": 95,
+      "technicality": 42
+    },
+    "emotion_profile": {
+      "baseline_positivity": 94,
+      "emotional_volatility": 90,
+      "stress_tolerance": 20,
+      "empathy": 63
+    },
+    "social_profile": {
+      "trust_propensity": 79,
+      "social_confidence": 91,
+      "conflict_style": "collaborating",
+      "influence_susceptibility": 20
+    },
+    "behavioral_indicators": {
+      "decision_speed": 39,
+      "information_seeking": 74,
+      "social_proof_reliance": 85,
+      "price_sensitivity": 60
+    }
   },
   {
     "id": "Vũ小姐",
@@ -1501,7 +3146,114 @@
     "currentQuestionIndex": 0,
     "isCompleted": false,
     "createdAt": "2026-01-06T16:25:29.455902",
-    "updatedAt": "2026-01-08T06:05:45.819Z"
+    "updatedAt": "2026-01-08T06:05:45.819Z",
+    "version": "v1.0",
+    "source_summary": {
+      "dialogue": 0.3,
+      "questionnaire": 0.5,
+      "behavior": 0.4
+    },
+    "big5": {
+      "openness": 10,
+      "conscientiousness": 37,
+      "extraversion": 15,
+      "agreeableness": 44,
+      "neuroticism": 23
+    },
+    "schwartz_values": {
+      "Hedonism": 72,
+      "Stimulation": 42,
+      "Self-Direction": 48,
+      "Benevolence": 39,
+      "Universalism": 70
+    },
+    "moral_foundations": {
+      "Care": 39,
+      "Fairness": 68,
+      "Loyalty": 65,
+      "Authority": 60,
+      "Sanctity": 44
+    },
+    "risk_profile": {
+      "overall": 10,
+      "financial": 39,
+      "ethical": 47,
+      "confidence": 0.87,
+      "social": 10,
+      "health": 10
+    },
+    "decision_style": {
+      "primary": "analytical",
+      "secondary": "intuitive",
+      "risk_seeking": 45,
+      "info_processing": "satisficer",
+      "social_preference": "collaborative"
+    },
+    "meta": {
+      "base_model": "gpt-4o-mini",
+      "temperature": 0.7,
+      "prompt_version": "v2.1",
+      "schema_validation": "pass"
+    },
+    "hexaco": {
+      "honesty_humility": 47,
+      "emotionality": 42,
+      "extraversion": 14,
+      "agreeableness": 43,
+      "conscientiousness": 40,
+      "openness": 17
+    },
+    "disc": {
+      "dominance": 57,
+      "influence": 17,
+      "steadiness": 74,
+      "conscientiousness": 35
+    },
+    "mbti": {
+      "E_I": -88,
+      "S_N": -56,
+      "T_F": 15,
+      "J_P": -46
+    },
+    "enneagram": {
+      "primary_type": 5,
+      "wing": 4,
+      "instinct": "sx"
+    },
+    "time_preference": {
+      "discount_rate": 30,
+      "planning_horizon": "medium_term",
+      "present_vs_future": 3
+    },
+    "regulatory_focus": {
+      "promotion": 20,
+      "prevention": 42
+    },
+    "language_style": {
+      "formality": 70,
+      "directness": 42,
+      "verbosity": 27,
+      "emotionality": 23,
+      "technicality": 20
+    },
+    "emotion_profile": {
+      "baseline_positivity": 25,
+      "emotional_volatility": 15,
+      "stress_tolerance": 77,
+      "empathy": 61
+    },
+    "social_profile": {
+      "trust_propensity": 43,
+      "social_confidence": 27,
+      "conflict_style": "avoiding",
+      "influence_susceptibility": 56
+    },
+    "behavioral_indicators": {
+      "decision_speed": 47,
+      "information_seeking": 25,
+      "social_proof_reliance": 60,
+      "price_sensitivity": 80
+    }
   },
   {
     "id": "Đặng先生",
@@ -1607,7 +3359,114 @@
     "currentQuestionIndex": 0,
     "isCompleted": false,
     "createdAt": "2026-01-06T15:05:10.790882",
-    "updatedAt": "2026-01-08T06:05:55.457Z"
+    "updatedAt": "2026-01-08T06:05:55.457Z",
+    "version": "v1.0",
+    "source_summary": {
+      "dialogue": 0.2,
+      "questionnaire": 0.4,
+      "behavior": 0.1
+    },
+    "big5": {
+      "openness": 17,
+      "conscientiousness": 25,
+      "extraversion": 10,
+      "agreeableness": 32,
+      "neuroticism": 43
+    },
+    "schwartz_values": {
+      "Hedonism": 33,
+      "Benevolence": 86,
+      "Power": 46,
+      "Universalism": 51,
+      "Tradition": 76
+    },
+    "moral_foundations": {
+      "Care": 78,
+      "Fairness": 75,
+      "Loyalty": 42,
+      "Authority": 45,
+      "Sanctity": 69
+    },
+    "risk_profile": {
+      "overall": 10,
+      "financial": 10,
+      "ethical": 46,
+      "confidence": 0.93,
+      "social": 10,
+      "health": 21
+    },
+    "decision_style": {
+      "primary": "analytical",
+      "secondary": "spontaneous",
+      "risk_seeking": 48,
+      "info_processing": "satisficer",
+      "social_preference": "collaborative"
+    },
+    "meta": {
+      "base_model": "gpt-4o-mini",
+      "temperature": 0.7,
+      "prompt_version": "v2.1",
+      "schema_validation": "pass"
+    },
+    "hexaco": {
+      "honesty_humility": 50,
+      "emotionality": 38,
+      "extraversion": 12,
+      "agreeableness": 45,
+      "conscientiousness": 16,
+      "openness": 14
+    },
+    "disc": {
+      "dominance": 64,
+      "influence": 10,
+      "steadiness": 59,
+      "conscientiousness": 24
+    },
+    "mbti": {
+      "E_I": -74,
+      "S_N": -41,
+      "T_F": 51,
+      "J_P": -56
+    },
+    "enneagram": {
+      "primary_type": 4,
+      "wing": 3,
+      "instinct": "sx"
+    },
+    "time_preference": {
+      "discount_rate": 59,
+      "planning_horizon": "short_term",
+      "present_vs_future": 75
+    },
+    "regulatory_focus": {
+      "promotion": 20,
+      "prevention": 20
+    },
+    "language_style": {
+      "formality": 54,
+      "directness": 77,
+      "verbosity": 20,
+      "emotionality": 67,
+      "technicality": 20
+    },
+    "emotion_profile": {
+      "baseline_positivity": 20,
+      "emotional_volatility": 38,
+      "stress_tolerance": 45,
+      "empathy": 38
+    },
+    "social_profile": {
+      "trust_propensity": 21,
+      "social_confidence": 20,
+      "conflict_style": "collaborating",
+      "influence_susceptibility": 70
+    },
+    "behavioral_indicators": {
+      "decision_speed": 44,
+      "information_seeking": 25,
+      "social_proof_reliance": 52,
+      "price_sensitivity": 90
+    }
   },
   {
     "id": "Bùi小姐",
@@ -1717,7 +3576,114 @@
     "currentQuestionIndex": 0,
     "isCompleted": false,
     "createdAt": "2026-01-06T15:05:10.791282",
-    "updatedAt": "2026-01-08T06:06:07.991Z"
+    "updatedAt": "2026-01-08T06:06:07.991Z",
+    "version": "v1.0",
+    "source_summary": {
+      "dialogue": 0.3,
+      "questionnaire": 0.4,
+      "behavior": 0.4
+    },
+    "big5": {
+      "openness": 55,
+      "conscientiousness": 71,
+      "extraversion": 58,
+      "agreeableness": 78,
+      "neuroticism": 78
+    },
+    "schwartz_values": {
+      "Hedonism": 42,
+      "Power": 89,
+      "Benevolence": 68,
+      "Tradition": 57,
+      "Security": 67
+    },
+    "moral_foundations": {
+      "Care": 36,
+      "Fairness": 36,
+      "Loyalty": 34,
+      "Authority": 40,
+      "Sanctity": 51
+    },
+    "risk_profile": {
+      "overall": 22,
+      "financial": 32,
+      "ethical": 64,
+      "confidence": 0.74,
+      "social": 10,
+      "health": 19
+    },
+    "decision_style": {
+      "primary": "dependent",
+      "secondary": "spontaneous",
+      "risk_seeking": 42,
+      "info_processing": "maximizer",
+      "social_preference": "autonomous"
+    },
+    "meta": {
+      "base_model": "gpt-4o-mini",
+      "temperature": 0.7,
+      "prompt_version": "v2.1",
+      "schema_validation": "pass"
+    },
+    "hexaco": {
+      "honesty_humility": 65,
+      "emotionality": 69,
+      "extraversion": 58,
+      "agreeableness": 78,
+      "conscientiousness": 75,
+      "openness": 54
+    },
+    "disc": {
+      "dominance": 23,
+      "influence": 54,
+      "steadiness": 28,
+      "conscientiousness": 81
+    },
+    "mbti": {
+      "E_I": 31,
+      "S_N": 1,
+      "T_F": -60,
+      "J_P": 61
+    },
+    "enneagram": {
+      "primary_type": 2,
+      "wing": 1,
+      "instinct": "sx"
+    },
+    "time_preference": {
+      "discount_rate": 71,
+      "planning_horizon": "long_term",
+      "present_vs_future": -70
+    },
+    "regulatory_focus": {
+      "promotion": 72,
+      "prevention": 66
+    },
+    "language_style": {
+      "formality": 27,
+      "directness": 20,
+      "verbosity": 52,
+      "emotionality": 71,
+      "technicality": 59
+    },
+    "emotion_profile": {
+      "baseline_positivity": 73,
+      "emotional_volatility": 65,
+      "stress_tolerance": 29,
+      "empathy": 82
+    },
+    "social_profile": {
+      "trust_propensity": 86,
+      "social_confidence": 48,
+      "conflict_style": "collaborating",
+      "influence_susceptibility": 30
+    },
+    "behavioral_indicators": {
+      "decision_speed": 64,
+      "information_seeking": 57,
+      "social_proof_reliance": 85,
+      "price_sensitivity": 77
+    }
   },
   {
     "id": "Dương先生",
@@ -1829,7 +3795,114 @@
     "currentQuestionIndex": 0,
     "isCompleted": false,
     "createdAt": "2026-01-06T15:05:10.791806",
-    "updatedAt": "2026-01-08T06:06:15.821Z"
+    "updatedAt": "2026-01-08T06:06:15.821Z",
+    "version": "v1.0",
+    "source_summary": {
+      "dialogue": 0.4,
+      "questionnaire": 0.5,
+      "behavior": 0.3
+    },
+    "big5": {
+      "openness": 21,
+      "conscientiousness": 33,
+      "extraversion": 39,
+      "agreeableness": 10,
+      "neuroticism": 59
+    },
+    "schwartz_values": {
+      "Power": 30,
+      "Hedonism": 64,
+      "Achievement": 81,
+      "Universalism": 53,
+      "Conformity": 46
+    },
+    "moral_foundations": {
+      "Care": 80,
+      "Fairness": 60,
+      "Loyalty": 40,
+      "Authority": 40,
+      "Sanctity": 70
+    },
+    "risk_profile": {
+      "overall": 42,
+      "financial": 10,
+      "ethical": 49,
+      "confidence": 0.7,
+      "social": 57,
+      "health": 32
+    },
+    "decision_style": {
+      "primary": "analytical",
+      "secondary": "dependent",
+      "risk_seeking": 65,
+      "info_processing": "maximizer",
+      "social_preference": "delegator"
+    },
+    "meta": {
+      "base_model": "gpt-4o-mini",
+      "temperature": 0.7,
+      "prompt_version": "v2.1",
+      "schema_validation": "pass"
+    },
+    "hexaco": {
+      "honesty_humility": 6,
+      "emotionality": 63,
+      "extraversion": 33,
+      "agreeableness": 23,
+      "conscientiousness": 28,
+      "openness": 26
+    },
+    "disc": {
+      "dominance": 93,
+      "influence": 45,
+      "steadiness": 34,
+      "conscientiousness": 35
+    },
+    "mbti": {
+      "E_I": -3,
+      "S_N": -67,
+      "T_F": 84,
+      "J_P": -34
+    },
+    "enneagram": {
+      "primary_type": 4,
+      "wing": 5,
+      "instinct": "so"
+    },
+    "time_preference": {
+      "discount_rate": 32,
+      "planning_horizon": "medium_term",
+      "present_vs_future": -25
+    },
+    "regulatory_focus": {
+      "promotion": 34,
+      "prevention": 42
+    },
+    "language_style": {
+      "formality": 34,
+      "directness": 78,
+      "verbosity": 33,
+      "emotionality": 67,
+      "technicality": 20
+    },
+    "emotion_profile": {
+      "baseline_positivity": 57,
+      "emotional_volatility": 47,
+      "stress_tolerance": 31,
+      "empathy": 25
+    },
+    "social_profile": {
+      "trust_propensity": 20,
+      "social_confidence": 52,
+      "conflict_style": "competing",
+      "influence_susceptibility": 54
+    },
+    "behavioral_indicators": {
+      "decision_speed": 46,
+      "information_seeking": 31,
+      "social_proof_reliance": 32,
+      "price_sensitivity": 55
+    }
   },
   {
     "id": "Nguyễn小姐_953bc9",
@@ -1899,7 +3972,114 @@
     "currentQuestionIndex": 0,
     "isCompleted": false,
     "createdAt": "2026-01-06T16:28:43.520561",
-    "updatedAt": "2026-01-08T06:06:26.489Z"
+    "updatedAt": "2026-01-08T06:06:26.489Z",
+    "version": "v1.0",
+    "source_summary": {
+      "dialogue": 0.3,
+      "questionnaire": 0.4,
+      "behavior": 0.2
+    },
+    "big5": {
+      "openness": 27,
+      "conscientiousness": 32,
+      "extraversion": 39,
+      "agreeableness": 19,
+      "neuroticism": 73
+    },
+    "schwartz_values": {
+      "Stimulation": 88,
+      "Security": 44,
+      "Tradition": 60,
+      "Achievement": 58,
+      "Universalism": 66
+    },
+    "moral_foundations": {
+      "Care": 22,
+      "Fairness": 41,
+      "Loyalty": 61,
+      "Authority": 25,
+      "Sanctity": 39
+    },
+    "risk_profile": {
+      "overall": 57,
+      "financial": 10,
+      "ethical": 43,
+      "confidence": 0.88,
+      "social": 40,
+      "health": 44
+    },
+    "decision_style": {
+      "primary": "intuitive",
+      "secondary": "avoidant",
+      "risk_seeking": 64,
+      "info_processing": "maximizer",
+      "social_preference": "delegator"
+    },
+    "meta": {
+      "base_model": "gpt-4o-mini",
+      "temperature": 0.7,
+      "prompt_version": "v2.1",
+      "schema_validation": "pass"
+    },
+    "hexaco": {
+      "honesty_humility": 23,
+      "emotionality": 81,
+      "extraversion": 32,
+      "agreeableness": 13,
+      "conscientiousness": 28,
+      "openness": 41
+    },
+    "disc": {
+      "dominance": 86,
+      "influence": 34,
+      "steadiness": 31,
+      "conscientiousness": 28
+    },
+    "mbti": {
+      "E_I": -15,
+      "S_N": -32,
+      "T_F": 76,
+      "J_P": -53
+    },
+    "enneagram": {
+      "primary_type": 5,
+      "wing": 6,
+      "instinct": "sp"
+    },
+    "time_preference": {
+      "discount_rate": 61,
+      "planning_horizon": "medium_term",
+      "present_vs_future": 79
+    },
+    "regulatory_focus": {
+      "promotion": 39,
+      "prevention": 48
+    },
+    "language_style": {
+      "formality": 50,
+      "directness": 89,
+      "verbosity": 57,
+      "emotionality": 95,
+      "technicality": 20
+    },
+    "emotion_profile": {
+      "baseline_positivity": 36,
+      "emotional_volatility": 86,
+      "stress_tolerance": 39,
+      "empathy": 39
+    },
+    "social_profile": {
+      "trust_propensity": 34,
+      "social_confidence": 53,
+      "conflict_style": "compromising",
+      "influence_susceptibility": 60
+    },
+    "behavioral_indicators": {
+      "decision_speed": 63,
+      "information_seeking": 30,
+      "social_proof_reliance": 42,
+      "price_sensitivity": 38
+    }
   },
   {
     "id": "Trần先生_e23d0f",
@@ -1971,7 +4151,114 @@
     "currentQuestionIndex": 0,
     "isCompleted": false,
     "createdAt": "2026-01-06T16:28:43.525092",
-    "updatedAt": "2026-01-08T06:06:34.507Z"
+    "updatedAt": "2026-01-08T06:06:34.507Z",
+    "version": "v1.0",
+    "source_summary": {
+      "dialogue": 0.2,
+      "questionnaire": 0.3,
+      "behavior": 0.3
+    },
+    "big5": {
+      "openness": 39,
+      "conscientiousness": 71,
+      "extraversion": 21,
+      "agreeableness": 62,
+      "neuroticism": 29
+    },
+    "schwartz_values": {
+      "Conformity": 36,
+      "Power": 32,
+      "Achievement": 76,
+      "Self-Direction": 40,
+      "Tradition": 66
+    },
+    "moral_foundations": {
+      "Care": 37,
+      "Fairness": 44,
+      "Loyalty": 61,
+      "Authority": 34,
+      "Sanctity": 45
+    },
+    "risk_profile": {
+      "overall": 45,
+      "financial": 47,
+      "ethical": 31,
+      "confidence": 0.68,
+      "social": 48,
+      "health": 28
+    },
+    "decision_style": {
+      "primary": "spontaneous",
+      "secondary": "avoidant",
+      "risk_seeking": 84,
+      "info_processing": "satisficer",
+      "social_preference": "collaborative"
+    },
+    "meta": {
+      "base_model": "gpt-4o-mini",
+      "temperature": 0.7,
+      "prompt_version": "v2.1",
+      "schema_validation": "pass"
+    },
+    "hexaco": {
+      "honesty_humility": 62,
+      "emotionality": 23,
+      "extraversion": 19,
+      "agreeableness": 69,
+      "conscientiousness": 62,
+      "openness": 45
+    },
+    "disc": {
+      "dominance": 23,
+      "influence": 17,
+      "steadiness": 72,
+      "conscientiousness": 70
+    },
+    "mbti": {
+      "E_I": -75,
+      "S_N": -16,
+      "T_F": -9,
+      "J_P": 46
+    },
+    "enneagram": {
+      "primary_type": 7,
+      "wing": 8,
+      "instinct": "so"
+    },
+    "time_preference": {
+      "discount_rate": 69,
+      "planning_horizon": "short_term",
+      "present_vs_future": -53
+    },
+    "regulatory_focus": {
+      "promotion": 54,
+      "prevention": 70
+    },
+    "language_style": {
+      "formality": 30,
+      "directness": 52,
+      "verbosity": 20,
+      "emotionality": 26,
+      "technicality": 33
+    },
+    "emotion_profile": {
+      "baseline_positivity": 28,
+      "emotional_volatility": 34,
+      "stress_tolerance": 65,
+      "empathy": 55
+    },
+    "social_profile": {
+      "trust_propensity": 51,
+      "social_confidence": 34,
+      "conflict_style": "accommodating",
+      "influence_susceptibility": 36
+    },
+    "behavioral_indicators": {
+      "decision_speed": 46,
+      "information_seeking": 66,
+      "social_proof_reliance": 80,
+      "price_sensitivity": 48
+    }
   },
   {
     "id": "Lê小姐_9ecf86",
@@ -2037,7 +4324,114 @@
     "currentQuestionIndex": 0,
     "isCompleted": false,
     "createdAt": "2026-01-06T16:28:43.527259",
-    "updatedAt": "2026-01-08T06:06:40.835Z"
+    "updatedAt": "2026-01-08T06:06:40.835Z",
+    "version": "v1.0",
+    "source_summary": {
+      "dialogue": 0.4,
+      "questionnaire": 0.4,
+      "behavior": 0.4
+    },
+    "big5": {
+      "openness": 50,
+      "conscientiousness": 50,
+      "extraversion": 12,
+      "agreeableness": 32,
+      "neuroticism": 25
+    },
+    "schwartz_values": {
+      "Conformity": 60,
+      "Universalism": 38,
+      "Hedonism": 62,
+      "Achievement": 38,
+      "Security": 58
+    },
+    "moral_foundations": {
+      "Care": 65,
+      "Fairness": 35,
+      "Loyalty": 70,
+      "Authority": 36,
+      "Sanctity": 30
+    },
+    "risk_profile": {
+      "overall": 10,
+      "financial": 10,
+      "ethical": 79,
+      "confidence": 0.52,
+      "social": 10,
+      "health": 23
+    },
+    "decision_style": {
+      "primary": "analytical",
+      "secondary": "intuitive",
+      "risk_seeking": 47,
+      "info_processing": "maximizer",
+      "social_preference": "collaborative"
+    },
+    "meta": {
+      "base_model": "gpt-4o-mini",
+      "temperature": 0.7,
+      "prompt_version": "v2.1",
+      "schema_validation": "pass"
+    },
+    "hexaco": {
+      "honesty_humility": 14,
+      "emotionality": 29,
+      "extraversion": 5,
+      "agreeableness": 39,
+      "conscientiousness": 51,
+      "openness": 59
+    },
+    "disc": {
+      "dominance": 54,
+      "influence": 21,
+      "steadiness": 76,
+      "conscientiousness": 41
+    },
+    "mbti": {
+      "E_I": -73,
+      "S_N": -16,
+      "T_F": 54,
+      "J_P": -17
+    },
+    "enneagram": {
+      "primary_type": 3,
+      "wing": 2,
+      "instinct": "so"
+    },
+    "time_preference": {
+      "discount_rate": 19,
+      "planning_horizon": "medium_term",
+      "present_vs_future": 7
+    },
+    "regulatory_focus": {
+      "promotion": 66,
+      "prevention": 59
+    },
+    "language_style": {
+      "formality": 46,
+      "directness": 86,
+      "verbosity": 24,
+      "emotionality": 44,
+      "technicality": 46
+    },
+    "emotion_profile": {
+      "baseline_positivity": 20,
+      "emotional_volatility": 22,
+      "stress_tolerance": 85,
+      "empathy": 31
+    },
+    "social_profile": {
+      "trust_propensity": 20,
+      "social_confidence": 22,
+      "conflict_style": "accommodating",
+      "influence_susceptibility": 36
+    },
+    "behavioral_indicators": {
+      "decision_speed": 74,
+      "information_seeking": 51,
+      "social_proof_reliance": 55,
+      "price_sensitivity": 90
+    }
   },
   {
     "id": "Phạm先生_36b656",
@@ -2109,7 +4503,114 @@
     "currentQuestionIndex": 0,
     "isCompleted": false,
     "createdAt": "2026-01-06T16:28:43.529095",
-    "updatedAt": "2026-01-08T06:06:49.075Z"
+    "updatedAt": "2026-01-08T06:06:49.075Z",
+    "version": "v1.0",
+    "source_summary": {
+      "dialogue": 0.2,
+      "questionnaire": 0.5,
+      "behavior": 0.4
+    },
+    "big5": {
+      "openness": 75,
+      "conscientiousness": 94,
+      "extraversion": 94,
+      "agreeableness": 44,
+      "neuroticism": 59
+    },
+    "schwartz_values": {
+      "Conformity": 55,
+      "Hedonism": 48,
+      "Tradition": 41,
+      "Stimulation": 43,
+      "Universalism": 90
+    },
+    "moral_foundations": {
+      "Care": 90,
+      "Fairness": 75,
+      "Loyalty": 28,
+      "Authority": 21,
+      "Sanctity": 57
+    },
+    "risk_profile": {
+      "overall": 24,
+      "financial": 60,
+      "ethical": 59,
+      "confidence": 0.75,
+      "social": 10,
+      "health": 10
+    },
+    "decision_style": {
+      "primary": "dependent",
+      "secondary": "intuitive",
+      "risk_seeking": 42,
+      "info_processing": "satisficer",
+      "social_preference": "collaborative"
+    },
+    "meta": {
+      "base_model": "gpt-4o-mini",
+      "temperature": 0.7,
+      "prompt_version": "v2.1",
+      "schema_validation": "pass"
+    },
+    "hexaco": {
+      "honesty_humility": 61,
+      "emotionality": 59,
+      "extraversion": 92,
+      "agreeableness": 53,
+      "conscientiousness": 84,
+      "openness": 68
+    },
+    "disc": {
+      "dominance": 69,
+      "influence": 87,
+      "steadiness": 32,
+      "conscientiousness": 97
+    },
+    "mbti": {
+      "E_I": 99,
+      "S_N": 41,
+      "T_F": 0,
+      "J_P": 79
+    },
+    "enneagram": {
+      "primary_type": 2,
+      "wing": 3,
+      "instinct": "sx"
+    },
+    "time_preference": {
+      "discount_rate": 64,
+      "planning_horizon": "short_term",
+      "present_vs_future": 59
+    },
+    "regulatory_focus": {
+      "promotion": 91,
+      "prevention": 95
+    },
+    "language_style": {
+      "formality": 65,
+      "directness": 42,
+      "verbosity": 81,
+      "emotionality": 52,
+      "technicality": 72
+    },
+    "emotion_profile": {
+      "baseline_positivity": 86,
+      "emotional_volatility": 64,
+      "stress_tolerance": 44,
+      "empathy": 51
+    },
+    "social_profile": {
+      "trust_propensity": 60,
+      "social_confidence": 95,
+      "conflict_style": "accommodating",
+      "influence_susceptibility": 21
+    },
+    "behavioral_indicators": {
+      "decision_speed": 78,
+      "information_seeking": 95,
+      "social_proof_reliance": 38,
+      "price_sensitivity": 81
+    }
   },
   {
     "id": "Huỳnh小姐_f8043a",
@@ -2175,7 +4676,114 @@
     "currentQuestionIndex": 0,
     "isCompleted": false,
     "createdAt": "2026-01-06T16:28:43.530960",
-    "updatedAt": "2026-01-08T06:06:53.313Z"
+    "updatedAt": "2026-01-08T06:06:53.313Z",
+    "version": "v1.0",
+    "source_summary": {
+      "dialogue": 0.4,
+      "questionnaire": 0.3,
+      "behavior": 0.2
+    },
+    "big5": {
+      "openness": 76,
+      "conscientiousness": 93,
+      "extraversion": 84,
+      "agreeableness": 58,
+      "neuroticism": 94
+    },
+    "schwartz_values": {
+      "Tradition": 60,
+      "Achievement": 70,
+      "Conformity": 66,
+      "Security": 34,
+      "Hedonism": 63
+    },
+    "moral_foundations": {
+      "Care": 77,
+      "Fairness": 59,
+      "Loyalty": 45,
+      "Authority": 35,
+      "Sanctity": 14
+    },
+    "risk_profile": {
+      "overall": 30,
+      "financial": 66,
+      "ethical": 48,
+      "confidence": 0.72,
+      "social": 54,
+      "health": 10
+    },
+    "decision_style": {
+      "primary": "dependent",
+      "secondary": "avoidant",
+      "risk_seeking": 42,
+      "info_processing": "satisficer",
+      "social_preference": "delegator"
+    },
+    "meta": {
+      "base_model": "gpt-4o-mini",
+      "temperature": 0.7,
+      "prompt_version": "v2.1",
+      "schema_validation": "pass"
+    },
+    "hexaco": {
+      "honesty_humility": 60,
+      "emotionality": 100,
+      "extraversion": 82,
+      "agreeableness": 55,
+      "conscientiousness": 93,
+      "openness": 84
+    },
+    "disc": {
+      "dominance": 53,
+      "influence": 85,
+      "steadiness": 2,
+      "conscientiousness": 86
+    },
+    "mbti": {
+      "E_I": 75,
+      "S_N": 54,
+      "T_F": -30,
+      "J_P": 78
+    },
+    "enneagram": {
+      "primary_type": 9,
+      "wing": 1,
+      "instinct": "sp"
+    },
+    "time_preference": {
+      "discount_rate": 68,
+      "planning_horizon": "short_term",
+      "present_vs_future": -60
+    },
+    "regulatory_focus": {
+      "promotion": 70,
+      "prevention": 95
+    },
+    "language_style": {
+      "formality": 53,
+      "directness": 28,
+      "verbosity": 95,
+      "emotionality": 95,
+      "technicality": 69
+    },
+    "emotion_profile": {
+      "baseline_positivity": 76,
+      "emotional_volatility": 85,
+      "stress_tolerance": 20,
+      "empathy": 51
+    },
+    "social_profile": {
+      "trust_propensity": 75,
+      "social_confidence": 93,
+      "conflict_style": "collaborating",
+      "influence_susceptibility": 20
+    },
+    "behavioral_indicators": {
+      "decision_speed": 71,
+      "information_seeking": 74,
+      "social_proof_reliance": 63,
+      "price_sensitivity": 57
+    }
   },
   {
     "id": "Hoàng先生_e94aff",
@@ -2245,7 +4853,114 @@
     "currentQuestionIndex": 0,
     "isCompleted": false,
     "createdAt": "2026-01-06T16:28:43.532601",
-    "updatedAt": "2026-01-08T06:07:01.798Z"
+    "updatedAt": "2026-01-08T06:07:01.798Z",
+    "version": "v1.0",
+    "source_summary": {
+      "dialogue": 0.5,
+      "questionnaire": 0.5,
+      "behavior": 0.3
+    },
+    "big5": {
+      "openness": 70,
+      "conscientiousness": 48,
+      "extraversion": 66,
+      "agreeableness": 42,
+      "neuroticism": 58
+    },
+    "schwartz_values": {
+      "Benevolence": 35,
+      "Achievement": 52,
+      "Power": 76,
+      "Security": 46,
+      "Universalism": 60
+    },
+    "moral_foundations": {
+      "Care": 38,
+      "Fairness": 59,
+      "Loyalty": 26,
+      "Authority": 35,
+      "Sanctity": 30
+    },
+    "risk_profile": {
+      "overall": 95,
+      "financial": 56,
+      "ethical": 52,
+      "confidence": 0.83,
+      "social": 79,
+      "health": 71
+    },
+    "decision_style": {
+      "primary": "rational",
+      "secondary": "avoidant",
+      "risk_seeking": 36,
+      "info_processing": "satisficer",
+      "social_preference": "collaborative"
+    },
+    "meta": {
+      "base_model": "gpt-4o-mini",
+      "temperature": 0.7,
+      "prompt_version": "v2.1",
+      "schema_validation": "pass"
+    },
+    "hexaco": {
+      "honesty_humility": 54,
+      "emotionality": 75,
+      "extraversion": 57,
+      "agreeableness": 28,
+      "conscientiousness": 54,
+      "openness": 71
+    },
+    "disc": {
+      "dominance": 67,
+      "influence": 64,
+      "steadiness": 38,
+      "conscientiousness": 40
+    },
+    "mbti": {
+      "E_I": 27,
+      "S_N": 27,
+      "T_F": 1,
+      "J_P": 6
+    },
+    "enneagram": {
+      "primary_type": 5,
+      "wing": 6,
+      "instinct": "sx"
+    },
+    "time_preference": {
+      "discount_rate": 26,
+      "planning_horizon": "short_term",
+      "present_vs_future": 20
+    },
+    "regulatory_focus": {
+      "promotion": 95,
+      "prevention": 65
+    },
+    "language_style": {
+      "formality": 46,
+      "directness": 72,
+      "verbosity": 64,
+      "emotionality": 78,
+      "technicality": 63
+    },
+    "emotion_profile": {
+      "baseline_positivity": 80,
+      "emotional_volatility": 66,
+      "stress_tolerance": 38,
+      "empathy": 60
+    },
+    "social_profile": {
+      "trust_propensity": 45,
+      "social_confidence": 76,
+      "conflict_style": "compromising",
+      "influence_susceptibility": 63
+    },
+    "behavioral_indicators": {
+      "decision_speed": 86,
+      "information_seeking": 61,
+      "social_proof_reliance": 45,
+      "price_sensitivity": 20
+    }
   },
   {
     "id": "Bùi小姐_772274",
@@ -2317,7 +5032,114 @@
     "currentQuestionIndex": 0,
     "isCompleted": false,
     "createdAt": "2026-01-06T16:28:43.534096",
-    "updatedAt": "2026-01-08T06:07:09.339Z"
+    "updatedAt": "2026-01-08T06:07:09.339Z",
+    "version": "v1.0",
+    "source_summary": {
+      "dialogue": 0.5,
+      "questionnaire": 0.4,
+      "behavior": 0.4
+    },
+    "big5": {
+      "openness": 49,
+      "conscientiousness": 65,
+      "extraversion": 31,
+      "agreeableness": 63,
+      "neuroticism": 55
+    },
+    "schwartz_values": {
+      "Stimulation": 76,
+      "Power": 75,
+      "Benevolence": 41,
+      "Self-Direction": 47,
+      "Security": 75
+    },
+    "moral_foundations": {
+      "Care": 76,
+      "Fairness": 33,
+      "Loyalty": 30,
+      "Authority": 72,
+      "Sanctity": 16
+    },
+    "risk_profile": {
+      "overall": 82,
+      "financial": 79,
+      "ethical": 72,
+      "confidence": 0.55,
+      "social": 90,
+      "health": 53
+    },
+    "decision_style": {
+      "primary": "spontaneous",
+      "secondary": "intuitive",
+      "risk_seeking": 70,
+      "info_processing": "satisficer",
+      "social_preference": "collaborative"
+    },
+    "meta": {
+      "base_model": "gpt-4o-mini",
+      "temperature": 0.7,
+      "prompt_version": "v2.1",
+      "schema_validation": "pass"
+    },
+    "hexaco": {
+      "honesty_humility": 59,
+      "emotionality": 57,
+      "extraversion": 23,
+      "agreeableness": 62,
+      "conscientiousness": 62,
+      "openness": 46
+    },
+    "disc": {
+      "dominance": 48,
+      "influence": 30,
+      "steadiness": 53,
+      "conscientiousness": 55
+    },
+    "mbti": {
+      "E_I": -45,
+      "S_N": -4,
+      "T_F": -19,
+      "J_P": 25
+    },
+    "enneagram": {
+      "primary_type": 8,
+      "wing": 9,
+      "instinct": "sx"
+    },
+    "time_preference": {
+      "discount_rate": 59,
+      "planning_horizon": "long_term",
+      "present_vs_future": 73
+    },
+    "regulatory_focus": {
+      "promotion": 56,
+      "prevention": 89
+    },
+    "language_style": {
+      "formality": 55,
+      "directness": 31,
+      "verbosity": 43,
+      "emotionality": 52,
+      "technicality": 68
+    },
+    "emotion_profile": {
+      "baseline_positivity": 34,
+      "emotional_volatility": 64,
+      "stress_tolerance": 31,
+      "empathy": 59
+    },
+    "social_profile": {
+      "trust_propensity": 52,
+      "social_confidence": 21,
+      "conflict_style": "collaborating",
+      "influence_susceptibility": 34
+    },
+    "behavioral_indicators": {
+      "decision_speed": 70,
+      "information_seeking": 66,
+      "social_proof_reliance": 82,
+      "price_sensitivity": 20
+    }
   },
   {
     "id": "Đỗ先生_69827a",
@@ -2390,7 +5212,114 @@
     "currentQuestionIndex": 0,
     "isCompleted": false,
     "createdAt": "2026-01-06T16:28:43.535581",
-    "updatedAt": "2026-01-08T06:07:16.736Z"
+    "updatedAt": "2026-01-08T06:07:16.736Z",
+    "version": "v1.0",
+    "source_summary": {
+      "dialogue": 0.3,
+      "questionnaire": 0.3,
+      "behavior": 0.2
+    },
+    "big5": {
+      "openness": 77,
+      "conscientiousness": 70,
+      "extraversion": 48,
+      "agreeableness": 52,
+      "neuroticism": 45
+    },
+    "schwartz_values": {
+      "Hedonism": 61,
+      "Achievement": 61,
+      "Tradition": 37,
+      "Power": 71,
+      "Self-Direction": 85
+    },
+    "moral_foundations": {
+      "Care": 75,
+      "Fairness": 37,
+      "Loyalty": 69,
+      "Authority": 37,
+      "Sanctity": 45
+    },
+    "risk_profile": {
+      "overall": 11,
+      "financial": 10,
+      "ethical": 75,
+      "confidence": 0.76,
+      "social": 10,
+      "health": 10
+    },
+    "decision_style": {
+      "primary": "intuitive",
+      "secondary": "avoidant",
+      "risk_seeking": 45,
+      "info_processing": "maximizer",
+      "social_preference": "delegator"
+    },
+    "meta": {
+      "base_model": "gpt-4o-mini",
+      "temperature": 0.7,
+      "prompt_version": "v2.1",
+      "schema_validation": "pass"
+    },
+    "hexaco": {
+      "honesty_humility": 61,
+      "emotionality": 66,
+      "extraversion": 47,
+      "agreeableness": 45,
+      "conscientiousness": 65,
+      "openness": 87
+    },
+    "disc": {
+      "dominance": 44,
+      "influence": 63,
+      "steadiness": 51,
+      "conscientiousness": 70
+    },
+    "mbti": {
+      "E_I": 3,
+      "S_N": 72,
+      "T_F": 6,
+      "J_P": 20
+    },
+    "enneagram": {
+      "primary_type": 5,
+      "wing": 4,
+      "instinct": "sx"
+    },
+    "time_preference": {
+      "discount_rate": 81,
+      "planning_horizon": "medium_term",
+      "present_vs_future": -42
+    },
+    "regulatory_focus": {
+      "promotion": 80,
+      "prevention": 74
+    },
+    "language_style": {
+      "formality": 67,
+      "directness": 55,
+      "verbosity": 57,
+      "emotionality": 63,
+      "technicality": 63
+    },
+    "emotion_profile": {
+      "baseline_positivity": 63,
+      "emotional_volatility": 41,
+      "stress_tolerance": 48,
+      "empathy": 52
+    },
+    "social_profile": {
+      "trust_propensity": 65,
+      "social_confidence": 45,
+      "conflict_style": "collaborating",
+      "influence_susceptibility": 37
+    },
+    "behavioral_indicators": {
+      "decision_speed": 80,
+      "information_seeking": 83,
+      "social_proof_reliance": 72,
+      "price_sensitivity": 86
+    }
   },
   {
     "id": "Nguyễn先生_8d67cb",
@@ -2456,7 +5385,114 @@
     "currentQuestionIndex": 0,
     "isCompleted": false,
     "createdAt": "2026-01-06T16:42:16.181618",
-    "updatedAt": "2026-01-08T06:07:26.100Z"
+    "updatedAt": "2026-01-08T06:07:26.100Z",
+    "version": "v1.0",
+    "source_summary": {
+      "dialogue": 0.3,
+      "questionnaire": 0.5,
+      "behavior": 0.2
+    },
+    "big5": {
+      "openness": 45,
+      "conscientiousness": 76,
+      "extraversion": 65,
+      "agreeableness": 95,
+      "neuroticism": 95
+    },
+    "schwartz_values": {
+      "Stimulation": 37,
+      "Achievement": 79,
+      "Security": 51,
+      "Self-Direction": 38,
+      "Benevolence": 60
+    },
+    "moral_foundations": {
+      "Care": 34,
+      "Fairness": 90,
+      "Loyalty": 23,
+      "Authority": 66,
+      "Sanctity": 51
+    },
+    "risk_profile": {
+      "overall": 31,
+      "financial": 23,
+      "ethical": 63,
+      "confidence": 0.63,
+      "social": 11,
+      "health": 45
+    },
+    "decision_style": {
+      "primary": "dependent",
+      "secondary": "avoidant",
+      "risk_seeking": 48,
+      "info_processing": "satisficer",
+      "social_preference": "autonomous"
+    },
+    "meta": {
+      "base_model": "gpt-4o-mini",
+      "temperature": 0.7,
+      "prompt_version": "v2.1",
+      "schema_validation": "pass"
+    },
+    "hexaco": {
+      "honesty_humility": 98,
+      "emotionality": 88,
+      "extraversion": 75,
+      "agreeableness": 89,
+      "conscientiousness": 79,
+      "openness": 39
+    },
+    "disc": {
+      "dominance": 4,
+      "influence": 56,
+      "steadiness": 0,
+      "conscientiousness": 78
+    },
+    "mbti": {
+      "E_I": 45,
+      "S_N": -34,
+      "T_F": -76,
+      "J_P": 50
+    },
+    "enneagram": {
+      "primary_type": 6,
+      "wing": 7,
+      "instinct": "so"
+    },
+    "time_preference": {
+      "discount_rate": 25,
+      "planning_horizon": "long_term",
+      "present_vs_future": -27
+    },
+    "regulatory_focus": {
+      "promotion": 62,
+      "prevention": 86
+    },
+    "language_style": {
+      "formality": 40,
+      "directness": 20,
+      "verbosity": 78,
+      "emotionality": 85,
+      "technicality": 42
+    },
+    "emotion_profile": {
+      "baseline_positivity": 64,
+      "emotional_volatility": 90,
+      "stress_tolerance": 20,
+      "empathy": 95
+    },
+    "social_profile": {
+      "trust_propensity": 90,
+      "social_confidence": 64,
+      "conflict_style": "compromising",
+      "influence_susceptibility": 20
+    },
+    "behavioral_indicators": {
+      "decision_speed": 54,
+      "information_seeking": 73,
+      "social_proof_reliance": 85,
+      "price_sensitivity": 81
+    }
   },
   {
     "id": "Trần小姐_489160",
@@ -2526,7 +5562,114 @@
     "currentQuestionIndex": 0,
     "isCompleted": false,
     "createdAt": "2026-01-06T16:42:16.187788",
-    "updatedAt": "2026-01-08T06:07:34.284Z"
+    "updatedAt": "2026-01-08T06:07:34.284Z",
+    "version": "v1.0",
+    "source_summary": {
+      "dialogue": 0.2,
+      "questionnaire": 0.5,
+      "behavior": 0.3
+    },
+    "big5": {
+      "openness": 66,
+      "conscientiousness": 95,
+      "extraversion": 50,
+      "agreeableness": 41,
+      "neuroticism": 49
+    },
+    "schwartz_values": {
+      "Achievement": 89,
+      "Tradition": 89,
+      "Universalism": 38,
+      "Security": 85,
+      "Power": 42
+    },
+    "moral_foundations": {
+      "Care": 77,
+      "Fairness": 50,
+      "Loyalty": 73,
+      "Authority": 58,
+      "Sanctity": 20
+    },
+    "risk_profile": {
+      "overall": 48,
+      "financial": 22,
+      "ethical": 45,
+      "confidence": 0.89,
+      "social": 39,
+      "health": 39
+    },
+    "decision_style": {
+      "primary": "dependent",
+      "secondary": "spontaneous",
+      "risk_seeking": 33,
+      "info_processing": "satisficer",
+      "social_preference": "collaborative"
+    },
+    "meta": {
+      "base_model": "gpt-4o-mini",
+      "temperature": 0.7,
+      "prompt_version": "v2.1",
+      "schema_validation": "pass"
+    },
+    "hexaco": {
+      "honesty_humility": 39,
+      "emotionality": 39,
+      "extraversion": 55,
+      "agreeableness": 34,
+      "conscientiousness": 99,
+      "openness": 63
+    },
+    "disc": {
+      "dominance": 54,
+      "influence": 53,
+      "steadiness": 58,
+      "conscientiousness": 85
+    },
+    "mbti": {
+      "E_I": -11,
+      "S_N": 22,
+      "T_F": 37,
+      "J_P": 83
+    },
+    "enneagram": {
+      "primary_type": 6,
+      "wing": 5,
+      "instinct": "sp"
+    },
+    "time_preference": {
+      "discount_rate": 36,
+      "planning_horizon": "short_term",
+      "present_vs_future": 53
+    },
+    "regulatory_focus": {
+      "promotion": 56,
+      "prevention": 94
+    },
+    "language_style": {
+      "formality": 33,
+      "directness": 59,
+      "verbosity": 70,
+      "emotionality": 62,
+      "technicality": 71
+    },
+    "emotion_profile": {
+      "baseline_positivity": 43,
+      "emotional_volatility": 61,
+      "stress_tolerance": 49,
+      "empathy": 39
+    },
+    "social_profile": {
+      "trust_propensity": 50,
+      "social_confidence": 58,
+      "conflict_style": "avoiding",
+      "influence_susceptibility": 20
+    },
+    "behavioral_indicators": {
+      "decision_speed": 65,
+      "information_seeking": 94,
+      "social_proof_reliance": 35,
+      "price_sensitivity": 66
+    }
   },
   {
     "id": "Lê先生_ad9e4c",
@@ -2598,7 +5741,114 @@
     "currentQuestionIndex": 0,
     "isCompleted": false,
     "createdAt": "2026-01-06T16:42:16.190499",
-    "updatedAt": "2026-01-08T06:07:46.100Z"
+    "updatedAt": "2026-01-08T06:07:46.100Z",
+    "version": "v1.0",
+    "source_summary": {
+      "dialogue": 0.5,
+      "questionnaire": 0.6,
+      "behavior": 0.3
+    },
+    "big5": {
+      "openness": 46,
+      "conscientiousness": 71,
+      "extraversion": 45,
+      "agreeableness": 56,
+      "neuroticism": 86
+    },
+    "schwartz_values": {
+      "Conformity": 72,
+      "Hedonism": 40,
+      "Universalism": 65,
+      "Security": 67,
+      "Power": 85
+    },
+    "moral_foundations": {
+      "Care": 66,
+      "Fairness": 74,
+      "Loyalty": 64,
+      "Authority": 70,
+      "Sanctity": 37
+    },
+    "risk_profile": {
+      "overall": 95,
+      "financial": 35,
+      "ethical": 95,
+      "confidence": 0.69,
+      "social": 90,
+      "health": 70
+    },
+    "decision_style": {
+      "primary": "rational",
+      "secondary": "dependent",
+      "risk_seeking": 26,
+      "info_processing": "maximizer",
+      "social_preference": "autonomous"
+    },
+    "meta": {
+      "base_model": "gpt-4o-mini",
+      "temperature": 0.7,
+      "prompt_version": "v2.1",
+      "schema_validation": "pass"
+    },
+    "hexaco": {
+      "honesty_humility": 55,
+      "emotionality": 84,
+      "extraversion": 49,
+      "agreeableness": 42,
+      "conscientiousness": 61,
+      "openness": 38
+    },
+    "disc": {
+      "dominance": 36,
+      "influence": 35,
+      "steadiness": 22,
+      "conscientiousness": 62
+    },
+    "mbti": {
+      "E_I": -7,
+      "S_N": 12,
+      "T_F": -19,
+      "J_P": 45
+    },
+    "enneagram": {
+      "primary_type": 6,
+      "wing": 5,
+      "instinct": "so"
+    },
+    "time_preference": {
+      "discount_rate": 73,
+      "planning_horizon": "medium_term",
+      "present_vs_future": -73
+    },
+    "regulatory_focus": {
+      "promotion": 66,
+      "prevention": 84
+    },
+    "language_style": {
+      "formality": 47,
+      "directness": 46,
+      "verbosity": 36,
+      "emotionality": 95,
+      "technicality": 59
+    },
+    "emotion_profile": {
+      "baseline_positivity": 39,
+      "emotional_volatility": 76,
+      "stress_tolerance": 21,
+      "empathy": 63
+    },
+    "social_profile": {
+      "trust_propensity": 75,
+      "social_confidence": 57,
+      "conflict_style": "competing",
+      "influence_susceptibility": 35
+    },
+    "behavioral_indicators": {
+      "decision_speed": 46,
+      "information_seeking": 48,
+      "social_proof_reliance": 75,
+      "price_sensitivity": 20
+    }
   },
   {
     "id": "Phạm小姐_7120de",
@@ -2664,7 +5914,114 @@
     "currentQuestionIndex": 0,
     "isCompleted": false,
     "createdAt": "2026-01-06T16:42:16.193605",
-    "updatedAt": "2026-01-08T06:08:08.573Z"
+    "updatedAt": "2026-01-08T06:08:08.573Z",
+    "version": "v1.0",
+    "source_summary": {
+      "dialogue": 0.2,
+      "questionnaire": 0.4,
+      "behavior": 0.3
+    },
+    "big5": {
+      "openness": 89,
+      "conscientiousness": 45,
+      "extraversion": 77,
+      "agreeableness": 87,
+      "neuroticism": 55
+    },
+    "schwartz_values": {
+      "Tradition": 68,
+      "Universalism": 82,
+      "Benevolence": 74,
+      "Security": 41,
+      "Power": 46
+    },
+    "moral_foundations": {
+      "Care": 58,
+      "Fairness": 43,
+      "Loyalty": 52,
+      "Authority": 30,
+      "Sanctity": 35
+    },
+    "risk_profile": {
+      "overall": 55,
+      "financial": 49,
+      "ethical": 60,
+      "confidence": 0.92,
+      "social": 73,
+      "health": 58
+    },
+    "decision_style": {
+      "primary": "dependent",
+      "secondary": "spontaneous",
+      "risk_seeking": 26,
+      "info_processing": "maximizer",
+      "social_preference": "collaborative"
+    },
+    "meta": {
+      "base_model": "gpt-4o-mini",
+      "temperature": 0.7,
+      "prompt_version": "v2.1",
+      "schema_validation": "pass"
+    },
+    "hexaco": {
+      "honesty_humility": 91,
+      "emotionality": 70,
+      "extraversion": 78,
+      "agreeableness": 74,
+      "conscientiousness": 53,
+      "openness": 84
+    },
+    "disc": {
+      "dominance": 13,
+      "influence": 84,
+      "steadiness": 35,
+      "conscientiousness": 51
+    },
+    "mbti": {
+      "E_I": 71,
+      "S_N": 63,
+      "T_F": -74,
+      "J_P": -16
+    },
+    "enneagram": {
+      "primary_type": 2,
+      "wing": 3,
+      "instinct": "sp"
+    },
+    "time_preference": {
+      "discount_rate": 15,
+      "planning_horizon": "long_term",
+      "present_vs_future": -19
+    },
+    "regulatory_focus": {
+      "promotion": 82,
+      "prevention": 54
+    },
+    "language_style": {
+      "formality": 49,
+      "directness": 20,
+      "verbosity": 65,
+      "emotionality": 77,
+      "technicality": 75
+    },
+    "emotion_profile": {
+      "baseline_positivity": 82,
+      "emotional_volatility": 63,
+      "stress_tolerance": 38,
+      "empathy": 91
+    },
+    "social_profile": {
+      "trust_propensity": 90,
+      "social_confidence": 86,
+      "conflict_style": "collaborating",
+      "influence_susceptibility": 53
+    },
+    "behavioral_indicators": {
+      "decision_speed": 90,
+      "information_seeking": 59,
+      "social_proof_reliance": 78,
+      "price_sensitivity": 31
+    }
   },
   {
     "id": "Hoàng先生_4303bb",
@@ -2734,7 +6091,114 @@
     "currentQuestionIndex": 0,
     "isCompleted": false,
     "createdAt": "2026-01-06T16:42:16.195744",
-    "updatedAt": "2026-01-08T06:08:19.380Z"
+    "updatedAt": "2026-01-08T06:08:19.380Z",
+    "version": "v1.0",
+    "source_summary": {
+      "dialogue": 0.3,
+      "questionnaire": 0.3,
+      "behavior": 0.1
+    },
+    "big5": {
+      "openness": 92,
+      "conscientiousness": 39,
+      "extraversion": 76,
+      "agreeableness": 33,
+      "neuroticism": 80
+    },
+    "schwartz_values": {
+      "Stimulation": 63,
+      "Universalism": 88,
+      "Security": 42,
+      "Conformity": 34,
+      "Achievement": 82
+    },
+    "moral_foundations": {
+      "Care": 79,
+      "Fairness": 50,
+      "Loyalty": 60,
+      "Authority": 16,
+      "Sanctity": 74
+    },
+    "risk_profile": {
+      "overall": 76,
+      "financial": 74,
+      "ethical": 78,
+      "confidence": 0.58,
+      "social": 66,
+      "health": 54
+    },
+    "decision_style": {
+      "primary": "rational",
+      "secondary": "dependent",
+      "risk_seeking": 49,
+      "info_processing": "satisficer",
+      "social_preference": "collaborative"
+    },
+    "meta": {
+      "base_model": "gpt-4o-mini",
+      "temperature": 0.7,
+      "prompt_version": "v2.1",
+      "schema_validation": "pass"
+    },
+    "hexaco": {
+      "honesty_humility": 25,
+      "emotionality": 97,
+      "extraversion": 79,
+      "agreeableness": 47,
+      "conscientiousness": 32,
+      "openness": 83
+    },
+    "disc": {
+      "dominance": 56,
+      "influence": 73,
+      "steadiness": 19,
+      "conscientiousness": 41
+    },
+    "mbti": {
+      "E_I": 33,
+      "S_N": 69,
+      "T_F": 37,
+      "J_P": -27
+    },
+    "enneagram": {
+      "primary_type": 3,
+      "wing": 4,
+      "instinct": "sp"
+    },
+    "time_preference": {
+      "discount_rate": 48,
+      "planning_horizon": "medium_term",
+      "present_vs_future": 73
+    },
+    "regulatory_focus": {
+      "promotion": 94,
+      "prevention": 36
+    },
+    "language_style": {
+      "formality": 47,
+      "directness": 77,
+      "verbosity": 62,
+      "emotionality": 88,
+      "technicality": 85
+    },
+    "emotion_profile": {
+      "baseline_positivity": 86,
+      "emotional_volatility": 79,
+      "stress_tolerance": 24,
+      "empathy": 41
+    },
+    "social_profile": {
+      "trust_propensity": 26,
+      "social_confidence": 84,
+      "conflict_style": "competing",
+      "influence_susceptibility": 70
+    },
+    "behavioral_indicators": {
+      "decision_speed": 90,
+      "information_seeking": 55,
+      "social_proof_reliance": 41,
+      "price_sensitivity": 30
+    }
   },
   {
     "id": "Võ小姐_a61afa",
@@ -2804,7 +6268,114 @@
     "currentQuestionIndex": 0,
     "isCompleted": false,
     "createdAt": "2026-01-06T16:42:16.198045",
-    "updatedAt": "2026-01-08T06:08:28.191Z"
+    "updatedAt": "2026-01-08T06:08:28.191Z",
+    "version": "v1.0",
+    "source_summary": {
+      "dialogue": 0.4,
+      "questionnaire": 0.6,
+      "behavior": 0.2
+    },
+    "big5": {
+      "openness": 39,
+      "conscientiousness": 48,
+      "extraversion": 53,
+      "agreeableness": 48,
+      "neuroticism": 57
+    },
+    "schwartz_values": {
+      "Power": 71,
+      "Tradition": 62,
+      "Stimulation": 80,
+      "Universalism": 90,
+      "Hedonism": 63
+    },
+    "moral_foundations": {
+      "Care": 32,
+      "Fairness": 56,
+      "Loyalty": 27,
+      "Authority": 44,
+      "Sanctity": 66
+    },
+    "risk_profile": {
+      "overall": 80,
+      "financial": 20,
+      "ethical": 68,
+      "confidence": 0.77,
+      "social": 57,
+      "health": 82
+    },
+    "decision_style": {
+      "primary": "spontaneous",
+      "secondary": "avoidant",
+      "risk_seeking": 68,
+      "info_processing": "satisficer",
+      "social_preference": "collaborative"
+    },
+    "meta": {
+      "base_model": "gpt-4o-mini",
+      "temperature": 0.7,
+      "prompt_version": "v2.1",
+      "schema_validation": "pass"
+    },
+    "hexaco": {
+      "honesty_humility": 55,
+      "emotionality": 81,
+      "extraversion": 50,
+      "agreeableness": 52,
+      "conscientiousness": 39,
+      "openness": 43
+    },
+    "disc": {
+      "dominance": 38,
+      "influence": 50,
+      "steadiness": 40,
+      "conscientiousness": 48
+    },
+    "mbti": {
+      "E_I": -7,
+      "S_N": -28,
+      "T_F": 18,
+      "J_P": -5
+    },
+    "enneagram": {
+      "primary_type": 4,
+      "wing": 5,
+      "instinct": "so"
+    },
+    "time_preference": {
+      "discount_rate": 86,
+      "planning_horizon": "long_term",
+      "present_vs_future": -39
+    },
+    "regulatory_focus": {
+      "promotion": 33,
+      "prevention": 54
+    },
+    "language_style": {
+      "formality": 53,
+      "directness": 64,
+      "verbosity": 65,
+      "emotionality": 52,
+      "technicality": 28
+    },
+    "emotion_profile": {
+      "baseline_positivity": 54,
+      "emotional_volatility": 49,
+      "stress_tolerance": 38,
+      "empathy": 39
+    },
+    "social_profile": {
+      "trust_propensity": 40,
+      "social_confidence": 56,
+      "conflict_style": "accommodating",
+      "influence_susceptibility": 51
+    },
+    "behavioral_indicators": {
+      "decision_speed": 51,
+      "information_seeking": 45,
+      "social_proof_reliance": 77,
+      "price_sensitivity": 29
+    }
   },
   {
     "id": "Đặng先生_e1b955",
@@ -2875,7 +6446,114 @@
     "currentQuestionIndex": 0,
     "isCompleted": false,
     "createdAt": "2026-01-06T16:42:16.199948",
-    "updatedAt": "2026-01-08T06:08:37.112Z"
+    "updatedAt": "2026-01-08T06:08:37.112Z",
+    "version": "v1.0",
+    "source_summary": {
+      "dialogue": 0.5,
+      "questionnaire": 0.5,
+      "behavior": 0.2
+    },
+    "big5": {
+      "openness": 60,
+      "conscientiousness": 55,
+      "extraversion": 80,
+      "agreeableness": 36,
+      "neuroticism": 55
+    },
+    "schwartz_values": {
+      "Benevolence": 47,
+      "Security": 69,
+      "Self-Direction": 32,
+      "Universalism": 73,
+      "Achievement": 87
+    },
+    "moral_foundations": {
+      "Care": 75,
+      "Fairness": 61,
+      "Loyalty": 54,
+      "Authority": 31,
+      "Sanctity": 12
+    },
+    "risk_profile": {
+      "overall": 19,
+      "financial": 31,
+      "ethical": 78,
+      "confidence": 0.53,
+      "social": 23,
+      "health": 10
+    },
+    "decision_style": {
+      "primary": "intuitive",
+      "secondary": "avoidant",
+      "risk_seeking": 49,
+      "info_processing": "maximizer",
+      "social_preference": "delegator"
+    },
+    "meta": {
+      "base_model": "gpt-4o-mini",
+      "temperature": 0.7,
+      "prompt_version": "v2.1",
+      "schema_validation": "pass"
+    },
+    "hexaco": {
+      "honesty_humility": 49,
+      "emotionality": 67,
+      "extraversion": 81,
+      "agreeableness": 29,
+      "conscientiousness": 61,
+      "openness": 61
+    },
+    "disc": {
+      "dominance": 51,
+      "influence": 93,
+      "steadiness": 52,
+      "conscientiousness": 60
+    },
+    "mbti": {
+      "E_I": 59,
+      "S_N": 29,
+      "T_F": 9,
+      "J_P": 14
+    },
+    "enneagram": {
+      "primary_type": 5,
+      "wing": 6,
+      "instinct": "sx"
+    },
+    "time_preference": {
+      "discount_rate": 28,
+      "planning_horizon": "medium_term",
+      "present_vs_future": 3
+    },
+    "regulatory_focus": {
+      "promotion": 60,
+      "prevention": 64
+    },
+    "language_style": {
+      "formality": 55,
+      "directness": 50,
+      "verbosity": 91,
+      "emotionality": 55,
+      "technicality": 51
+    },
+    "emotion_profile": {
+      "baseline_positivity": 74,
+      "emotional_volatility": 40,
+      "stress_tolerance": 50,
+      "empathy": 51
+    },
+    "social_profile": {
+      "trust_propensity": 23,
+      "social_confidence": 87,
+      "conflict_style": "avoiding",
+      "influence_susceptibility": 40
+    },
+    "behavioral_indicators": {
+      "decision_speed": 68,
+      "information_seeking": 54,
+      "social_proof_reliance": 57,
+      "price_sensitivity": 85
+    }
   },
   {
     "id": "Bùi小姐_2acf4c",
@@ -2945,7 +6623,114 @@
     "currentQuestionIndex": 0,
     "isCompleted": false,
     "createdAt": "2026-01-06T16:42:16.202468",
-    "updatedAt": "2026-01-08T06:08:45.812Z"
+    "updatedAt": "2026-01-08T06:08:45.812Z",
+    "version": "v1.0",
+    "source_summary": {
+      "dialogue": 0.2,
+      "questionnaire": 0.4,
+      "behavior": 0.3
+    },
+    "big5": {
+      "openness": 29,
+      "conscientiousness": 56,
+      "extraversion": 27,
+      "agreeableness": 68,
+      "neuroticism": 39
+    },
+    "schwartz_values": {
+      "Self-Direction": 40,
+      "Power": 61,
+      "Achievement": 68,
+      "Stimulation": 75,
+      "Hedonism": 69
+    },
+    "moral_foundations": {
+      "Care": 57,
+      "Fairness": 58,
+      "Loyalty": 55,
+      "Authority": 20,
+      "Sanctity": 15
+    },
+    "risk_profile": {
+      "overall": 51,
+      "financial": 68,
+      "ethical": 45,
+      "confidence": 0.69,
+      "social": 67,
+      "health": 42
+    },
+    "decision_style": {
+      "primary": "spontaneous",
+      "secondary": "dependent",
+      "risk_seeking": 73,
+      "info_processing": "satisficer",
+      "social_preference": "autonomous"
+    },
+    "meta": {
+      "base_model": "gpt-4o-mini",
+      "temperature": 0.7,
+      "prompt_version": "v2.1",
+      "schema_validation": "pass"
+    },
+    "hexaco": {
+      "honesty_humility": 75,
+      "emotionality": 44,
+      "extraversion": 28,
+      "agreeableness": 63,
+      "conscientiousness": 59,
+      "openness": 24
+    },
+    "disc": {
+      "dominance": 47,
+      "influence": 38,
+      "steadiness": 59,
+      "conscientiousness": 55
+    },
+    "mbti": {
+      "E_I": -50,
+      "S_N": -59,
+      "T_F": -24,
+      "J_P": 12
+    },
+    "enneagram": {
+      "primary_type": 7,
+      "wing": 6,
+      "instinct": "so"
+    },
+    "time_preference": {
+      "discount_rate": 39,
+      "planning_horizon": "medium_term",
+      "present_vs_future": 81
+    },
+    "regulatory_focus": {
+      "promotion": 45,
+      "prevention": 69
+    },
+    "language_style": {
+      "formality": 46,
+      "directness": 30,
+      "verbosity": 23,
+      "emotionality": 31,
+      "technicality": 20
+    },
+    "emotion_profile": {
+      "baseline_positivity": 31,
+      "emotional_volatility": 46,
+      "stress_tolerance": 62,
+      "empathy": 82
+    },
+    "social_profile": {
+      "trust_propensity": 64,
+      "social_confidence": 30,
+      "conflict_style": "avoiding",
+      "influence_susceptibility": 51
+    },
+    "behavioral_indicators": {
+      "decision_speed": 39,
+      "information_seeking": 34,
+      "social_proof_reliance": 78,
+      "price_sensitivity": 61
+    }
   },
   {
     "id": "Đỗ先生_782c75",
@@ -3011,7 +6796,114 @@
     "currentQuestionIndex": 0,
     "isCompleted": false,
     "createdAt": "2026-01-06T16:42:16.204337",
-    "updatedAt": "2026-01-08T06:08:53.691Z"
+    "updatedAt": "2026-01-08T06:08:53.691Z",
+    "version": "v1.0",
+    "source_summary": {
+      "dialogue": 0.5,
+      "questionnaire": 0.5,
+      "behavior": 0.3
+    },
+    "big5": {
+      "openness": 43,
+      "conscientiousness": 58,
+      "extraversion": 71,
+      "agreeableness": 68,
+      "neuroticism": 50
+    },
+    "schwartz_values": {
+      "Tradition": 39,
+      "Self-Direction": 36,
+      "Conformity": 88,
+      "Power": 89,
+      "Benevolence": 90
+    },
+    "moral_foundations": {
+      "Care": 84,
+      "Fairness": 59,
+      "Loyalty": 37,
+      "Authority": 43,
+      "Sanctity": 64
+    },
+    "risk_profile": {
+      "overall": 68,
+      "financial": 55,
+      "ethical": 45,
+      "confidence": 0.9,
+      "social": 58,
+      "health": 77
+    },
+    "decision_style": {
+      "primary": "intuitive",
+      "secondary": "avoidant",
+      "risk_seeking": 40,
+      "info_processing": "maximizer",
+      "social_preference": "delegator"
+    },
+    "meta": {
+      "base_model": "gpt-4o-mini",
+      "temperature": 0.7,
+      "prompt_version": "v2.1",
+      "schema_validation": "pass"
+    },
+    "hexaco": {
+      "honesty_humility": 57,
+      "emotionality": 62,
+      "extraversion": 65,
+      "agreeableness": 62,
+      "conscientiousness": 52,
+      "openness": 40
+    },
+    "disc": {
+      "dominance": 22,
+      "influence": 68,
+      "steadiness": 41,
+      "conscientiousness": 53
+    },
+    "mbti": {
+      "E_I": 57,
+      "S_N": -26,
+      "T_F": -39,
+      "J_P": 33
+    },
+    "enneagram": {
+      "primary_type": 9,
+      "wing": 8,
+      "instinct": "sp"
+    },
+    "time_preference": {
+      "discount_rate": 81,
+      "planning_horizon": "medium_term",
+      "present_vs_future": -60
+    },
+    "regulatory_focus": {
+      "promotion": 37,
+      "prevention": 73
+    },
+    "language_style": {
+      "formality": 24,
+      "directness": 35,
+      "verbosity": 59,
+      "emotionality": 46,
+      "technicality": 57
+    },
+    "emotion_profile": {
+      "baseline_positivity": 62,
+      "emotional_volatility": 62,
+      "stress_tolerance": 65,
+      "empathy": 84
+    },
+    "social_profile": {
+      "trust_propensity": 62,
+      "social_confidence": 80,
+      "conflict_style": "competing",
+      "influence_susceptibility": 46
+    },
+    "behavioral_indicators": {
+      "decision_speed": 57,
+      "information_seeking": 59,
+      "social_proof_reliance": 69,
+      "price_sensitivity": 41
+    }
   },
   {
     "id": "Hồ小姐_716e7e",
@@ -3077,7 +6969,114 @@
     "currentQuestionIndex": 0,
     "isCompleted": false,
     "createdAt": "2026-01-06T16:42:16.206228",
-    "updatedAt": "2026-01-08T06:09:03.248Z"
+    "updatedAt": "2026-01-08T06:09:03.248Z",
+    "version": "v1.0",
+    "source_summary": {
+      "dialogue": 0.5,
+      "questionnaire": 0.3,
+      "behavior": 0.1
+    },
+    "big5": {
+      "openness": 52,
+      "conscientiousness": 44,
+      "extraversion": 45,
+      "agreeableness": 28,
+      "neuroticism": 13
+    },
+    "schwartz_values": {
+      "Achievement": 73,
+      "Security": 40,
+      "Universalism": 49,
+      "Hedonism": 71,
+      "Stimulation": 81
+    },
+    "moral_foundations": {
+      "Care": 65,
+      "Fairness": 47,
+      "Loyalty": 75,
+      "Authority": 20,
+      "Sanctity": 60
+    },
+    "risk_profile": {
+      "overall": 26,
+      "financial": 10,
+      "ethical": 54,
+      "confidence": 0.75,
+      "social": 10,
+      "health": 10
+    },
+    "decision_style": {
+      "primary": "analytical",
+      "secondary": "dependent",
+      "risk_seeking": 64,
+      "info_processing": "satisficer",
+      "social_preference": "delegator"
+    },
+    "meta": {
+      "base_model": "gpt-4o-mini",
+      "temperature": 0.7,
+      "prompt_version": "v2.1",
+      "schema_validation": "pass"
+    },
+    "hexaco": {
+      "honesty_humility": 30,
+      "emotionality": 26,
+      "extraversion": 42,
+      "agreeableness": 22,
+      "conscientiousness": 38,
+      "openness": 53
+    },
+    "disc": {
+      "dominance": 73,
+      "influence": 52,
+      "steadiness": 81,
+      "conscientiousness": 43
+    },
+    "mbti": {
+      "E_I": -8,
+      "S_N": 16,
+      "T_F": 47,
+      "J_P": 7
+    },
+    "enneagram": {
+      "primary_type": 3,
+      "wing": 4,
+      "instinct": "sp"
+    },
+    "time_preference": {
+      "discount_rate": 24,
+      "planning_horizon": "long_term",
+      "present_vs_future": 9
+    },
+    "regulatory_focus": {
+      "promotion": 54,
+      "prevention": 60
+    },
+    "language_style": {
+      "formality": 59,
+      "directness": 91,
+      "verbosity": 62,
+      "emotionality": 23,
+      "technicality": 47
+    },
+    "emotion_profile": {
+      "baseline_positivity": 58,
+      "emotional_volatility": 15,
+      "stress_tolerance": 80,
+      "empathy": 25
+    },
+    "social_profile": {
+      "trust_propensity": 46,
+      "social_confidence": 58,
+      "conflict_style": "accommodating",
+      "influence_susceptibility": 64
+    },
+    "behavioral_indicators": {
+      "decision_speed": 81,
+      "information_seeking": 55,
+      "social_proof_reliance": 44,
+      "price_sensitivity": 76
+    }
   },
   {
     "id": "Nguyễn先生_33ce60",
@@ -3133,7 +7132,114 @@
     "currentQuestionIndex": 0,
     "isCompleted": false,
     "createdAt": "2026-01-07T16:00:46.456346",
-    "updatedAt": "2026-01-08T06:09:13.421Z"
+    "updatedAt": "2026-01-08T06:09:13.421Z",
+    "version": "v1.0",
+    "source_summary": {
+      "dialogue": 0.5,
+      "questionnaire": 0.3,
+      "behavior": 0.4
+    },
+    "big5": {
+      "openness": 40,
+      "conscientiousness": 31,
+      "extraversion": 19,
+      "agreeableness": 23,
+      "neuroticism": 31
+    },
+    "schwartz_values": {
+      "Universalism": 43,
+      "Hedonism": 32,
+      "Benevolence": 88,
+      "Power": 62,
+      "Conformity": 52
+    },
+    "moral_foundations": {
+      "Care": 70,
+      "Fairness": 67,
+      "Loyalty": 58,
+      "Authority": 48,
+      "Sanctity": 67
+    },
+    "risk_profile": {
+      "overall": 33,
+      "financial": 21,
+      "ethical": 44,
+      "confidence": 0.58,
+      "social": 38,
+      "health": 27
+    },
+    "decision_style": {
+      "primary": "analytical",
+      "secondary": "dependent",
+      "risk_seeking": 65,
+      "info_processing": "maximizer",
+      "social_preference": "collaborative"
+    },
+    "meta": {
+      "base_model": "gpt-4o-mini",
+      "temperature": 0.7,
+      "prompt_version": "v2.1",
+      "schema_validation": "pass"
+    },
+    "hexaco": {
+      "honesty_humility": 39,
+      "emotionality": 28,
+      "extraversion": 15,
+      "agreeableness": 16,
+      "conscientiousness": 40,
+      "openness": 30
+    },
+    "disc": {
+      "dominance": 64,
+      "influence": 26,
+      "steadiness": 71,
+      "conscientiousness": 27
+    },
+    "mbti": {
+      "E_I": -45,
+      "S_N": -37,
+      "T_F": 37,
+      "J_P": -31
+    },
+    "enneagram": {
+      "primary_type": 6,
+      "wing": 7,
+      "instinct": "sx"
+    },
+    "time_preference": {
+      "discount_rate": 48,
+      "planning_horizon": "short_term",
+      "present_vs_future": 85
+    },
+    "regulatory_focus": {
+      "promotion": 53,
+      "prevention": 39
+    },
+    "language_style": {
+      "formality": 50,
+      "directness": 89,
+      "verbosity": 20,
+      "emotionality": 41,
+      "technicality": 53
+    },
+    "emotion_profile": {
+      "baseline_positivity": 20,
+      "emotional_volatility": 18,
+      "stress_tolerance": 71,
+      "empathy": 25
+    },
+    "social_profile": {
+      "trust_propensity": 21,
+      "social_confidence": 29,
+      "conflict_style": "accommodating",
+      "influence_susceptibility": 70
+    },
+    "behavioral_indicators": {
+      "decision_speed": 84,
+      "information_seeking": 34,
+      "social_proof_reliance": 50,
+      "price_sensitivity": 73
+    }
   },
   {
     "id": "Trần小姐_488837",
@@ -3183,7 +7289,114 @@
     "currentQuestionIndex": 0,
     "isCompleted": false,
     "createdAt": "2026-01-07T16:00:46.461786",
-    "updatedAt": "2026-01-08T06:09:23.622Z"
+    "updatedAt": "2026-01-08T06:09:23.622Z",
+    "version": "v1.0",
+    "source_summary": {
+      "dialogue": 0.4,
+      "questionnaire": 0.3,
+      "behavior": 0.4
+    },
+    "big5": {
+      "openness": 58,
+      "conscientiousness": 91,
+      "extraversion": 59,
+      "agreeableness": 74,
+      "neuroticism": 22
+    },
+    "schwartz_values": {
+      "Power": 62,
+      "Security": 71,
+      "Achievement": 38,
+      "Benevolence": 33,
+      "Universalism": 58
+    },
+    "moral_foundations": {
+      "Care": 56,
+      "Fairness": 54,
+      "Loyalty": 54,
+      "Authority": 54,
+      "Sanctity": 27
+    },
+    "risk_profile": {
+      "overall": 83,
+      "financial": 63,
+      "ethical": 54,
+      "confidence": 0.53,
+      "social": 90,
+      "health": 54
+    },
+    "decision_style": {
+      "primary": "spontaneous",
+      "secondary": "rational",
+      "risk_seeking": 84,
+      "info_processing": "satisficer",
+      "social_preference": "delegator"
+    },
+    "meta": {
+      "base_model": "gpt-4o-mini",
+      "temperature": 0.7,
+      "prompt_version": "v2.1",
+      "schema_validation": "pass"
+    },
+    "hexaco": {
+      "honesty_humility": 69,
+      "emotionality": 44,
+      "extraversion": 61,
+      "agreeableness": 72,
+      "conscientiousness": 89,
+      "openness": 62
+    },
+    "disc": {
+      "dominance": 40,
+      "influence": 53,
+      "steadiness": 81,
+      "conscientiousness": 88
+    },
+    "mbti": {
+      "E_I": 3,
+      "S_N": 9,
+      "T_F": -66,
+      "J_P": 69
+    },
+    "enneagram": {
+      "primary_type": 8,
+      "wing": 9,
+      "instinct": "sx"
+    },
+    "time_preference": {
+      "discount_rate": 85,
+      "planning_horizon": "medium_term",
+      "present_vs_future": -77
+    },
+    "regulatory_focus": {
+      "promotion": 71,
+      "prevention": 95
+    },
+    "language_style": {
+      "formality": 35,
+      "directness": 23,
+      "verbosity": 65,
+      "emotionality": 44,
+      "technicality": 72
+    },
+    "emotion_profile": {
+      "baseline_positivity": 73,
+      "emotional_volatility": 15,
+      "stress_tolerance": 69,
+      "empathy": 77
+    },
+    "social_profile": {
+      "trust_propensity": 70,
+      "social_confidence": 69,
+      "conflict_style": "avoiding",
+      "influence_susceptibility": 22
+    },
+    "behavioral_indicators": {
+      "decision_speed": 62,
+      "information_seeking": 68,
+      "social_proof_reliance": 82,
+      "price_sensitivity": 20
+    }
   },
   {
     "id": "Lê先生_a74977",
@@ -3237,7 +7450,114 @@
     "currentQuestionIndex": 0,
     "isCompleted": false,
     "createdAt": "2026-01-07T16:00:46.463527",
-    "updatedAt": "2026-01-08T06:09:36.303Z"
+    "updatedAt": "2026-01-08T06:09:36.303Z",
+    "version": "v1.0",
+    "source_summary": {
+      "dialogue": 0.4,
+      "questionnaire": 0.4,
+      "behavior": 0.2
+    },
+    "big5": {
+      "openness": 72,
+      "conscientiousness": 49,
+      "extraversion": 25,
+      "agreeableness": 45,
+      "neuroticism": 69
+    },
+    "schwartz_values": {
+      "Power": 85,
+      "Benevolence": 40,
+      "Achievement": 43,
+      "Stimulation": 73,
+      "Conformity": 41
+    },
+    "moral_foundations": {
+      "Care": 37,
+      "Fairness": 47,
+      "Loyalty": 61,
+      "Authority": 58,
+      "Sanctity": 15
+    },
+    "risk_profile": {
+      "overall": 37,
+      "financial": 12,
+      "ethical": 49,
+      "confidence": 0.54,
+      "social": 54,
+      "health": 47
+    },
+    "decision_style": {
+      "primary": "intuitive",
+      "secondary": "rational",
+      "risk_seeking": 70,
+      "info_processing": "maximizer",
+      "social_preference": "delegator"
+    },
+    "meta": {
+      "base_model": "gpt-4o-mini",
+      "temperature": 0.7,
+      "prompt_version": "v2.1",
+      "schema_validation": "pass"
+    },
+    "hexaco": {
+      "honesty_humility": 52,
+      "emotionality": 68,
+      "extraversion": 17,
+      "agreeableness": 45,
+      "conscientiousness": 39,
+      "openness": 74
+    },
+    "disc": {
+      "dominance": 56,
+      "influence": 37,
+      "steadiness": 22,
+      "conscientiousness": 45
+    },
+    "mbti": {
+      "E_I": -68,
+      "S_N": 68,
+      "T_F": -9,
+      "J_P": 13
+    },
+    "enneagram": {
+      "primary_type": 7,
+      "wing": 6,
+      "instinct": "sp"
+    },
+    "time_preference": {
+      "discount_rate": 16,
+      "planning_horizon": "short_term",
+      "present_vs_future": 19
+    },
+    "regulatory_focus": {
+      "promotion": 71,
+      "prevention": 41
+    },
+    "language_style": {
+      "formality": 63,
+      "directness": 43,
+      "verbosity": 43,
+      "emotionality": 79,
+      "technicality": 86
+    },
+    "emotion_profile": {
+      "baseline_positivity": 21,
+      "emotional_volatility": 69,
+      "stress_tolerance": 32,
+      "empathy": 64
+    },
+    "social_profile": {
+      "trust_propensity": 62,
+      "social_confidence": 20,
+      "conflict_style": "accommodating",
+      "influence_susceptibility": 52
+    },
+    "behavioral_indicators": {
+      "decision_speed": 90,
+      "information_seeking": 51,
+      "social_proof_reliance": 49,
+      "price_sensitivity": 71
+    }
   },
   {
     "id": "Phạm小姐_38fd4a",
@@ -3285,7 +7605,114 @@
     "currentQuestionIndex": 0,
     "isCompleted": false,
     "createdAt": "2026-01-07T16:00:46.465336",
-    "updatedAt": "2026-01-08T06:09:40.274Z"
+    "updatedAt": "2026-01-08T06:09:40.274Z",
+    "version": "v1.0",
+    "source_summary": {
+      "dialogue": 0.4,
+      "questionnaire": 0.4,
+      "behavior": 0.3
+    },
+    "big5": {
+      "openness": 52,
+      "conscientiousness": 46,
+      "extraversion": 47,
+      "agreeableness": 82,
+      "neuroticism": 58
+    },
+    "schwartz_values": {
+      "Security": 56,
+      "Self-Direction": 43,
+      "Tradition": 82,
+      "Hedonism": 72,
+      "Power": 74
+    },
+    "moral_foundations": {
+      "Care": 38,
+      "Fairness": 66,
+      "Loyalty": 35,
+      "Authority": 33,
+      "Sanctity": 53
+    },
+    "risk_profile": {
+      "overall": 88,
+      "financial": 52,
+      "ethical": 80,
+      "confidence": 0.86,
+      "social": 72,
+      "health": 60
+    },
+    "decision_style": {
+      "primary": "spontaneous",
+      "secondary": "rational",
+      "risk_seeking": 81,
+      "info_processing": "maximizer",
+      "social_preference": "autonomous"
+    },
+    "meta": {
+      "base_model": "gpt-4o-mini",
+      "temperature": 0.7,
+      "prompt_version": "v2.1",
+      "schema_validation": "pass"
+    },
+    "hexaco": {
+      "honesty_humility": 62,
+      "emotionality": 56,
+      "extraversion": 55,
+      "agreeableness": 77,
+      "conscientiousness": 38,
+      "openness": 47
+    },
+    "disc": {
+      "dominance": 26,
+      "influence": 55,
+      "steadiness": 40,
+      "conscientiousness": 46
+    },
+    "mbti": {
+      "E_I": -9,
+      "S_N": 6,
+      "T_F": -75,
+      "J_P": -13
+    },
+    "enneagram": {
+      "primary_type": 8,
+      "wing": 7,
+      "instinct": "sp"
+    },
+    "time_preference": {
+      "discount_rate": 37,
+      "planning_horizon": "medium_term",
+      "present_vs_future": 79
+    },
+    "regulatory_focus": {
+      "promotion": 73,
+      "prevention": 53
+    },
+    "language_style": {
+      "formality": 50,
+      "directness": 20,
+      "verbosity": 60,
+      "emotionality": 66,
+      "technicality": 40
+    },
+    "emotion_profile": {
+      "baseline_positivity": 44,
+      "emotional_volatility": 43,
+      "stress_tolerance": 31,
+      "empathy": 84
+    },
+    "social_profile": {
+      "trust_propensity": 77,
+      "social_confidence": 41,
+      "conflict_style": "avoiding",
+      "influence_susceptibility": 58
+    },
+    "behavioral_indicators": {
+      "decision_speed": 74,
+      "information_seeking": 43,
+      "social_proof_reliance": 85,
+      "price_sensitivity": 20
+    }
   },
   {
     "id": "Huỳnh先生_508f99",
@@ -3327,7 +7754,114 @@
     "currentQuestionIndex": 0,
     "isCompleted": false,
     "createdAt": "2026-01-07T16:00:46.467163",
-    "updatedAt": "2026-01-08T06:09:44.770Z"
+    "updatedAt": "2026-01-08T06:09:44.770Z",
+    "version": "v1.0",
+    "source_summary": {
+      "dialogue": 0.4,
+      "questionnaire": 0.4,
+      "behavior": 0.1
+    },
+    "big5": {
+      "openness": 35,
+      "conscientiousness": 85,
+      "extraversion": 32,
+      "agreeableness": 76,
+      "neuroticism": 45
+    },
+    "schwartz_values": {
+      "Achievement": 37,
+      "Conformity": 44,
+      "Power": 62,
+      "Tradition": 78,
+      "Self-Direction": 87
+    },
+    "moral_foundations": {
+      "Care": 32,
+      "Fairness": 72,
+      "Loyalty": 72,
+      "Authority": 45,
+      "Sanctity": 45
+    },
+    "risk_profile": {
+      "overall": 49,
+      "financial": 65,
+      "ethical": 66,
+      "confidence": 0.52,
+      "social": 63,
+      "health": 54
+    },
+    "decision_style": {
+      "primary": "spontaneous",
+      "secondary": "intuitive",
+      "risk_seeking": 58,
+      "info_processing": "satisficer",
+      "social_preference": "collaborative"
+    },
+    "meta": {
+      "base_model": "gpt-4o-mini",
+      "temperature": 0.7,
+      "prompt_version": "v2.1",
+      "schema_validation": "pass"
+    },
+    "hexaco": {
+      "honesty_humility": 72,
+      "emotionality": 32,
+      "extraversion": 36,
+      "agreeableness": 72,
+      "conscientiousness": 75,
+      "openness": 34
+    },
+    "disc": {
+      "dominance": 35,
+      "influence": 29,
+      "steadiness": 59,
+      "conscientiousness": 79
+    },
+    "mbti": {
+      "E_I": -29,
+      "S_N": -33,
+      "T_F": -45,
+      "J_P": 78
+    },
+    "enneagram": {
+      "primary_type": 7,
+      "wing": 8,
+      "instinct": "so"
+    },
+    "time_preference": {
+      "discount_rate": 77,
+      "planning_horizon": "medium_term",
+      "present_vs_future": -44
+    },
+    "regulatory_focus": {
+      "promotion": 35,
+      "prevention": 83
+    },
+    "language_style": {
+      "formality": 43,
+      "directness": 20,
+      "verbosity": 50,
+      "emotionality": 50,
+      "technicality": 22
+    },
+    "emotion_profile": {
+      "baseline_positivity": 35,
+      "emotional_volatility": 40,
+      "stress_tolerance": 61,
+      "empathy": 67
+    },
+    "social_profile": {
+      "trust_propensity": 63,
+      "social_confidence": 36,
+      "conflict_style": "collaborating",
+      "influence_susceptibility": 20
+    },
+    "behavioral_indicators": {
+      "decision_speed": 40,
+      "information_seeking": 62,
+      "social_proof_reliance": 85,
+      "price_sensitivity": 37
+    }
   },
   {
     "id": "Hoàng小姐_48b14b",
@@ -3376,7 +7910,114 @@
     "currentQuestionIndex": 0,
     "isCompleted": false,
     "createdAt": "2026-01-07T16:00:46.468894",
-    "updatedAt": "2026-01-08T06:09:53.182Z"
+    "updatedAt": "2026-01-08T06:09:53.182Z",
+    "version": "v1.0",
+    "source_summary": {
+      "dialogue": 0.3,
+      "questionnaire": 0.4,
+      "behavior": 0.4
+    },
+    "big5": {
+      "openness": 33,
+      "conscientiousness": 41,
+      "extraversion": 38,
+      "agreeableness": 59,
+      "neuroticism": 57
+    },
+    "schwartz_values": {
+      "Benevolence": 51,
+      "Stimulation": 32,
+      "Self-Direction": 74,
+      "Achievement": 31,
+      "Tradition": 75
+    },
+    "moral_foundations": {
+      "Care": 52,
+      "Fairness": 52,
+      "Loyalty": 42,
+      "Authority": 70,
+      "Sanctity": 47
+    },
+    "risk_profile": {
+      "overall": 95,
+      "financial": 88,
+      "ethical": 62,
+      "confidence": 0.85,
+      "social": 90,
+      "health": 72
+    },
+    "decision_style": {
+      "primary": "rational",
+      "secondary": "spontaneous",
+      "risk_seeking": 25,
+      "info_processing": "maximizer",
+      "social_preference": "collaborative"
+    },
+    "meta": {
+      "base_model": "gpt-4o-mini",
+      "temperature": 0.7,
+      "prompt_version": "v2.1",
+      "schema_validation": "pass"
+    },
+    "hexaco": {
+      "honesty_humility": 65,
+      "emotionality": 72,
+      "extraversion": 30,
+      "agreeableness": 48,
+      "conscientiousness": 44,
+      "openness": 47
+    },
+    "disc": {
+      "dominance": 26,
+      "influence": 47,
+      "steadiness": 36,
+      "conscientiousness": 44
+    },
+    "mbti": {
+      "E_I": -37,
+      "S_N": -11,
+      "T_F": -4,
+      "J_P": -17
+    },
+    "enneagram": {
+      "primary_type": 5,
+      "wing": 6,
+      "instinct": "so"
+    },
+    "time_preference": {
+      "discount_rate": 27,
+      "planning_horizon": "short_term",
+      "present_vs_future": 4
+    },
+    "regulatory_focus": {
+      "promotion": 46,
+      "prevention": 55
+    },
+    "language_style": {
+      "formality": 53,
+      "directness": 59,
+      "verbosity": 57,
+      "emotionality": 47,
+      "technicality": 20
+    },
+    "emotion_profile": {
+      "baseline_positivity": 36,
+      "emotional_volatility": 68,
+      "stress_tolerance": 56,
+      "empathy": 63
+    },
+    "social_profile": {
+      "trust_propensity": 59,
+      "social_confidence": 37,
+      "conflict_style": "collaborating",
+      "influence_susceptibility": 54
+    },
+    "behavioral_indicators": {
+      "decision_speed": 77,
+      "information_seeking": 38,
+      "social_proof_reliance": 68,
+      "price_sensitivity": 20
+    }
   },
   {
     "id": "Phan先生_baccf6",
@@ -3423,7 +8064,114 @@
     "currentQuestionIndex": 0,
     "isCompleted": false,
     "createdAt": "2026-01-07T16:00:46.470743",
-    "updatedAt": "2026-01-08T06:10:00.925Z"
+    "updatedAt": "2026-01-08T06:10:00.925Z",
+    "version": "v1.0",
+    "source_summary": {
+      "dialogue": 0.3,
+      "questionnaire": 0.3,
+      "behavior": 0.2
+    },
+    "big5": {
+      "openness": 58,
+      "conscientiousness": 51,
+      "extraversion": 31,
+      "agreeableness": 10,
+      "neuroticism": 54
+    },
+    "schwartz_values": {
+      "Tradition": 58,
+      "Universalism": 66,
+      "Achievement": 35,
+      "Stimulation": 37,
+      "Security": 65
+    },
+    "moral_foundations": {
+      "Care": 65,
+      "Fairness": 44,
+      "Loyalty": 41,
+      "Authority": 69,
+      "Sanctity": 63
+    },
+    "risk_profile": {
+      "overall": 10,
+      "financial": 10,
+      "ethical": 41,
+      "confidence": 0.54,
+      "social": 30,
+      "health": 10
+    },
+    "decision_style": {
+      "primary": "analytical",
+      "secondary": "intuitive",
+      "risk_seeking": 35,
+      "info_processing": "maximizer",
+      "social_preference": "collaborative"
+    },
+    "meta": {
+      "base_model": "gpt-4o-mini",
+      "temperature": 0.7,
+      "prompt_version": "v2.1",
+      "schema_validation": "pass"
+    },
+    "hexaco": {
+      "honesty_humility": 0,
+      "emotionality": 76,
+      "extraversion": 41,
+      "agreeableness": 0,
+      "conscientiousness": 47,
+      "openness": 66
+    },
+    "disc": {
+      "dominance": 99,
+      "influence": 34,
+      "steadiness": 37,
+      "conscientiousness": 45
+    },
+    "mbti": {
+      "E_I": -34,
+      "S_N": 24,
+      "T_F": 73,
+      "J_P": -14
+    },
+    "enneagram": {
+      "primary_type": 5,
+      "wing": 6,
+      "instinct": "sp"
+    },
+    "time_preference": {
+      "discount_rate": 49,
+      "planning_horizon": "long_term",
+      "present_vs_future": 78
+    },
+    "regulatory_focus": {
+      "promotion": 69,
+      "prevention": 80
+    },
+    "language_style": {
+      "formality": 62,
+      "directness": 87,
+      "verbosity": 48,
+      "emotionality": 53,
+      "technicality": 59
+    },
+    "emotion_profile": {
+      "baseline_positivity": 51,
+      "emotional_volatility": 43,
+      "stress_tolerance": 33,
+      "empathy": 25
+    },
+    "social_profile": {
+      "trust_propensity": 20,
+      "social_confidence": 27,
+      "conflict_style": "compromising",
+      "influence_susceptibility": 57
+    },
+    "behavioral_indicators": {
+      "decision_speed": 88,
+      "information_seeking": 62,
+      "social_proof_reliance": 26,
+      "price_sensitivity": 78
+    }
   },
   {
     "id": "Vũ小姐_3d696f",
@@ -3472,7 +8220,114 @@
     "currentQuestionIndex": 0,
     "isCompleted": false,
     "createdAt": "2026-01-07T16:00:46.472401",
-    "updatedAt": "2026-01-08T06:10:08.288Z"
+    "updatedAt": "2026-01-08T06:10:08.288Z",
+    "version": "v1.0",
+    "source_summary": {
+      "dialogue": 0.3,
+      "questionnaire": 0.4,
+      "behavior": 0.3
+    },
+    "big5": {
+      "openness": 48,
+      "conscientiousness": 94,
+      "extraversion": 67,
+      "agreeableness": 59,
+      "neuroticism": 68
+    },
+    "schwartz_values": {
+      "Self-Direction": 69,
+      "Security": 79,
+      "Universalism": 33,
+      "Achievement": 61,
+      "Stimulation": 74
+    },
+    "moral_foundations": {
+      "Care": 52,
+      "Fairness": 49,
+      "Loyalty": 36,
+      "Authority": 53,
+      "Sanctity": 27
+    },
+    "risk_profile": {
+      "overall": 59,
+      "financial": 71,
+      "ethical": 74,
+      "confidence": 0.86,
+      "social": 65,
+      "health": 43
+    },
+    "decision_style": {
+      "primary": "dependent",
+      "secondary": "rational",
+      "risk_seeking": 23,
+      "info_processing": "satisficer",
+      "social_preference": "collaborative"
+    },
+    "meta": {
+      "base_model": "gpt-4o-mini",
+      "temperature": 0.7,
+      "prompt_version": "v2.1",
+      "schema_validation": "pass"
+    },
+    "hexaco": {
+      "honesty_humility": 43,
+      "emotionality": 80,
+      "extraversion": 72,
+      "agreeableness": 60,
+      "conscientiousness": 96,
+      "openness": 47
+    },
+    "disc": {
+      "dominance": 33,
+      "influence": 67,
+      "steadiness": 29,
+      "conscientiousness": 88
+    },
+    "mbti": {
+      "E_I": 31,
+      "S_N": -17,
+      "T_F": -1,
+      "J_P": 83
+    },
+    "enneagram": {
+      "primary_type": 2,
+      "wing": 3,
+      "instinct": "sp"
+    },
+    "time_preference": {
+      "discount_rate": 68,
+      "planning_horizon": "medium_term",
+      "present_vs_future": -61
+    },
+    "regulatory_focus": {
+      "promotion": 61,
+      "prevention": 94
+    },
+    "language_style": {
+      "formality": 36,
+      "directness": 56,
+      "verbosity": 61,
+      "emotionality": 92,
+      "technicality": 57
+    },
+    "emotion_profile": {
+      "baseline_positivity": 75,
+      "emotional_volatility": 81,
+      "stress_tolerance": 20,
+      "empathy": 57
+    },
+    "social_profile": {
+      "trust_propensity": 66,
+      "social_confidence": 79,
+      "conflict_style": "compromising",
+      "influence_susceptibility": 20
+    },
+    "behavioral_indicators": {
+      "decision_speed": 39,
+      "information_seeking": 79,
+      "social_proof_reliance": 64,
+      "price_sensitivity": 49
+    }
   },
   {
     "id": "Đặng先生_288edf",
@@ -3518,7 +8373,114 @@
     "currentQuestionIndex": 0,
     "isCompleted": false,
     "createdAt": "2026-01-07T16:00:46.475027",
-    "updatedAt": "2026-01-08T06:10:14.154Z"
+    "updatedAt": "2026-01-08T06:10:14.154Z",
+    "version": "v1.0",
+    "source_summary": {
+      "dialogue": 0.4,
+      "questionnaire": 0.4,
+      "behavior": 0.4
+    },
+    "big5": {
+      "openness": 72,
+      "conscientiousness": 60,
+      "extraversion": 27,
+      "agreeableness": 48,
+      "neuroticism": 48
+    },
+    "schwartz_values": {
+      "Self-Direction": 43,
+      "Security": 61,
+      "Achievement": 56,
+      "Hedonism": 42,
+      "Tradition": 54
+    },
+    "moral_foundations": {
+      "Care": 54,
+      "Fairness": 37,
+      "Loyalty": 61,
+      "Authority": 35,
+      "Sanctity": 13
+    },
+    "risk_profile": {
+      "overall": 37,
+      "financial": 51,
+      "ethical": 71,
+      "confidence": 0.85,
+      "social": 34,
+      "health": 14
+    },
+    "decision_style": {
+      "primary": "intuitive",
+      "secondary": "avoidant",
+      "risk_seeking": 53,
+      "info_processing": "maximizer",
+      "social_preference": "collaborative"
+    },
+    "meta": {
+      "base_model": "gpt-4o-mini",
+      "temperature": 0.7,
+      "prompt_version": "v2.1",
+      "schema_validation": "pass"
+    },
+    "hexaco": {
+      "honesty_humility": 65,
+      "emotionality": 63,
+      "extraversion": 22,
+      "agreeableness": 58,
+      "conscientiousness": 62,
+      "openness": 72
+    },
+    "disc": {
+      "dominance": 54,
+      "influence": 28,
+      "steadiness": 46,
+      "conscientiousness": 61
+    },
+    "mbti": {
+      "E_I": -51,
+      "S_N": 56,
+      "T_F": 5,
+      "J_P": 23
+    },
+    "enneagram": {
+      "primary_type": 7,
+      "wing": 8,
+      "instinct": "sp"
+    },
+    "time_preference": {
+      "discount_rate": 20,
+      "planning_horizon": "short_term",
+      "present_vs_future": 1
+    },
+    "regulatory_focus": {
+      "promotion": 75,
+      "prevention": 63
+    },
+    "language_style": {
+      "formality": 53,
+      "directness": 34,
+      "verbosity": 20,
+      "emotionality": 52,
+      "technicality": 75
+    },
+    "emotion_profile": {
+      "baseline_positivity": 43,
+      "emotional_volatility": 44,
+      "stress_tolerance": 52,
+      "empathy": 65
+    },
+    "social_profile": {
+      "trust_propensity": 39,
+      "social_confidence": 21,
+      "conflict_style": "competing",
+      "influence_susceptibility": 32
+    },
+    "behavioral_indicators": {
+      "decision_speed": 88,
+      "information_seeking": 77,
+      "social_proof_reliance": 51,
+      "price_sensitivity": 78
+    }
   },
   {
     "id": "Bùi小姐_dbc3fa",
@@ -3560,7 +8522,114 @@
     "currentQuestionIndex": 0,
     "isCompleted": false,
     "createdAt": "2026-01-07T16:00:46.477475",
-    "updatedAt": "2026-01-08T06:10:25.542Z"
+    "updatedAt": "2026-01-08T06:10:25.542Z",
+    "version": "v1.0",
+    "source_summary": {
+      "dialogue": 0.4,
+      "questionnaire": 0.4,
+      "behavior": 0.3
+    },
+    "big5": {
+      "openness": 79,
+      "conscientiousness": 61,
+      "extraversion": 72,
+      "agreeableness": 37,
+      "neuroticism": 60
+    },
+    "schwartz_values": {
+      "Stimulation": 63,
+      "Power": 41,
+      "Hedonism": 62,
+      "Achievement": 69,
+      "Self-Direction": 62
+    },
+    "moral_foundations": {
+      "Care": 34,
+      "Fairness": 49,
+      "Loyalty": 68,
+      "Authority": 57,
+      "Sanctity": 54
+    },
+    "risk_profile": {
+      "overall": 91,
+      "financial": 95,
+      "ethical": 87,
+      "confidence": 0.82,
+      "social": 75,
+      "health": 90
+    },
+    "decision_style": {
+      "primary": "rational",
+      "secondary": "avoidant",
+      "risk_seeking": 33,
+      "info_processing": "maximizer",
+      "social_preference": "autonomous"
+    },
+    "meta": {
+      "base_model": "gpt-4o-mini",
+      "temperature": 0.7,
+      "prompt_version": "v2.1",
+      "schema_validation": "pass"
+    },
+    "hexaco": {
+      "honesty_humility": 48,
+      "emotionality": 84,
+      "extraversion": 71,
+      "agreeableness": 46,
+      "conscientiousness": 66,
+      "openness": 82
+    },
+    "disc": {
+      "dominance": 70,
+      "influence": 81,
+      "steadiness": 36,
+      "conscientiousness": 63
+    },
+    "mbti": {
+      "E_I": 34,
+      "S_N": 35,
+      "T_F": 31,
+      "J_P": 33
+    },
+    "enneagram": {
+      "primary_type": 6,
+      "wing": 5,
+      "instinct": "sp"
+    },
+    "time_preference": {
+      "discount_rate": 49,
+      "planning_horizon": "long_term",
+      "present_vs_future": 62
+    },
+    "regulatory_focus": {
+      "promotion": 91,
+      "prevention": 64
+    },
+    "language_style": {
+      "formality": 34,
+      "directness": 59,
+      "verbosity": 92,
+      "emotionality": 66,
+      "technicality": 93
+    },
+    "emotion_profile": {
+      "baseline_positivity": 84,
+      "emotional_volatility": 55,
+      "stress_tolerance": 39,
+      "empathy": 51
+    },
+    "social_profile": {
+      "trust_propensity": 33,
+      "social_confidence": 72,
+      "conflict_style": "competing",
+      "influence_susceptibility": 41
+    },
+    "behavioral_indicators": {
+      "decision_speed": 90,
+      "information_seeking": 75,
+      "social_proof_reliance": 35,
+      "price_sensitivity": 20
+    }
   },
   {
     "id": "Nguyễn先生_2a2d0a",
@@ -3598,7 +8667,114 @@
     "currentQuestionIndex": 0,
     "isCompleted": false,
     "createdAt": "2026-01-08T09:29:31.032015",
-    "updatedAt": "2026-01-08T06:10:35.981Z"
+    "updatedAt": "2026-01-08T06:10:35.981Z",
+    "version": "v1.0",
+    "source_summary": {
+      "dialogue": 0.5,
+      "questionnaire": 0.5,
+      "behavior": 0.2
+    },
+    "big5": {
+      "openness": 49,
+      "conscientiousness": 61,
+      "extraversion": 72,
+      "agreeableness": 35,
+      "neuroticism": 43
+    },
+    "schwartz_values": {
+      "Hedonism": 33,
+      "Self-Direction": 53,
+      "Tradition": 81,
+      "Universalism": 55,
+      "Conformity": 82
+    },
+    "moral_foundations": {
+      "Care": 39,
+      "Fairness": 78,
+      "Loyalty": 71,
+      "Authority": 59,
+      "Sanctity": 40
+    },
+    "risk_profile": {
+      "overall": 65,
+      "financial": 10,
+      "ethical": 78,
+      "confidence": 0.92,
+      "social": 87,
+      "health": 57
+    },
+    "decision_style": {
+      "primary": "intuitive",
+      "secondary": "spontaneous",
+      "risk_seeking": 70,
+      "info_processing": "satisficer",
+      "social_preference": "collaborative"
+    },
+    "meta": {
+      "base_model": "gpt-4o-mini",
+      "temperature": 0.7,
+      "prompt_version": "v2.1",
+      "schema_validation": "pass"
+    },
+    "hexaco": {
+      "honesty_humility": 22,
+      "emotionality": 57,
+      "extraversion": 81,
+      "agreeableness": 23,
+      "conscientiousness": 57,
+      "openness": 45
+    },
+    "disc": {
+      "dominance": 79,
+      "influence": 69,
+      "steadiness": 48,
+      "conscientiousness": 68
+    },
+    "mbti": {
+      "E_I": 49,
+      "S_N": 16,
+      "T_F": 47,
+      "J_P": 11
+    },
+    "enneagram": {
+      "primary_type": 5,
+      "wing": 4,
+      "instinct": "so"
+    },
+    "time_preference": {
+      "discount_rate": 69,
+      "planning_horizon": "medium_term",
+      "present_vs_future": -54
+    },
+    "regulatory_focus": {
+      "promotion": 68,
+      "prevention": 63
+    },
+    "language_style": {
+      "formality": 43,
+      "directness": 68,
+      "verbosity": 87,
+      "emotionality": 67,
+      "technicality": 57
+    },
+    "emotion_profile": {
+      "baseline_positivity": 69,
+      "emotional_volatility": 48,
+      "stress_tolerance": 66,
+      "empathy": 34
+    },
+    "social_profile": {
+      "trust_propensity": 35,
+      "social_confidence": 86,
+      "conflict_style": "accommodating",
+      "influence_susceptibility": 47
+    },
+    "behavioral_indicators": {
+      "decision_speed": 79,
+      "information_seeking": 58,
+      "social_proof_reliance": 61,
+      "price_sensitivity": 26
+    }
   },
   {
     "id": "Lê小姐_acd6ee",
@@ -3638,7 +8814,114 @@
     "currentQuestionIndex": 0,
     "isCompleted": false,
     "createdAt": "2026-01-08T09:29:31.038831",
-    "updatedAt": "2026-01-08T06:10:46.495Z"
+    "updatedAt": "2026-01-08T06:10:46.495Z",
+    "version": "v1.0",
+    "source_summary": {
+      "dialogue": 0.3,
+      "questionnaire": 0.6,
+      "behavior": 0.1
+    },
+    "big5": {
+      "openness": 60,
+      "conscientiousness": 85,
+      "extraversion": 10,
+      "agreeableness": 31,
+      "neuroticism": 39
+    },
+    "schwartz_values": {
+      "Self-Direction": 81,
+      "Tradition": 39,
+      "Conformity": 47,
+      "Benevolence": 33,
+      "Achievement": 56
+    },
+    "moral_foundations": {
+      "Care": 62,
+      "Fairness": 36,
+      "Loyalty": 40,
+      "Authority": 26,
+      "Sanctity": 51
+    },
+    "risk_profile": {
+      "overall": 85,
+      "financial": 61,
+      "ethical": 67,
+      "confidence": 0.84,
+      "social": 90,
+      "health": 61
+    },
+    "decision_style": {
+      "primary": "spontaneous",
+      "secondary": "intuitive",
+      "risk_seeking": 63,
+      "info_processing": "maximizer",
+      "social_preference": "autonomous"
+    },
+    "meta": {
+      "base_model": "gpt-4o-mini",
+      "temperature": 0.7,
+      "prompt_version": "v2.1",
+      "schema_validation": "pass"
+    },
+    "hexaco": {
+      "honesty_humility": 42,
+      "emotionality": 28,
+      "extraversion": 16,
+      "agreeableness": 46,
+      "conscientiousness": 76,
+      "openness": 55
+    },
+    "disc": {
+      "dominance": 63,
+      "influence": 9,
+      "steadiness": 63,
+      "conscientiousness": 88
+    },
+    "mbti": {
+      "E_I": -79,
+      "S_N": 27,
+      "T_F": 58,
+      "J_P": 79
+    },
+    "enneagram": {
+      "primary_type": 7,
+      "wing": 6,
+      "instinct": "sx"
+    },
+    "time_preference": {
+      "discount_rate": 24,
+      "planning_horizon": "long_term",
+      "present_vs_future": -28
+    },
+    "regulatory_focus": {
+      "promotion": 78,
+      "prevention": 92
+    },
+    "language_style": {
+      "formality": 62,
+      "directness": 67,
+      "verbosity": 20,
+      "emotionality": 32,
+      "technicality": 51
+    },
+    "emotion_profile": {
+      "baseline_positivity": 27,
+      "emotional_volatility": 35,
+      "stress_tolerance": 62,
+      "empathy": 34
+    },
+    "social_profile": {
+      "trust_propensity": 44,
+      "social_confidence": 23,
+      "conflict_style": "avoiding",
+      "influence_susceptibility": 20
+    },
+    "behavioral_indicators": {
+      "decision_speed": 61,
+      "information_seeking": 74,
+      "social_proof_reliance": 53,
+      "price_sensitivity": 20
+    }
   },
   {
     "id": "Trần先生_3d3d5b",
@@ -3672,7 +8955,114 @@
     "currentQuestionIndex": 0,
     "isCompleted": false,
     "createdAt": "2026-01-08T09:29:31.044523",
-    "updatedAt": "2026-01-08T06:10:57.206Z"
+    "updatedAt": "2026-01-08T06:10:57.206Z",
+    "version": "v1.0",
+    "source_summary": {
+      "dialogue": 0.3,
+      "questionnaire": 0.5,
+      "behavior": 0.4
+    },
+    "big5": {
+      "openness": 22,
+      "conscientiousness": 54,
+      "extraversion": 26,
+      "agreeableness": 54,
+      "neuroticism": 74
+    },
+    "schwartz_values": {
+      "Conformity": 85,
+      "Self-Direction": 31,
+      "Universalism": 89,
+      "Tradition": 81,
+      "Power": 38
+    },
+    "moral_foundations": {
+      "Care": 37,
+      "Fairness": 28,
+      "Loyalty": 72,
+      "Authority": 23,
+      "Sanctity": 23
+    },
+    "risk_profile": {
+      "overall": 38,
+      "financial": 68,
+      "ethical": 62,
+      "confidence": 0.78,
+      "social": 25,
+      "health": 35
+    },
+    "decision_style": {
+      "primary": "spontaneous",
+      "secondary": "dependent",
+      "risk_seeking": 67,
+      "info_processing": "satisficer",
+      "social_preference": "autonomous"
+    },
+    "meta": {
+      "base_model": "gpt-4o-mini",
+      "temperature": 0.7,
+      "prompt_version": "v2.1",
+      "schema_validation": "pass"
+    },
+    "hexaco": {
+      "honesty_humility": 71,
+      "emotionality": 94,
+      "extraversion": 27,
+      "agreeableness": 65,
+      "conscientiousness": 48,
+      "openness": 27
+    },
+    "disc": {
+      "dominance": 53,
+      "influence": 36,
+      "steadiness": 17,
+      "conscientiousness": 52
+    },
+    "mbti": {
+      "E_I": -62,
+      "S_N": -58,
+      "T_F": -15,
+      "J_P": 2
+    },
+    "enneagram": {
+      "primary_type": 7,
+      "wing": 6,
+      "instinct": "so"
+    },
+    "time_preference": {
+      "discount_rate": 45,
+      "planning_horizon": "short_term",
+      "present_vs_future": 70
+    },
+    "regulatory_focus": {
+      "promotion": 20,
+      "prevention": 64
+    },
+    "language_style": {
+      "formality": 56,
+      "directness": 55,
+      "verbosity": 34,
+      "emotionality": 85,
+      "technicality": 20
+    },
+    "emotion_profile": {
+      "baseline_positivity": 39,
+      "emotional_volatility": 65,
+      "stress_tolerance": 36,
+      "empathy": 70
+    },
+    "social_profile": {
+      "trust_propensity": 71,
+      "social_confidence": 29,
+      "conflict_style": "avoiding",
+      "influence_susceptibility": 48
+    },
+    "behavioral_indicators": {
+      "decision_speed": 54,
+      "information_seeking": 30,
+      "social_proof_reliance": 85,
+      "price_sensitivity": 57
+    }
   },
   {
     "id": "Phạm小姐_5b2997",
@@ -3710,7 +9100,114 @@
     "currentQuestionIndex": 0,
     "isCompleted": false,
     "createdAt": "2026-01-08T09:29:31.049230",
-    "updatedAt": "2026-01-08T06:11:03.737Z"
+    "updatedAt": "2026-01-08T06:11:03.737Z",
+    "version": "v1.0",
+    "source_summary": {
+      "dialogue": 0.2,
+      "questionnaire": 0.5,
+      "behavior": 0.2
+    },
+    "big5": {
+      "openness": 41,
+      "conscientiousness": 57,
+      "extraversion": 49,
+      "agreeableness": 54,
+      "neuroticism": 37
+    },
+    "schwartz_values": {
+      "Benevolence": 38,
+      "Stimulation": 31,
+      "Security": 44,
+      "Conformity": 32,
+      "Tradition": 51
+    },
+    "moral_foundations": {
+      "Care": 78,
+      "Fairness": 54,
+      "Loyalty": 53,
+      "Authority": 37,
+      "Sanctity": 24
+    },
+    "risk_profile": {
+      "overall": 19,
+      "financial": 10,
+      "ethical": 80,
+      "confidence": 0.95,
+      "social": 10,
+      "health": 10
+    },
+    "decision_style": {
+      "primary": "intuitive",
+      "secondary": "spontaneous",
+      "risk_seeking": 58,
+      "info_processing": "satisficer",
+      "social_preference": "delegator"
+    },
+    "meta": {
+      "base_model": "gpt-4o-mini",
+      "temperature": 0.7,
+      "prompt_version": "v2.1",
+      "schema_validation": "pass"
+    },
+    "hexaco": {
+      "honesty_humility": 44,
+      "emotionality": 54,
+      "extraversion": 59,
+      "agreeableness": 57,
+      "conscientiousness": 52,
+      "openness": 51
+    },
+    "disc": {
+      "dominance": 41,
+      "influence": 61,
+      "steadiness": 67,
+      "conscientiousness": 54
+    },
+    "mbti": {
+      "E_I": 18,
+      "S_N": -13,
+      "T_F": -26,
+      "J_P": 11
+    },
+    "enneagram": {
+      "primary_type": 9,
+      "wing": 8,
+      "instinct": "sx"
+    },
+    "time_preference": {
+      "discount_rate": 77,
+      "planning_horizon": "long_term",
+      "present_vs_future": -48
+    },
+    "regulatory_focus": {
+      "promotion": 43,
+      "prevention": 70
+    },
+    "language_style": {
+      "formality": 52,
+      "directness": 56,
+      "verbosity": 49,
+      "emotionality": 45,
+      "technicality": 38
+    },
+    "emotion_profile": {
+      "baseline_positivity": 64,
+      "emotional_volatility": 40,
+      "stress_tolerance": 50,
+      "empathy": 51
+    },
+    "social_profile": {
+      "trust_propensity": 57,
+      "social_confidence": 58,
+      "conflict_style": "collaborating",
+      "influence_susceptibility": 41
+    },
+    "behavioral_indicators": {
+      "decision_speed": 67,
+      "information_seeking": 57,
+      "social_proof_reliance": 58,
+      "price_sensitivity": 90
+    }
   },
   {
     "id": "Huỳnh先生_710ace",
@@ -3750,7 +9247,114 @@
     "currentQuestionIndex": 0,
     "isCompleted": false,
     "createdAt": "2026-01-08T09:29:31.052659",
-    "updatedAt": "2026-01-08T06:11:11.724Z"
+    "updatedAt": "2026-01-08T06:11:11.724Z",
+    "version": "v1.0",
+    "source_summary": {
+      "dialogue": 0.2,
+      "questionnaire": 0.6,
+      "behavior": 0.2
+    },
+    "big5": {
+      "openness": 83,
+      "conscientiousness": 56,
+      "extraversion": 48,
+      "agreeableness": 61,
+      "neuroticism": 92
+    },
+    "schwartz_values": {
+      "Universalism": 45,
+      "Benevolence": 48,
+      "Stimulation": 82,
+      "Conformity": 90,
+      "Security": 59
+    },
+    "moral_foundations": {
+      "Care": 44,
+      "Fairness": 46,
+      "Loyalty": 66,
+      "Authority": 53,
+      "Sanctity": 69
+    },
+    "risk_profile": {
+      "overall": 50,
+      "financial": 61,
+      "ethical": 45,
+      "confidence": 0.81,
+      "social": 67,
+      "health": 51
+    },
+    "decision_style": {
+      "primary": "dependent",
+      "secondary": "intuitive",
+      "risk_seeking": 23,
+      "info_processing": "satisficer",
+      "social_preference": "autonomous"
+    },
+    "meta": {
+      "base_model": "gpt-4o-mini",
+      "temperature": 0.7,
+      "prompt_version": "v2.1",
+      "schema_validation": "pass"
+    },
+    "hexaco": {
+      "honesty_humility": 55,
+      "emotionality": 94,
+      "extraversion": 42,
+      "agreeableness": 70,
+      "conscientiousness": 51,
+      "openness": 89
+    },
+    "disc": {
+      "dominance": 43,
+      "influence": 49,
+      "steadiness": 0,
+      "conscientiousness": 55
+    },
+    "mbti": {
+      "E_I": -20,
+      "S_N": 83,
+      "T_F": -11,
+      "J_P": 12
+    },
+    "enneagram": {
+      "primary_type": 6,
+      "wing": 7,
+      "instinct": "sx"
+    },
+    "time_preference": {
+      "discount_rate": 25,
+      "planning_horizon": "long_term",
+      "present_vs_future": 15
+    },
+    "regulatory_focus": {
+      "promotion": 92,
+      "prevention": 67
+    },
+    "language_style": {
+      "formality": 58,
+      "directness": 50,
+      "verbosity": 47,
+      "emotionality": 90,
+      "technicality": 95
+    },
+    "emotion_profile": {
+      "baseline_positivity": 54,
+      "emotional_volatility": 90,
+      "stress_tolerance": 20,
+      "empathy": 56
+    },
+    "social_profile": {
+      "trust_propensity": 66,
+      "social_confidence": 60,
+      "conflict_style": "accommodating",
+      "influence_susceptibility": 53
+    },
+    "behavioral_indicators": {
+      "decision_speed": 90,
+      "information_seeking": 66,
+      "social_proof_reliance": 50,
+      "price_sensitivity": 60
+    }
   },
   {
     "id": "Hoàng小姐_1b970a",
@@ -3784,7 +9388,114 @@
     "currentQuestionIndex": 0,
     "isCompleted": false,
     "createdAt": "2026-01-08T09:29:31.056807",
-    "updatedAt": "2026-01-08T06:11:27.256Z"
+    "updatedAt": "2026-01-08T06:11:27.256Z",
+    "version": "v1.0",
+    "source_summary": {
+      "dialogue": 0.5,
+      "questionnaire": 0.5,
+      "behavior": 0.3
+    },
+    "big5": {
+      "openness": 40,
+      "conscientiousness": 19,
+      "extraversion": 37,
+      "agreeableness": 21,
+      "neuroticism": 21
+    },
+    "schwartz_values": {
+      "Self-Direction": 36,
+      "Universalism": 78,
+      "Tradition": 33,
+      "Power": 63,
+      "Hedonism": 34
+    },
+    "moral_foundations": {
+      "Care": 70,
+      "Fairness": 66,
+      "Loyalty": 30,
+      "Authority": 54,
+      "Sanctity": 16
+    },
+    "risk_profile": {
+      "overall": 13,
+      "financial": 24,
+      "ethical": 46,
+      "confidence": 0.91,
+      "social": 26,
+      "health": 10
+    },
+    "decision_style": {
+      "primary": "analytical",
+      "secondary": "avoidant",
+      "risk_seeking": 61,
+      "info_processing": "satisficer",
+      "social_preference": "collaborative"
+    },
+    "meta": {
+      "base_model": "gpt-4o-mini",
+      "temperature": 0.7,
+      "prompt_version": "v2.1",
+      "schema_validation": "pass"
+    },
+    "hexaco": {
+      "honesty_humility": 26,
+      "emotionality": 32,
+      "extraversion": 39,
+      "agreeableness": 8,
+      "conscientiousness": 20,
+      "openness": 48
+    },
+    "disc": {
+      "dominance": 67,
+      "influence": 50,
+      "steadiness": 81,
+      "conscientiousness": 18
+    },
+    "mbti": {
+      "E_I": -7,
+      "S_N": 1,
+      "T_F": 72,
+      "J_P": -58
+    },
+    "enneagram": {
+      "primary_type": 9,
+      "wing": 1,
+      "instinct": "sp"
+    },
+    "time_preference": {
+      "discount_rate": 63,
+      "planning_horizon": "medium_term",
+      "present_vs_future": 78
+    },
+    "regulatory_focus": {
+      "promotion": 41,
+      "prevention": 20
+    },
+    "language_style": {
+      "formality": 34,
+      "directness": 86,
+      "verbosity": 35,
+      "emotionality": 40,
+      "technicality": 25
+    },
+    "emotion_profile": {
+      "baseline_positivity": 30,
+      "emotional_volatility": 20,
+      "stress_tolerance": 76,
+      "empathy": 33
+    },
+    "social_profile": {
+      "trust_propensity": 20,
+      "social_confidence": 38,
+      "conflict_style": "competing",
+      "influence_susceptibility": 81
+    },
+    "behavioral_indicators": {
+      "decision_speed": 90,
+      "information_seeking": 41,
+      "social_proof_reliance": 39,
+      "price_sensitivity": 85
+    }
   },
   {
     "id": "Phan先生_7f8598",
@@ -3822,7 +9533,114 @@
     "currentQuestionIndex": 0,
     "isCompleted": false,
     "createdAt": "2026-01-08T09:29:31.060327",
-    "updatedAt": "2026-01-08T06:11:37.091Z"
+    "updatedAt": "2026-01-08T06:11:37.091Z",
+    "version": "v1.0",
+    "source_summary": {
+      "dialogue": 0.5,
+      "questionnaire": 0.5,
+      "behavior": 0.4
+    },
+    "big5": {
+      "openness": 50,
+      "conscientiousness": 73,
+      "extraversion": 39,
+      "agreeableness": 63,
+      "neuroticism": 36
+    },
+    "schwartz_values": {
+      "Self-Direction": 88,
+      "Power": 72,
+      "Benevolence": 50,
+      "Tradition": 70,
+      "Security": 55
+    },
+    "moral_foundations": {
+      "Care": 40,
+      "Fairness": 36,
+      "Loyalty": 62,
+      "Authority": 62,
+      "Sanctity": 35
+    },
+    "risk_profile": {
+      "overall": 85,
+      "financial": 71,
+      "ethical": 66,
+      "confidence": 0.95,
+      "social": 74,
+      "health": 76
+    },
+    "decision_style": {
+      "primary": "spontaneous",
+      "secondary": "avoidant",
+      "risk_seeking": 73,
+      "info_processing": "satisficer",
+      "social_preference": "collaborative"
+    },
+    "meta": {
+      "base_model": "gpt-4o-mini",
+      "temperature": 0.7,
+      "prompt_version": "v2.1",
+      "schema_validation": "pass"
+    },
+    "hexaco": {
+      "honesty_humility": 65,
+      "emotionality": 35,
+      "extraversion": 32,
+      "agreeableness": 62,
+      "conscientiousness": 72,
+      "openness": 48
+    },
+    "disc": {
+      "dominance": 32,
+      "influence": 32,
+      "steadiness": 65,
+      "conscientiousness": 72
+    },
+    "mbti": {
+      "E_I": -27,
+      "S_N": 0,
+      "T_F": -27,
+      "J_P": 31
+    },
+    "enneagram": {
+      "primary_type": 4,
+      "wing": 3,
+      "instinct": "sp"
+    },
+    "time_preference": {
+      "discount_rate": 68,
+      "planning_horizon": "short_term",
+      "present_vs_future": -37
+    },
+    "regulatory_focus": {
+      "promotion": 47,
+      "prevention": 86
+    },
+    "language_style": {
+      "formality": 56,
+      "directness": 43,
+      "verbosity": 46,
+      "emotionality": 51,
+      "technicality": 70
+    },
+    "emotion_profile": {
+      "baseline_positivity": 43,
+      "emotional_volatility": 41,
+      "stress_tolerance": 55,
+      "empathy": 76
+    },
+    "social_profile": {
+      "trust_propensity": 80,
+      "social_confidence": 43,
+      "conflict_style": "avoiding",
+      "influence_susceptibility": 20
+    },
+    "behavioral_indicators": {
+      "decision_speed": 76,
+      "information_seeking": 74,
+      "social_proof_reliance": 85,
+      "price_sensitivity": 20
+    }
   },
   {
     "id": "Vũ小姐_2c20de",
@@ -3862,6 +9680,496 @@
     "currentQuestionIndex": 0,
     "isCompleted": false,
     "createdAt": "2026-01-08T09:29:31.063547",
-    "updatedAt": "2026-01-08T06:11:46.948Z"
+    "updatedAt": "2026-01-08T06:11:46.948Z",
+    "version": "v1.0",
+    "source_summary": {
+      "dialogue": 0.4,
+      "questionnaire": 0.3,
+      "behavior": 0.4
+    },
+    "big5": {
+      "openness": 90,
+      "conscientiousness": 70,
+      "extraversion": 81,
+      "agreeableness": 50,
+      "neuroticism": 94
+    },
+    "schwartz_values": {
+      "Security": 45,
+      "Conformity": 72,
+      "Self-Direction": 83,
+      "Hedonism": 76,
+      "Power": 80
+    },
+    "moral_foundations": {
+      "Care": 62,
+      "Fairness": 58,
+      "Loyalty": 45,
+      "Authority": 51,
+      "Sanctity": 57
+    },
+    "risk_profile": {
+      "overall": 68,
+      "financial": 50,
+      "ethical": 55,
+      "confidence": 0.85,
+      "social": 54,
+      "health": 72
+    },
+    "decision_style": {
+      "primary": "dependent",
+      "secondary": "avoidant",
+      "risk_seeking": 42,
+      "info_processing": "maximizer",
+      "social_preference": "autonomous"
+    },
+    "meta": {
+      "base_model": "gpt-4o-mini",
+      "temperature": 0.7,
+      "prompt_version": "v2.1",
+      "schema_validation": "pass"
+    },
+    "hexaco": {
+      "honesty_humility": 51,
+      "emotionality": 95,
+      "extraversion": 84,
+      "agreeableness": 62,
+      "conscientiousness": 73,
+      "openness": 88
+    },
+    "disc": {
+      "dominance": 56,
+      "influence": 71,
+      "steadiness": 2,
+      "conscientiousness": 76
+    },
+    "mbti": {
+      "E_I": 68,
+      "S_N": 74,
+      "T_F": -10,
+      "J_P": 54
+    },
+    "enneagram": {
+      "primary_type": 6,
+      "wing": 7,
+      "instinct": "sp"
+    },
+    "time_preference": {
+      "discount_rate": 17,
+      "planning_horizon": "medium_term",
+      "present_vs_future": 8
+    },
+    "regulatory_focus": {
+      "promotion": 95,
+      "prevention": 83
+    },
+    "language_style": {
+      "formality": 36,
+      "directness": 35,
+      "verbosity": 74,
+      "emotionality": 95,
+      "technicality": 88
+    },
+    "emotion_profile": {
+      "baseline_positivity": 79,
+      "emotional_volatility": 90,
+      "stress_tolerance": 20,
+      "empathy": 43
+    },
+    "social_profile": {
+      "trust_propensity": 38,
+      "social_confidence": 71,
+      "conflict_style": "collaborating",
+      "influence_susceptibility": 26
+    },
+    "behavioral_indicators": {
+      "decision_speed": 90,
+      "information_seeking": 92,
+      "social_proof_reliance": 46,
+      "price_sensitivity": 20
+    }
+  },
+  {
+    "id": "Trần先生_0a3566",
+    "lastName": "Trần",
+    "gender": "Male",
+    "age": 29,
+    "occupation": "Software Engineer",
+    "timesOfOverseasTravelInsurance": 0,
+    "purchasedBrand": [],
+    "purchasedChannels": [],
+    "personalBackground": "居住地：河內科技城\n職業背景：在一家大型科技公司擔任軟體工程師，工作6年\n旅遊習慣：每年出差或旅遊次數約3-4次，主要是亞洲國家\n其他：熱愛科技產品，通常選擇自助旅行，自行安排行程",
+    "interviewHistory": [],
+    "currentSectionIndex": 0,
+    "currentQuestionIndex": 0,
+    "isCompleted": false,
+    "createdAt": "2026-01-09T09:49:13.679228",
+    "updatedAt": "2026-01-09T09:49:13.679241",
+    "version": "v1.0",
+    "source_summary": {
+      "dialogue": 0.3,
+      "questionnaire": 0.5,
+      "behavior": 0.2
+    },
+    "big5": {
+      "openness": 72,
+      "conscientiousness": 24,
+      "extraversion": 50,
+      "agreeableness": 59,
+      "neuroticism": 60
+    },
+    "schwartz_values": {
+      "Tradition": 49,
+      "Benevolence": 54,
+      "Conformity": 60,
+      "Power": 85,
+      "Security": 41
+    },
+    "moral_foundations": {
+      "Care": 90,
+      "Fairness": 77,
+      "Loyalty": 30,
+      "Authority": 21,
+      "Sanctity": 58
+    },
+    "risk_profile": {
+      "overall": 95,
+      "financial": 86,
+      "ethical": 44,
+      "confidence": 0.94,
+      "social": 90,
+      "health": 68
+    },
+    "decision_style": {
+      "primary": "rational",
+      "secondary": "spontaneous",
+      "risk_seeking": 49,
+      "info_processing": "satisficer",
+      "social_preference": "autonomous"
+    },
+    "meta": {
+      "base_model": "gpt-4o-mini",
+      "temperature": 0.7,
+      "prompt_version": "v2.1",
+      "schema_validation": "pass"
+    },
+    "hexaco": {
+      "honesty_humility": 75,
+      "emotionality": 69,
+      "extraversion": 58,
+      "agreeableness": 71,
+      "conscientiousness": 27,
+      "openness": 69
+    },
+    "disc": {
+      "dominance": 44,
+      "influence": 52,
+      "steadiness": 32,
+      "conscientiousness": 15
+    },
+    "mbti": {
+      "E_I": 20,
+      "S_N": 44,
+      "T_F": -23,
+      "J_P": -33
+    },
+    "enneagram": {
+      "primary_type": 1,
+      "wing": 9,
+      "instinct": "so"
+    },
+    "time_preference": {
+      "discount_rate": 38,
+      "planning_horizon": "long_term",
+      "present_vs_future": 58
+    },
+    "regulatory_focus": {
+      "promotion": 79,
+      "prevention": 36
+    },
+    "language_style": {
+      "formality": 51,
+      "directness": 35,
+      "verbosity": 53,
+      "emotionality": 75,
+      "technicality": 75
+    },
+    "emotion_profile": {
+      "baseline_positivity": 55,
+      "emotional_volatility": 74,
+      "stress_tolerance": 47,
+      "empathy": 52
+    },
+    "social_profile": {
+      "trust_propensity": 59,
+      "social_confidence": 58,
+      "conflict_style": "avoiding",
+      "influence_susceptibility": 78
+    },
+    "behavioral_indicators": {
+      "decision_speed": 90,
+      "information_seeking": 48,
+      "social_proof_reliance": 63,
+      "price_sensitivity": 20
+    }
+  },
+  {
+    "id": "Nguyễn小姐_901415",
+    "lastName": "Nguyễn",
+    "gender": "Female",
+    "age": 35,
+    "occupation": "Marketing Manager",
+    "timesOfOverseasTravelInsurance": 1,
+    "purchasedBrand": [
+      "Bao Viet"
+    ],
+    "purchasedChannels": [
+      "官網"
+    ],
+    "personalBackground": "居住地：胡志明市第一郡\n職業背景：在跨國消費品公司擔任行銷經理，已有8年經驗\n旅遊習慣：每年和家人出國旅遊1-2次，偏好度假村式旅遊\n其他：經常參加公司培訓，對於旅遊保險有一定重視，但多選擇基本款",
+    "interviewHistory": [],
+    "currentSectionIndex": 0,
+    "currentQuestionIndex": 0,
+    "isCompleted": false,
+    "createdAt": "2026-01-09T09:49:13.687163",
+    "updatedAt": "2026-01-09T09:49:13.687175",
+    "version": "v1.0",
+    "source_summary": {
+      "dialogue": 0.3,
+      "questionnaire": 0.5,
+      "behavior": 0.4
+    },
+    "big5": {
+      "openness": 63,
+      "conscientiousness": 95,
+      "extraversion": 42,
+      "agreeableness": 38,
+      "neuroticism": 70
+    },
+    "schwartz_values": {
+      "Self-Direction": 50,
+      "Power": 44,
+      "Stimulation": 82,
+      "Universalism": 44,
+      "Hedonism": 67
+    },
+    "moral_foundations": {
+      "Care": 36,
+      "Fairness": 38,
+      "Loyalty": 57,
+      "Authority": 66,
+      "Sanctity": 29
+    },
+    "risk_profile": {
+      "overall": 24,
+      "financial": 54,
+      "ethical": 76,
+      "confidence": 0.88,
+      "social": 10,
+      "health": 11
+    },
+    "decision_style": {
+      "primary": "dependent",
+      "secondary": "avoidant",
+      "risk_seeking": 21,
+      "info_processing": "maximizer",
+      "social_preference": "autonomous"
+    },
+    "meta": {
+      "base_model": "gpt-4o-mini",
+      "temperature": 0.7,
+      "prompt_version": "v2.1",
+      "schema_validation": "pass"
+    },
+    "hexaco": {
+      "honesty_humility": 49,
+      "emotionality": 68,
+      "extraversion": 46,
+      "agreeableness": 51,
+      "conscientiousness": 85,
+      "openness": 64
+    },
+    "disc": {
+      "dominance": 73,
+      "influence": 37,
+      "steadiness": 38,
+      "conscientiousness": 100
+    },
+    "mbti": {
+      "E_I": -34,
+      "S_N": 48,
+      "T_F": 4,
+      "J_P": 95
+    },
+    "enneagram": {
+      "primary_type": 2,
+      "wing": 3,
+      "instinct": "so"
+    },
+    "time_preference": {
+      "discount_rate": 78,
+      "planning_horizon": "medium_term",
+      "present_vs_future": -49
+    },
+    "regulatory_focus": {
+      "promotion": 90,
+      "prevention": 95
+    },
+    "language_style": {
+      "formality": 47,
+      "directness": 57,
+      "verbosity": 48,
+      "emotionality": 66,
+      "technicality": 75
+    },
+    "emotion_profile": {
+      "baseline_positivity": 52,
+      "emotional_volatility": 82,
+      "stress_tolerance": 20,
+      "empathy": 29
+    },
+    "social_profile": {
+      "trust_propensity": 35,
+      "social_confidence": 37,
+      "conflict_style": "competing",
+      "influence_susceptibility": 20
+    },
+    "behavioral_indicators": {
+      "decision_speed": 57,
+      "information_seeking": 90,
+      "social_proof_reliance": 52,
+      "price_sensitivity": 85
+    }
+  },
+  {
+    "id": "Lê先生_67cc5d",
+    "lastName": "Lê",
+    "gender": "Male",
+    "age": 48,
+    "occupation": "Business Owner",
+    "timesOfOverseasTravelInsurance": 4,
+    "purchasedBrand": [
+      "VBI",
+      "PVI",
+      "Liberty"
+    ],
+    "purchasedChannels": [
+      "銀行/信用卡",
+      "旅行社"
+    ],
+    "personalBackground": "居住地：峴港市區\n職業背景：經營一家小型家族企業，主要代理國際品牌\n旅遊習慣：經常出差，尤其到歐洲和美洲拓展業務\n其他：重視風險管理，常購買多種保險以保護商務活動",
+    "interviewHistory": [],
+    "currentSectionIndex": 0,
+    "currentQuestionIndex": 0,
+    "isCompleted": false,
+    "createdAt": "2026-01-09T09:49:13.693390",
+    "updatedAt": "2026-01-09T09:49:13.693396",
+    "version": "v1.0",
+    "source_summary": {
+      "dialogue": 0.2,
+      "questionnaire": 0.4,
+      "behavior": 0.3
+    },
+    "big5": {
+      "openness": 59,
+      "conscientiousness": 36,
+      "extraversion": 19,
+      "agreeableness": 38,
+      "neuroticism": 39
+    },
+    "schwartz_values": {
+      "Power": 39,
+      "Universalism": 88,
+      "Achievement": 59,
+      "Tradition": 42,
+      "Security": 58
+    },
+    "moral_foundations": {
+      "Care": 36,
+      "Fairness": 36,
+      "Loyalty": 45,
+      "Authority": 24,
+      "Sanctity": 63
+    },
+    "risk_profile": {
+      "overall": 57,
+      "financial": 79,
+      "ethical": 66,
+      "confidence": 0.9,
+      "social": 55,
+      "health": 70
+    },
+    "decision_style": {
+      "primary": "spontaneous",
+      "secondary": "intuitive",
+      "risk_seeking": 63,
+      "info_processing": "satisficer",
+      "social_preference": "autonomous"
+    },
+    "meta": {
+      "base_model": "gpt-4o-mini",
+      "temperature": 0.7,
+      "prompt_version": "v2.1",
+      "schema_validation": "pass"
+    },
+    "hexaco": {
+      "honesty_humility": 57,
+      "emotionality": 40,
+      "extraversion": 15,
+      "agreeableness": 37,
+      "conscientiousness": 34,
+      "openness": 74
+    },
+    "disc": {
+      "dominance": 57,
+      "influence": 14,
+      "steadiness": 67,
+      "conscientiousness": 41
+    },
+    "mbti": {
+      "E_I": -81,
+      "S_N": 12,
+      "T_F": 17,
+      "J_P": -10
+    },
+    "enneagram": {
+      "primary_type": 4,
+      "wing": 3,
+      "instinct": "sx"
+    },
+    "time_preference": {
+      "discount_rate": 18,
+      "planning_horizon": "short_term",
+      "present_vs_future": -14
+    },
+    "regulatory_focus": {
+      "promotion": 55,
+      "prevention": 30
+    },
+    "language_style": {
+      "formality": 63,
+      "directness": 61,
+      "verbosity": 20,
+      "emotionality": 43,
+      "technicality": 67
+    },
+    "emotion_profile": {
+      "baseline_positivity": 22,
+      "emotional_volatility": 52,
+      "stress_tolerance": 73,
+      "empathy": 32
+    },
+    "social_profile": {
+      "trust_propensity": 29,
+      "social_confidence": 29,
+      "conflict_style": "competing",
+      "influence_susceptibility": 55
+    },
+    "behavioral_indicators": {
+      "decision_speed": 86,
+      "information_seeking": 47,
+      "social_proof_reliance": 64,
+      "price_sensitivity": 37
+    }
   }
 ]

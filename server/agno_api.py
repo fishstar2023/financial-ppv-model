@@ -1465,7 +1465,7 @@ def api_delete_persona(persona_id: str):
 
 
 # ========== Vietnam Interview API Endpoints ==========
-from vietnam_interview_agent import interview_vietnam_persona
+from vietnam_interview_agent import interview_vietnam_persona, interview_vietnam_persona_observer
 from vietnam_generator_agent import generate_vietnam_personas
 from vietnam_analysis_agent import analyze_interview_responses
 from vietnam_classifier_agent import classify_responses, classify_responses_multi_dimension
@@ -1776,4 +1776,244 @@ def api_vietnam_semantic_group(request: SemanticGroupRequest):
         }
     except Exception as e:
         print(f"語義分組錯誤: {e}")
+        return JSONResponse({"error": str(e)}, status_code=500)
+
+
+# ========== Vietnam Interview 2 API Endpoints (Independent Copy) ==========
+VIETNAM2_DB_FILE = Path("server/vietnam2_personas.json")
+
+def load_vietnam2_db() -> List[Dict[str, Any]]:
+    """從 JSON 檔案讀取越南訪談資料 (副本)"""
+    if not VIETNAM2_DB_FILE.exists():
+        return []
+    try:
+        with open(VIETNAM2_DB_FILE, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except Exception as e:
+        print(f"讀取越南2資料庫失敗: {e}")
+        return []
+
+def save_vietnam2_db(persona: Dict[str, Any]):
+    """儲存/更新越南訪談資料 (副本)"""
+    all_data = load_vietnam2_db()
+    data_map = {p.get('id'): p for p in all_data}
+    data_map[persona.get('id')] = persona
+    with open(VIETNAM2_DB_FILE, "w", encoding="utf-8") as f:
+        json.dump(list(data_map.values()), f, ensure_ascii=False, indent=2)
+
+@app.get("/api/vietnam2_personas")
+def api_get_vietnam2_personas():
+    """取得所有越南訪談記錄 (副本)"""
+    return load_vietnam2_db()
+
+@app.post("/api/vietnam2_personas")
+def api_save_vietnam2_persona(persona: Dict[str, Any]):
+    """儲存/更新越南訪談記錄 (副本)"""
+    save_vietnam2_db(persona)
+    return {"status": "saved", "id": persona.get('id')}
+
+@app.delete("/api/vietnam2_personas/{persona_id}")
+def api_delete_vietnam2_persona(persona_id: str):
+    """刪除單一越南訪談記錄 (副本)"""
+    all_data = load_vietnam2_db()
+    filtered = [p for p in all_data if p.get('id') != persona_id]
+    with open(VIETNAM2_DB_FILE, "w", encoding="utf-8") as f:
+        json.dump(filtered, f, ensure_ascii=False, indent=2)
+    return {"status": "deleted", "id": persona_id}
+
+@app.delete("/api/vietnam2_personas")
+def api_clear_vietnam2_personas():
+    """清除所有越南訪談記錄 (副本)"""
+    if VIETNAM2_DB_FILE.exists():
+        os.remove(VIETNAM2_DB_FILE)
+    return {"status": "cleared"}
+
+@app.post("/api/vietnam2_interview")
+def api_vietnam2_interview(request: VietnamInterviewRequest):
+    """使用 AI 生成第三方觀察者視角的訪談記錄 (Observer Notes)"""
+    try:
+        # 使用第三方觀察者視角輸出
+        response_text = interview_vietnam_persona_observer(
+            request.persona,
+            request.question,
+            request.subQuestions
+        )
+        return {"response": response_text}
+    except Exception as e:
+        print(f"觀察記錄生成錯誤: {e}")
+        return JSONResponse({"error": str(e)}, status_code=500)
+
+@app.post("/api/generate_vietnam2_personas")
+def api_generate_vietnam2_personas(req: GenerateRequest):
+    """AI 生成越南受訪者 (副本)"""
+    print(f"🇻🇳 收到越南2受訪者生成請求: {req.hint} (x{req.count})")
+    try:
+        results = generate_vietnam_personas(req.hint, req.count)
+
+        if results:
+            import uuid
+            saved_personas = []
+            for p in results:
+                unique_suffix = str(uuid.uuid4())[:6]
+                unique_id = f"{p.id}_{unique_suffix}"
+                full_persona = {
+                    "id": unique_id,
+                    "lastName": p.lastName,
+                    "gender": p.gender,
+                    "age": p.age,
+                    "occupation": p.occupation,
+                    "timesOfOverseasTravelInsurance": p.timesOfOverseasTravelInsurance,
+                    "purchasedBrand": p.purchasedBrand,
+                    "purchasedChannels": p.purchasedChannels,
+                    "personalBackground": p.personalBackground,
+                    "interviewHistory": [],
+                    "currentSectionIndex": 0,
+                    "currentQuestionIndex": 0,
+                    "isCompleted": False,
+                    "createdAt": datetime.datetime.now().isoformat(),
+                    "updatedAt": datetime.datetime.now().isoformat()
+                }
+                save_vietnam2_db(full_persona)
+                saved_personas.append(full_persona)
+
+            return saved_personas
+        else:
+            return JSONResponse({"error": "生成失敗"}, status_code=500)
+    except Exception as e:
+        print(f"越南2受訪者生成錯誤: {e}")
+        return JSONResponse({"error": str(e)}, status_code=500)
+
+@app.post("/api/vietnam2_analysis")
+def api_vietnam2_analysis(request: AnalysisRequest):
+    """分析多位受訪者對同一問題的回答 (副本)"""
+    try:
+        print(f"📊 收到分析請求(V2): {request.question[:50]}... ({len(request.responses)} responses)")
+        analysis = analyze_interview_responses(
+            request.question,
+            request.responses
+        )
+        return {"analysis": analysis}
+    except Exception as e:
+        print(f"分析錯誤(V2): {e}")
+        return JSONResponse({"error": str(e)}, status_code=500)
+
+@app.post("/api/vietnam2_classify_multi")
+def api_vietnam2_classify_multi(request: MultiClassifyRequest):
+    """多維度分類 (副本)"""
+    try:
+        print(f"📊 收到多維度分類請求(V2): {request.question[:50]}... ({len(request.responses)} responses)")
+        result = classify_responses_multi_dimension(
+            request.question,
+            request.responses
+        )
+        return result
+    except Exception as e:
+        print(f"多維度分類錯誤(V2): {e}")
+        return JSONResponse({"error": str(e)}, status_code=500)
+
+@app.post("/api/vietnam2_semantic_group")
+def api_vietnam2_semantic_group(request: SemanticGroupRequest):
+    """語義問題分組 (副本)"""
+    try:
+        print(f"🔍 收到語義分組請求(V2): {len(request.questions)} questions, threshold={request.threshold}")
+
+        groups = group_similar_questions(request.questions, request.threshold)
+
+        mapping = {}
+        for canonical, similar_list in groups.items():
+            for q in similar_list:
+                mapping[q] = canonical
+
+        return {
+            "groups": groups,
+            "mapping": mapping,
+            "total_questions": len(request.questions),
+            "total_groups": len(groups)
+        }
+    except Exception as e:
+        print(f"語義分組錯誤(V2): {e}")
+        return JSONResponse({"error": str(e)}, status_code=500)
+
+
+# ========== PPV Diversity Monitoring API ==========
+from ppv_diversity_monitor import analyze_persona_diversity, generate_diversity_report
+
+class DiversityAnalysisRequest(BaseModel):
+    personas: List[Dict[str, Any]]
+    entropy_threshold: float = 0.5
+
+@app.post("/api/ppv_diversity")
+def api_ppv_diversity(request: DiversityAnalysisRequest):
+    """分析 Personas 的多樣性（Core/Style 解耦）"""
+    try:
+        print(f"📊 收到 PPV 多樣性分析請求: {len(request.personas)} personas")
+        metrics = analyze_persona_diversity(request.personas, request.entropy_threshold)
+        return metrics
+    except Exception as e:
+        print(f"PPV 分析錯誤: {e}")
+        return JSONResponse({"error": str(e)}, status_code=500)
+
+@app.post("/api/ppv_diversity_report")
+def api_ppv_diversity_report(request: DiversityAnalysisRequest):
+    """生成 PPV 多樣性報告"""
+    try:
+        print(f"📊 生成 PPV 多樣性報告: {len(request.personas)} personas")
+        report = generate_diversity_report(request.personas, request.entropy_threshold)
+        return {"report": report}
+    except Exception as e:
+        print(f"PPV 報告錯誤: {e}")
+        return JSONResponse({"error": str(e)}, status_code=500)
+
+@app.get("/api/vietnam_ppv_diversity")
+def api_vietnam_ppv_diversity():
+    """分析 Vietnam Interview personas 的多樣性"""
+    try:
+        personas = load_vietnam_db()
+        if not personas:
+            return {"error": "No personas found"}
+        print(f"📊 分析 Vietnam personas 多樣性: {len(personas)} personas")
+        metrics = analyze_persona_diversity(personas)
+        return metrics
+    except Exception as e:
+        print(f"Vietnam PPV 分析錯誤: {e}")
+        return JSONResponse({"error": str(e)}, status_code=500)
+
+@app.get("/api/vietnam2_ppv_diversity")
+def api_vietnam2_ppv_diversity():
+    """分析 Observer Notes (Vietnam2) personas 的多樣性"""
+    try:
+        personas = load_vietnam2_db()
+        if not personas:
+            return {"error": "No personas found"}
+        print(f"📊 分析 Observer Notes personas 多樣性: {len(personas)} personas")
+        metrics = analyze_persona_diversity(personas)
+        return metrics
+    except Exception as e:
+        print(f"Observer Notes PPV 分析錯誤: {e}")
+        return JSONResponse({"error": str(e)}, status_code=500)
+
+@app.get("/api/all_ppv_diversity")
+def api_all_ppv_diversity():
+    """分析所有 Vietnam personas (合併 vietnam + vietnam2) 的多樣性"""
+    try:
+        personas1 = load_vietnam_db()
+        personas2 = load_vietnam2_db()
+        all_personas = (personas1 or []) + (personas2 or [])
+
+        if not all_personas:
+            return {"error": "No personas found"}
+
+        print(f"📊 分析所有 Vietnam personas 多樣性: {len(all_personas)} personas (vietnam: {len(personas1 or [])}, vietnam2: {len(personas2 or [])})")
+        metrics = analyze_persona_diversity(all_personas)
+
+        # 添加來源統計
+        metrics["source_breakdown"] = {
+            "vietnam": len(personas1 or []),
+            "vietnam2": len(personas2 or []),
+            "total": len(all_personas)
+        }
+
+        return metrics
+    except Exception as e:
+        print(f"All PPV 分析錯誤: {e}")
         return JSONResponse({"error": str(e)}, status_code=500)

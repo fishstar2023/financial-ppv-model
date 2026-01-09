@@ -2,9 +2,11 @@ import './styles.css';
 import { useState } from 'react';
 import { MarketSimulator } from './features/MarketSimulator';
 import { VietnamInterview } from './features/VietnamInterview';
+import { VietnamInterview2 } from './features/VietnamInterview2';
+import { PPVDashboard } from './features/PPVDashboard';
 
 function App() {
-  const [currentPage, setCurrentPage] = useState('home'); // 'home' | 'market' | 'vietnam'
+  const [currentPage, setCurrentPage] = useState('home'); // 'home' | 'market' | 'vietnam' | 'vietnam2' | 'ppv'
 
   // 首頁
   if (currentPage === 'home') {
@@ -55,9 +57,9 @@ function App() {
         {/* Feature Cards */}
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(2, 1fr)',
+          gridTemplateColumns: 'repeat(4, 1fr)',
           gap: '24px',
-          maxWidth: '800px',
+          maxWidth: '1400px',
           width: '100%'
         }}>
           {/* Market Simulator Card */}
@@ -193,6 +195,140 @@ function App() {
               <span style={{ fontSize: '18px' }}>→</span>
             </div>
           </button>
+
+          {/* Vietnam Interview 2 Card */}
+          <button
+            onClick={() => setCurrentPage('vietnam2')}
+            style={{
+              background: 'rgba(255, 255, 255, 0.9)',
+              backdropFilter: 'blur(10px)',
+              border: '1px solid rgba(122, 149, 171, 0.2)',
+              borderRadius: '20px',
+              padding: '32px',
+              cursor: 'pointer',
+              textAlign: 'left',
+              transition: 'all 0.3s ease',
+              boxShadow: '0 4px 24px rgba(90, 107, 122, 0.1)'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(-4px)';
+              e.currentTarget.style.boxShadow = '0 12px 40px rgba(90, 107, 122, 0.2)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = '0 4px 24px rgba(90, 107, 122, 0.1)';
+            }}
+          >
+            <div style={{
+              width: '56px',
+              height: '56px',
+              background: 'linear-gradient(135deg, #7a95ab 0%, #5a7a8a 100%)',
+              borderRadius: '16px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginBottom: '20px',
+              boxShadow: '0 4px 16px rgba(122, 149, 171, 0.25)'
+            }}>
+              <span style={{ fontSize: '28px' }}>📋</span>
+            </div>
+            <h2 style={{
+              margin: '0 0 8px 0',
+              fontSize: '20px',
+              fontWeight: 600,
+              color: '#3a4a5a'
+            }}>
+              Observer Notes
+            </h2>
+            <p style={{
+              margin: '0 0 20px 0',
+              fontSize: '14px',
+              color: '#6b7c8a',
+              lineHeight: '1.6'
+            }}>
+              Third-Party Observation Records
+              <br />
+              Record user feedback from observer's view
+            </p>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              color: '#5a7a8a',
+              fontSize: '14px',
+              fontWeight: 500
+            }}>
+              Enter
+              <span style={{ fontSize: '18px' }}>→</span>
+            </div>
+          </button>
+
+          {/* PPV Dashboard Card */}
+          <button
+            onClick={() => setCurrentPage('ppv')}
+            style={{
+              background: 'rgba(255, 255, 255, 0.9)',
+              backdropFilter: 'blur(10px)',
+              border: '1px solid rgba(168, 133, 158, 0.2)',
+              borderRadius: '20px',
+              padding: '32px',
+              cursor: 'pointer',
+              textAlign: 'left',
+              transition: 'all 0.3s ease',
+              boxShadow: '0 4px 24px rgba(90, 107, 122, 0.1)'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(-4px)';
+              e.currentTarget.style.boxShadow = '0 12px 40px rgba(90, 107, 122, 0.2)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = '0 4px 24px rgba(90, 107, 122, 0.1)';
+            }}
+          >
+            <div style={{
+              width: '56px',
+              height: '56px',
+              background: 'linear-gradient(135deg, #a8859e 0%, #8a6580 100%)',
+              borderRadius: '16px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginBottom: '20px',
+              boxShadow: '0 4px 16px rgba(168, 133, 158, 0.25)'
+            }}>
+              <span style={{ fontSize: '28px' }}>📊</span>
+            </div>
+            <h2 style={{
+              margin: '0 0 8px 0',
+              fontSize: '20px',
+              fontWeight: 600,
+              color: '#3a4a5a'
+            }}>
+              PPV Dashboard
+            </h2>
+            <p style={{
+              margin: '0 0 20px 0',
+              fontSize: '14px',
+              color: '#6b7c8a',
+              lineHeight: '1.6'
+            }}>
+              Persona Personality Variance
+              <br />
+              Real-time diversity monitoring
+            </p>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              color: '#8a6580',
+              fontSize: '14px',
+              fontWeight: 500
+            }}>
+              Enter
+              <span style={{ fontSize: '18px' }}>→</span>
+            </div>
+          </button>
         </div>
 
         {/* Footer */}
@@ -232,7 +368,11 @@ function App() {
                 height: '40px',
                 background: currentPage === 'market'
                   ? 'linear-gradient(135deg, #9db4c7 0%, #7a95ab 100%)'
-                  : 'linear-gradient(135deg, #8b9e85 0%, #6b8065 100%)',
+                  : currentPage === 'vietnam2'
+                    ? 'linear-gradient(135deg, #7a95ab 0%, #5a7a8a 100%)'
+                    : currentPage === 'ppv'
+                      ? 'linear-gradient(135deg, #a8859e 0%, #8a6580 100%)'
+                      : 'linear-gradient(135deg, #8b9e85 0%, #6b8065 100%)',
                 borderRadius: '12px',
                 display: 'flex',
                 alignItems: 'center',
@@ -247,7 +387,7 @@ function App() {
               }}
               title="Back to Home"
             >
-              {currentPage === 'market' ? 'M' : 'V'}
+              {currentPage === 'market' ? 'M' : currentPage === 'vietnam2' ? 'O' : currentPage === 'ppv' ? 'P' : 'V'}
             </button>
             <div>
               <h1 style={{
@@ -257,12 +397,16 @@ function App() {
                 color: '#5a6b7a',
                 letterSpacing: '-0.02em'
               }}>
-                {currentPage === 'market' ? 'Market Research Simulator' : 'Vietnam Interview'}
+                {currentPage === 'market' ? 'Market Research Simulator' : currentPage === 'vietnam2' ? 'Observer Notes' : currentPage === 'ppv' ? 'PPV Dashboard' : 'Vietnam Interview'}
               </h1>
               <p style={{ margin: '4px 0 0 0', color: '#8599a8', fontSize: '14px', fontWeight: 400 }}>
                 {currentPage === 'market'
                   ? 'Synthetic Persona Interview Platform'
-                  : 'Travel Insurance User Research'}
+                  : currentPage === 'vietnam2'
+                    ? 'Third-Party Observation Records'
+                    : currentPage === 'ppv'
+                      ? 'Real-time Persona Diversity Monitoring'
+                      : 'Travel Insurance User Research'}
               </p>
             </div>
           </div>
@@ -284,6 +428,16 @@ function App() {
               isActive={currentPage === 'vietnam'}
               onClick={() => setCurrentPage('vietnam')}
             />
+            <NavButton
+              label="Observer Notes"
+              isActive={currentPage === 'vietnam2'}
+              onClick={() => setCurrentPage('vietnam2')}
+            />
+            <NavButton
+              label="PPV Dashboard"
+              isActive={currentPage === 'ppv'}
+              onClick={() => setCurrentPage('ppv')}
+            />
           </nav>
         </div>
       </header>
@@ -292,6 +446,8 @@ function App() {
       <main style={{ maxWidth: '1400px', margin: '0 auto', padding: '28px 32px' }}>
         {currentPage === 'market' && <MarketSimulator />}
         {currentPage === 'vietnam' && <VietnamInterview />}
+        {currentPage === 'vietnam2' && <VietnamInterview2 />}
+        {currentPage === 'ppv' && <PPVDashboard />}
       </main>
     </div>
   );

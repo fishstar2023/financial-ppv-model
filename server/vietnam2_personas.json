@@ -1,0 +1,1985 @@
+[
+  {
+    "id": "Nguyễn先生_5446a3",
+    "lastName": "Nguyễn",
+    "gender": "Male",
+    "age": 28,
+    "occupation": "Software Developer",
+    "timesOfOverseasTravelInsurance": 1,
+    "purchasedBrand": [
+      "Liberty"
+    ],
+    "purchasedChannels": [
+      "Official website"
+    ],
+    "personalBackground": "居住地：胡志明市第十郡\n職業背景：在信息技術公司擔任軟體開發工程師\n旅遊習慣：每年出國旅遊一次，主要去日本和韓國\n其他：喜歡科技產品和當地美食探索",
+    "interviewHistory": [
+      {
+        "sectionId": "batch",
+        "questionId": "batch_1767921708675_Nguyễn先生_5446a3",
+        "question": "\"第一次買旅遊險的時候，你怎麼決定要買哪一個旅遊險方案的？請概述當時情境\n▪️參考資訊來源\n▪️購買管道選擇 ＆ 原因\n▪️目前共有多少次自行購買旅遊險的經驗（旅行社代買的情況不算）\"",
+        "answer": "觀察到Nguyễn 先生在回應時顯得有些焦慮。他表示，第一次購買旅遊險方案時，主要是基於對於旅遊安全的擔憂，擔心沒有足夠的保障。根據Nguyễn 先生的說法，他曾經參考過幾個線上的保險比較網站，試圖找到最適合的方案。不過，他提到在選擇時對於各家保險的理賠條款感到困惑，這使得他花費了不少時間研究。Nguyễn 先生最後選擇了Liberty的方案，並通過其官方網站完成了購買。他提到目前為止，他只有一次自行購買旅遊險的經驗。值得注意的是，Nguyễn 先生提及過去有一次不愉快的客服體驗，這讓他對未來的保險選擇更為謹慎。",
+        "timestamp": "2026-01-09T01:21:48.675Z",
+        "topicTag": "旅遊險意識啟蒙"
+      }
+    ],
+    "currentSectionIndex": 0,
+    "currentQuestionIndex": 0,
+    "isCompleted": false,
+    "createdAt": "2026-01-08T16:35:11.823040",
+    "updatedAt": "2026-01-09T01:21:48.675Z",
+    "version": "v1.0",
+    "source_summary": {
+      "dialogue": 0.4,
+      "questionnaire": 0.4,
+      "behavior": 0.2
+    },
+    "big5": {
+      "openness": 49,
+      "conscientiousness": 65,
+      "extraversion": 87,
+      "agreeableness": 83,
+      "neuroticism": 82
+    },
+    "schwartz_values": {
+      "Benevolence": 44,
+      "Self-Direction": 56,
+      "Security": 33,
+      "Power": 56,
+      "Tradition": 39
+    },
+    "moral_foundations": {
+      "Care": 60,
+      "Fairness": 28,
+      "Loyalty": 60,
+      "Authority": 23,
+      "Sanctity": 24
+    },
+    "risk_profile": {
+      "overall": 23,
+      "financial": 33,
+      "ethical": 72,
+      "confidence": 0.6
+    },
+    "hexaco": {
+      "honesty_humility": 65,
+      "emotionality": 78,
+      "extraversion": 85,
+      "agreeableness": 80,
+      "conscientiousness": 68,
+      "openness": 52
+    },
+    "disc": {
+      "dominance": 42,
+      "influence": 78,
+      "steadiness": 55,
+      "conscientiousness": 62
+    },
+    "mbti": {
+      "E_I": 60,
+      "S_N": -15,
+      "T_F": -40,
+      "J_P": -25
+    },
+    "enneagram": {
+      "primary_type": 6,
+      "wing": 7,
+      "instinct": "so"
+    },
+    "time_preference": {
+      "discount_rate": 45,
+      "planning_horizon": "medium_term",
+      "present_vs_future": 20
+    },
+    "regulatory_focus": {
+      "promotion": 65,
+      "prevention": 72
+    },
+    "decision_style": {
+      "primary": "dependent",
+      "secondary": "intuitive",
+      "risk_seeking": 35,
+      "info_processing": "maximizer",
+      "social_preference": "collaborative"
+    },
+    "language_style": {
+      "formality": 45,
+      "directness": 55,
+      "emotion_expression": 72,
+      "verbosity": 60,
+      "questioning_style": 70
+    },
+    "emotion_profile": {
+      "baseline_valence": 62,
+      "emotional_range": 75,
+      "stress_response": "fight",
+      "recovery_speed": 55
+    },
+    "social_profile": {
+      "trust_default": 52,
+      "cooperation_tendency": 78,
+      "conformity": 58,
+      "independence": 48
+    },
+    "behavioral_indicators": {
+      "information_seeking": 82,
+      "comparison_behavior": 78,
+      "price_sensitivity": 55,
+      "brand_loyalty": 35
+    },
+    "meta": {
+      "base_model": "gpt-4o-mini",
+      "temperature": 0.7,
+      "prompt_version": "v2.2-full-ppv",
+      "schema_validation": "pass"
+    }
+  },
+  {
+    "id": "Trần小姐_250928",
+    "lastName": "Trần",
+    "gender": "Female",
+    "age": 35,
+    "occupation": "Marketing Manager",
+    "timesOfOverseasTravelInsurance": 3,
+    "purchasedBrand": [
+      "PVI",
+      "AIA"
+    ],
+    "purchasedChannels": [
+      "Travel agency",
+      "Mobile app"
+    ],
+    "personalBackground": "居住地：河內巴亭郡\n職業背景：國際公司的營銷經理，擁有豐富的市場推廣經驗\n旅遊習慣：每年出國旅遊3-4次， 喜愛歐美國家\n其他：喜歡參加國際展覽和商務會議",
+    "interviewHistory": [
+      {
+        "sectionId": "batch",
+        "questionId": "batch_1767921718053_Trần小姐_250928",
+        "question": "\"第一次買旅遊險的時候，你怎麼決定要買哪一個旅遊險方案的？請概述當時情境\n▪️參考資訊來源\n▪️購買管道選擇 ＆ 原因\n▪️目前共有多少次自行購買旅遊險的經驗（旅行社代買的情況不算）\"",
+        "answer": "觀察到當被問及第一次購買旅遊險的決策過程時，Trần 小姐表示當時對各種保險方案並不太關心，因此選擇了透過旅行社代為購買。受訪者提到主要是因為旅行社提供了簡單明瞭的選擇，讓她省下不少時間和精力。根據Trần 小姐的說法，她並沒有投入太多時間去研究或比較不同的保險方案，因為她過去的經驗從未真正需要使用保險理賠。值得注意的是，目前為止，Trần 小姐自行購買旅遊險的次數只有一次，其餘兩次都是通過旅行社的服務完成的。",
+        "timestamp": "2026-01-09T01:21:58.053Z",
+        "topicTag": "旅遊險意識啟蒙"
+      }
+    ],
+    "currentSectionIndex": 0,
+    "currentQuestionIndex": 0,
+    "isCompleted": false,
+    "createdAt": "2026-01-08T16:35:11.824062",
+    "updatedAt": "2026-01-09T01:21:58.053Z",
+    "version": "v1.0",
+    "source_summary": {
+      "dialogue": 0.4,
+      "questionnaire": 0.3,
+      "behavior": 0.2
+    },
+    "big5": {
+      "openness": 68,
+      "conscientiousness": 64,
+      "extraversion": 52,
+      "agreeableness": 48,
+      "neuroticism": 79
+    },
+    "schwartz_values": {
+      "Hedonism": 52,
+      "Benevolence": 50,
+      "Stimulation": 33,
+      "Achievement": 49,
+      "Universalism": 87
+    },
+    "moral_foundations": {
+      "Care": 68,
+      "Fairness": 55,
+      "Loyalty": 27,
+      "Authority": 26,
+      "Sanctity": 44
+    },
+    "risk_profile": {
+      "overall": 80,
+      "financial": 45,
+      "ethical": 70,
+      "confidence": 0.87
+    },
+    "hexaco": {
+      "honesty_humility": 55,
+      "emotionality": 70,
+      "extraversion": 55,
+      "agreeableness": 45,
+      "conscientiousness": 62,
+      "openness": 72
+    },
+    "disc": {
+      "dominance": 68,
+      "influence": 72,
+      "steadiness": 38,
+      "conscientiousness": 52
+    },
+    "mbti": {
+      "E_I": 15,
+      "S_N": 45,
+      "T_F": 25,
+      "J_P": 35
+    },
+    "enneagram": {
+      "primary_type": 3,
+      "wing": 4,
+      "instinct": "so"
+    },
+    "time_preference": {
+      "discount_rate": 55,
+      "planning_horizon": "long_term",
+      "present_vs_future": 40
+    },
+    "regulatory_focus": {
+      "promotion": 78,
+      "prevention": 58
+    },
+    "decision_style": {
+      "primary": "rational",
+      "secondary": "analytical",
+      "risk_seeking": 65,
+      "info_processing": "optimizer",
+      "social_preference": "independent"
+    },
+    "language_style": {
+      "formality": 72,
+      "directness": 78,
+      "emotion_expression": 45,
+      "verbosity": 52,
+      "questioning_style": 48
+    },
+    "emotion_profile": {
+      "baseline_valence": 58,
+      "emotional_range": 68,
+      "stress_response": "flight",
+      "recovery_speed": 65
+    },
+    "social_profile": {
+      "trust_default": 45,
+      "cooperation_tendency": 58,
+      "conformity": 42,
+      "independence": 72
+    },
+    "behavioral_indicators": {
+      "information_seeking": 72,
+      "comparison_behavior": 85,
+      "price_sensitivity": 65,
+      "brand_loyalty": 48
+    },
+    "meta": {
+      "base_model": "gpt-4o-mini",
+      "temperature": 0.7,
+      "prompt_version": "v2.2-full-ppv",
+      "schema_validation": "pass"
+    }
+  },
+  {
+    "id": "Lê先生_769725",
+    "lastName": "Lê",
+    "gender": "Male",
+    "age": 47,
+    "occupation": "Restaurant Owner",
+    "timesOfOverseasTravelInsurance": 0,
+    "purchasedBrand": [],
+    "purchasedChannels": [],
+    "personalBackground": "居住地：峴港市海洲郡\n職業背景：經營一家越南傳統餐廳，已有十多年經驗\n旅遊習慣：偶爾出國旅遊，多數是家庭旅行\n其他：對食物文化非常熱愛，經常參加廚藝比賽",
+    "interviewHistory": [
+      {
+        "sectionId": "batch",
+        "questionId": "batch_1767921730892_Lê先生_769725",
+        "question": "\"第一次買旅遊險的時候，你怎麼決定要買哪一個旅遊險方案的？請概述當時情境\n▪️參考資訊來源\n▪️購買管道選擇 ＆ 原因\n▪️目前共有多少次自行購買旅遊險的經驗（旅行社代買的情況不算）\"",
+        "answer": "觀察到Lê 先生在回答有關第一次購買旅遊險的問題時顯得有些猶豫，最終表示自己其實從未自行購買過旅遊險。受訪者提到，對於保險公司通常試圖避免賠償的印象，使他對購買旅遊險感到不太信任。Lê 先生認為，過去的壞服務經驗讓他對保險公司的信譽感到懷疑。提到參考資訊來源時，Lê 先生表示自己對相關資料並不熟悉，這也是他不主動購買旅遊險的原因之一。值得注意的是，Lê 先生目前沒有任何自行購買旅遊險的經驗，旅行時也未曾透過旅行社代購。",
+        "timestamp": "2026-01-09T01:22:10.892Z",
+        "topicTag": "旅遊險意識啟蒙"
+      }
+    ],
+    "currentSectionIndex": 0,
+    "currentQuestionIndex": 0,
+    "isCompleted": false,
+    "createdAt": "2026-01-08T16:35:11.824419",
+    "updatedAt": "2026-01-09T01:22:10.892Z",
+    "version": "v1.0",
+    "source_summary": {
+      "dialogue": 0.4,
+      "questionnaire": 0.4,
+      "behavior": 0.4
+    },
+    "big5": {
+      "openness": 63,
+      "conscientiousness": 40,
+      "extraversion": 58,
+      "agreeableness": 60,
+      "neuroticism": 62
+    },
+    "schwartz_values": {
+      "Hedonism": 53,
+      "Universalism": 81,
+      "Conformity": 30,
+      "Power": 45,
+      "Security": 64
+    },
+    "moral_foundations": {
+      "Care": 44,
+      "Fairness": 44,
+      "Loyalty": 39,
+      "Authority": 67,
+      "Sanctity": 19
+    },
+    "risk_profile": {
+      "overall": 57,
+      "financial": 95,
+      "ethical": 58,
+      "confidence": 0.52
+    },
+    "hexaco": {
+      "honesty_humility": 72,
+      "emotionality": 55,
+      "extraversion": 62,
+      "agreeableness": 58,
+      "conscientiousness": 42,
+      "openness": 65
+    },
+    "disc": {
+      "dominance": 35,
+      "influence": 58,
+      "steadiness": 72,
+      "conscientiousness": 45
+    },
+    "mbti": {
+      "E_I": 25,
+      "S_N": -55,
+      "T_F": 35,
+      "J_P": -45
+    },
+    "enneagram": {
+      "primary_type": 8,
+      "wing": 9,
+      "instinct": "sp"
+    },
+    "time_preference": {
+      "discount_rate": 72,
+      "planning_horizon": "short_term",
+      "present_vs_future": -25
+    },
+    "regulatory_focus": {
+      "promotion": 42,
+      "prevention": 78
+    },
+    "decision_style": {
+      "primary": "rational",
+      "secondary": "avoidant",
+      "risk_seeking": 28,
+      "info_processing": "satisficer",
+      "social_preference": "collaborative"
+    },
+    "language_style": {
+      "formality": 35,
+      "directness": 42,
+      "emotion_expression": 58,
+      "verbosity": 45,
+      "questioning_style": 32
+    },
+    "emotion_profile": {
+      "baseline_valence": 52,
+      "emotional_range": 48,
+      "stress_response": "fawn",
+      "recovery_speed": 42
+    },
+    "social_profile": {
+      "trust_default": 35,
+      "cooperation_tendency": 65,
+      "conformity": 72,
+      "independence": 38
+    },
+    "behavioral_indicators": {
+      "information_seeking": 28,
+      "comparison_behavior": 35,
+      "price_sensitivity": 85,
+      "brand_loyalty": 75
+    },
+    "meta": {
+      "base_model": "gpt-4o-mini",
+      "temperature": 0.7,
+      "prompt_version": "v2.2-full-ppv",
+      "schema_validation": "pass"
+    }
+  },
+  {
+    "id": "Phạm小姐_f4c9b5",
+    "lastName": "Phạm",
+    "gender": "Female",
+    "age": 29,
+    "occupation": "Freelance Graphic Designer",
+    "timesOfOverseasTravelInsurance": 2,
+    "purchasedBrand": [
+      "VBI"
+    ],
+    "purchasedChannels": [
+      "Third-party platform",
+      "Official website"
+    ],
+    "personalBackground": "居住地：胡志明市富潤郡\n職業背景：作為自由職業的平面設計師，擁有多樣化的設計作品\n旅遊習慣：喜歡每年到不同的國家旅行以尋找靈感\n其他：熱愛攝影，經常在旅途中拍攝自然景色",
+    "interviewHistory": [
+      {
+        "sectionId": "batch",
+        "questionId": "batch_1767921712909_Phạm小姐_f4c9b5",
+        "question": "\"第一次買旅遊險的時候，你怎麼決定要買哪一個旅遊險方案的？請概述當時情境\n▪️參考資訊來源\n▪️購買管道選擇 ＆ 原因\n▪️目前共有多少次自行購買旅遊險的經驗（旅行社代買的情況不算）\"",
+        "answer": "Phạm 小姐表示，第一次購買旅遊險時，主要參考了多個第三方網站上的資訊來比較不同的保險方案。她特別關注價格，因為她認為價格是選擇保險的重要因素。受訪者提到，那時候她選擇了在第三方平台上購買保險，因為平台上提供了多種選擇，且價格比官方網站更有競爭力。根據Phạm 小姐的說法，她目前總共自行購買了兩次旅遊險，都是透過線上平台完成的交易，並且對整個購買流程感到滿意。值得注意的是，她強調先前的購買經驗都非常順利，這讓她對未來的保險購買更加有信心。",
+        "timestamp": "2026-01-09T01:21:52.909Z",
+        "topicTag": "旅遊險意識啟蒙"
+      }
+    ],
+    "currentSectionIndex": 0,
+    "currentQuestionIndex": 0,
+    "isCompleted": false,
+    "createdAt": "2026-01-08T16:35:11.824714",
+    "updatedAt": "2026-01-09T01:21:52.909Z",
+    "version": "v1.0",
+    "source_summary": {
+      "dialogue": 0.3,
+      "questionnaire": 0.5,
+      "behavior": 0.1
+    },
+    "big5": {
+      "openness": 74,
+      "conscientiousness": 40,
+      "extraversion": 55,
+      "agreeableness": 67,
+      "neuroticism": 23
+    },
+    "schwartz_values": {
+      "Tradition": 86,
+      "Self-Direction": 78,
+      "Stimulation": 60,
+      "Security": 73,
+      "Conformity": 67
+    },
+    "moral_foundations": {
+      "Care": 74,
+      "Fairness": 35,
+      "Loyalty": 53,
+      "Authority": 34,
+      "Sanctity": 57
+    },
+    "risk_profile": {
+      "overall": 27,
+      "financial": 31,
+      "ethical": 29,
+      "confidence": 0.92
+    },
+    "hexaco": {
+      "honesty_humility": 62,
+      "emotionality": 28,
+      "extraversion": 58,
+      "agreeableness": 65,
+      "conscientiousness": 38,
+      "openness": 82
+    },
+    "disc": {
+      "dominance": 28,
+      "influence": 65,
+      "steadiness": 45,
+      "conscientiousness": 35
+    },
+    "mbti": {
+      "E_I": 20,
+      "S_N": 72,
+      "T_F": 55,
+      "J_P": -65
+    },
+    "enneagram": {
+      "primary_type": 4,
+      "wing": 5,
+      "instinct": "sx"
+    },
+    "time_preference": {
+      "discount_rate": 62,
+      "planning_horizon": "medium_term",
+      "present_vs_future": 10
+    },
+    "regulatory_focus": {
+      "promotion": 72,
+      "prevention": 32
+    },
+    "decision_style": {
+      "primary": "intuitive",
+      "secondary": "spontaneous",
+      "risk_seeking": 55,
+      "info_processing": "satisficer",
+      "social_preference": "independent"
+    },
+    "language_style": {
+      "formality": 28,
+      "directness": 62,
+      "emotion_expression": 78,
+      "verbosity": 72,
+      "questioning_style": 58
+    },
+    "emotion_profile": {
+      "baseline_valence": 72,
+      "emotional_range": 82,
+      "stress_response": "fight",
+      "recovery_speed": 78
+    },
+    "social_profile": {
+      "trust_default": 68,
+      "cooperation_tendency": 52,
+      "conformity": 28,
+      "independence": 82
+    },
+    "behavioral_indicators": {
+      "information_seeking": 55,
+      "comparison_behavior": 48,
+      "price_sensitivity": 78,
+      "brand_loyalty": 22
+    },
+    "meta": {
+      "base_model": "gpt-4o-mini",
+      "temperature": 0.7,
+      "prompt_version": "v2.2-full-ppv",
+      "schema_validation": "pass"
+    }
+  },
+  {
+    "id": "Hoàng先生_8d0a19",
+    "lastName": "Hoàng",
+    "gender": "Male",
+    "age": 52,
+    "occupation": "University Professor",
+    "timesOfOverseasTravelInsurance": 4,
+    "purchasedBrand": [
+      "Prudential",
+      "Cathay"
+    ],
+    "purchasedChannels": [
+      "Bank/Credit card",
+      "Travel agency"
+    ],
+    "personalBackground": "居住地：芽莊\n職業背景：大學教授，專注於經濟學研究和教學\n旅遊習慣：經常出國參加學術會議和學術交流\n其他：已婚，有兩個小孩，家庭生活幸福",
+    "interviewHistory": [
+      {
+        "sectionId": "batch",
+        "questionId": "batch_1767921723934_Hoàng先生_8d0a19",
+        "question": "\"第一次買旅遊險的時候，你怎麼決定要買哪一個旅遊險方案的？請概述當時情境\n▪️參考資訊來源\n▪️購買管道選擇 ＆ 原因\n▪️目前共有多少次自行購買旅遊險的經驗（旅行社代買的情況不算）\"",
+        "answer": "Hoàng 先生表示，第一次購買旅遊險時，他主要是透過網上搜尋以及與朋友的交流來蒐集資訊。受訪者提到，他特別注重價格因素，因此選擇了價格相對便宜的方案。至於購買管道，他選擇通過銀行進行購買，因為覺得這樣比較方便而且銀行給予了一些折扣優惠。值得注意的是，Hoàng 先生提到，他總共自行購買了兩次旅遊險，其餘的則是透過旅行社代為購買的。在描述這些經驗時，他一直強調保險曾經在一次旅遊中幫助他大幅度節省了開支，這使他對旅遊險抱有一定的信任。",
+        "timestamp": "2026-01-09T01:22:03.934Z",
+        "topicTag": "旅遊險意識啟蒙"
+      }
+    ],
+    "currentSectionIndex": 0,
+    "currentQuestionIndex": 0,
+    "isCompleted": false,
+    "createdAt": "2026-01-08T16:35:11.825020",
+    "updatedAt": "2026-01-09T01:22:03.934Z",
+    "version": "v1.0",
+    "source_summary": {
+      "dialogue": 0.3,
+      "questionnaire": 0.5,
+      "behavior": 0.2
+    },
+    "big5": {
+      "openness": 24,
+      "conscientiousness": 38,
+      "extraversion": 11,
+      "agreeableness": 50,
+      "neuroticism": 53
+    },
+    "schwartz_values": {
+      "Tradition": 89,
+      "Achievement": 74,
+      "Benevolence": 76,
+      "Self-Direction": 33,
+      "Stimulation": 30
+    },
+    "moral_foundations": {
+      "Care": 48,
+      "Fairness": 56,
+      "Loyalty": 63,
+      "Authority": 10,
+      "Sanctity": 57
+    },
+    "risk_profile": {
+      "overall": 12,
+      "financial": 17,
+      "ethical": 77,
+      "confidence": 0.65
+    },
+    "hexaco": {
+      "honesty_humility": 85,
+      "emotionality": 48,
+      "extraversion": 15,
+      "agreeableness": 52,
+      "conscientiousness": 35,
+      "openness": 28
+    },
+    "disc": {
+      "dominance": 22,
+      "influence": 18,
+      "steadiness": 82,
+      "conscientiousness": 88
+    },
+    "mbti": {
+      "E_I": -70,
+      "S_N": -45,
+      "T_F": -65,
+      "J_P": 80
+    },
+    "enneagram": {
+      "primary_type": 5,
+      "wing": 6,
+      "instinct": "sp"
+    },
+    "time_preference": {
+      "discount_rate": 18,
+      "planning_horizon": "long_term",
+      "present_vs_future": 75
+    },
+    "regulatory_focus": {
+      "promotion": 25,
+      "prevention": 88
+    },
+    "decision_style": {
+      "primary": "analytical",
+      "secondary": "dependent",
+      "risk_seeking": 12,
+      "info_processing": "optimizer",
+      "social_preference": "independent"
+    },
+    "language_style": {
+      "formality": 88,
+      "directness": 32,
+      "emotion_expression": 22,
+      "verbosity": 28,
+      "questioning_style": 82
+    },
+    "emotion_profile": {
+      "baseline_valence": 48,
+      "emotional_range": 32,
+      "stress_response": "freeze",
+      "recovery_speed": 35
+    },
+    "social_profile": {
+      "trust_default": 28,
+      "cooperation_tendency": 45,
+      "conformity": 78,
+      "independence": 55
+    },
+    "behavioral_indicators": {
+      "information_seeking": 92,
+      "comparison_behavior": 88,
+      "price_sensitivity": 45,
+      "brand_loyalty": 82
+    },
+    "meta": {
+      "base_model": "gpt-4o-mini",
+      "temperature": 0.7,
+      "prompt_version": "v2.2-full-ppv",
+      "schema_validation": "pass"
+    }
+  },
+  {
+    "id": "Bùi小姐_1db7db",
+    "lastName": "Bùi",
+    "gender": "Female",
+    "age": 40,
+    "occupation": "Retail Store Manager",
+    "timesOfOverseasTravelInsurance": 0,
+    "purchasedBrand": [],
+    "purchasedChannels": [],
+    "personalBackground": "居住地：河內棟多郡\n職業背景：零售店經理，負責店舖的日常運營和管理\n旅遊習慣：喜歡在國內旅遊，對國外旅行興趣不大\n其他：享受烹飪和閱讀",
+    "interviewHistory": [
+      {
+        "sectionId": "batch",
+        "questionId": "batch_1767921736578_Bùi小姐_1db7db",
+        "question": "\"第一次買旅遊險的時候，你怎麼決定要買哪一個旅遊險方案的？請概述當時情境\n▪️參考資訊來源\n▪️購買管道選擇 ＆ 原因\n▪️目前共有多少次自行購買旅遊險的經驗（旅行社代買的情況不算）\"",
+        "answer": "觀察到Bùi 小姐在回應時顯得有些困惑，因為她從來沒有自行購買過旅遊保險。受訪者提到她對於旅遊險的資訊來源不多，因此在決策時感到比較困難。Bùi 小姐表示，她並沒有使用任何特定的購買管道，因為過去她對保險並不太重視。根據Bùi 小姐的說法，她從未自行購買旅遊險，也未曾透過旅行社代買。值得注意的是，Bùi 小姐對於如何選擇合適的保險方案感到焦慮，尤其擔心保險涵蓋範圍不足。",
+        "timestamp": "2026-01-09T01:22:16.579Z",
+        "topicTag": "旅遊險意識啟蒙"
+      }
+    ],
+    "currentSectionIndex": 0,
+    "currentQuestionIndex": 0,
+    "isCompleted": false,
+    "createdAt": "2026-01-08T16:35:11.825340",
+    "updatedAt": "2026-01-09T01:22:16.579Z",
+    "version": "v1.0",
+    "source_summary": {
+      "dialogue": 0.5,
+      "questionnaire": 0.5,
+      "behavior": 0.3
+    },
+    "big5": {
+      "openness": 43,
+      "conscientiousness": 32,
+      "extraversion": 56,
+      "agreeableness": 56,
+      "neuroticism": 54
+    },
+    "schwartz_values": {
+      "Benevolence": 70,
+      "Hedonism": 39,
+      "Tradition": 53,
+      "Self-Direction": 90,
+      "Stimulation": 73
+    },
+    "moral_foundations": {
+      "Care": 90,
+      "Fairness": 51,
+      "Loyalty": 38,
+      "Authority": 22,
+      "Sanctity": 12
+    },
+    "risk_profile": {
+      "overall": 66,
+      "financial": 70,
+      "ethical": 40,
+      "confidence": 0.61
+    },
+    "hexaco": {
+      "honesty_humility": 68,
+      "emotionality": 52,
+      "extraversion": 58,
+      "agreeableness": 55,
+      "conscientiousness": 32,
+      "openness": 45
+    },
+    "disc": {
+      "dominance": 38,
+      "influence": 55,
+      "steadiness": 68,
+      "conscientiousness": 42
+    },
+    "mbti": {
+      "E_I": 22,
+      "S_N": -25,
+      "T_F": 42,
+      "J_P": -15
+    },
+    "enneagram": {
+      "primary_type": 9,
+      "wing": 8,
+      "instinct": "so"
+    },
+    "time_preference": {
+      "discount_rate": 58,
+      "planning_horizon": "short_term",
+      "present_vs_future": -15
+    },
+    "regulatory_focus": {
+      "promotion": 48,
+      "prevention": 62
+    },
+    "decision_style": {
+      "primary": "rational",
+      "secondary": "dependent",
+      "risk_seeking": 48,
+      "info_processing": "satisficer",
+      "social_preference": "collaborative"
+    },
+    "language_style": {
+      "formality": 52,
+      "directness": 48,
+      "emotion_expression": 62,
+      "verbosity": 55,
+      "questioning_style": 42
+    },
+    "emotion_profile": {
+      "baseline_valence": 65,
+      "emotional_range": 52,
+      "stress_response": "fawn",
+      "recovery_speed": 58
+    },
+    "social_profile": {
+      "trust_default": 62,
+      "cooperation_tendency": 72,
+      "conformity": 65,
+      "independence": 42
+    },
+    "behavioral_indicators": {
+      "information_seeking": 42,
+      "comparison_behavior": 55,
+      "price_sensitivity": 68,
+      "brand_loyalty": 58
+    },
+    "meta": {
+      "base_model": "gpt-4o-mini",
+      "temperature": 0.7,
+      "prompt_version": "v2.2-full-ppv",
+      "schema_validation": "pass"
+    }
+  },
+  {
+    "id": "Đỗ先生_54eb76",
+    "lastName": "Đỗ",
+    "gender": "Male",
+    "age": 33,
+    "occupation": "Architect",
+    "timesOfOverseasTravelInsurance": 1,
+    "purchasedBrand": [
+      "Bao Viet"
+    ],
+    "purchasedChannels": [
+      "Official website"
+    ],
+    "personalBackground": "居住地：胡志明市平盛郡\n職業背景：建築師，參與多個商業和住宅項目\n旅遊習慣：每年計劃一次長途旅行，以放鬆和探索建築文化為目的\n其他：喜愛畫畫和藝術，常參加藝術展覽",
+    "interviewHistory": [
+      {
+        "sectionId": "batch",
+        "questionId": "batch_1767921742818_Đỗ先生_54eb76",
+        "question": "\"第一次買旅遊險的時候，你怎麼決定要買哪一個旅遊險方案的？請概述當時情境\n▪️參考資訊來源\n▪️購買管道選擇 ＆ 原因\n▪️目前共有多少次自行購買旅遊險的經驗（旅行社代買的情況不算）\"",
+        "answer": "Đỗ 先生表示，在第一次購買旅遊險時，他選擇了一個方案主要是因為家人的建議，而不是基於個人的研究。受訪者提到，他參考的資訊來源有限，主要依賴於身邊人的經驗，並沒有特別去查閱其他資料。購買管道選擇了 Bao Viet 的官方網站，因為覺得這樣比較直接和方便。Đỗ 先生透露，目前僅有一次自行購買旅遊險的經驗，並且對於旅遊險的細節並不特別關心。他還提到，過去曾遇到過不好的客戶服務經歷，這讓他對旅遊險的印象不是很好。",
+        "timestamp": "2026-01-09T01:22:22.818Z",
+        "topicTag": "旅遊險意識啟蒙"
+      }
+    ],
+    "currentSectionIndex": 0,
+    "currentQuestionIndex": 0,
+    "isCompleted": false,
+    "createdAt": "2026-01-08T16:35:11.825807",
+    "updatedAt": "2026-01-09T01:22:22.818Z",
+    "version": "v1.0",
+    "source_summary": {
+      "dialogue": 0.5,
+      "questionnaire": 0.5,
+      "behavior": 0.2
+    },
+    "big5": {
+      "openness": 75,
+      "conscientiousness": 61,
+      "extraversion": 84,
+      "agreeableness": 40,
+      "neuroticism": 77
+    },
+    "schwartz_values": {
+      "Benevolence": 76,
+      "Stimulation": 56,
+      "Achievement": 58,
+      "Self-Direction": 68,
+      "Security": 48
+    },
+    "moral_foundations": {
+      "Care": 39,
+      "Fairness": 61,
+      "Loyalty": 26,
+      "Authority": 22,
+      "Sanctity": 54
+    },
+    "risk_profile": {
+      "overall": 60,
+      "financial": 94,
+      "ethical": 47,
+      "confidence": 0.61
+    },
+    "hexaco": {
+      "honesty_humility": 58,
+      "emotionality": 72,
+      "extraversion": 82,
+      "agreeableness": 42,
+      "conscientiousness": 58,
+      "openness": 78
+    },
+    "disc": {
+      "dominance": 72,
+      "influence": 68,
+      "steadiness": 28,
+      "conscientiousness": 55
+    },
+    "mbti": {
+      "E_I": 68,
+      "S_N": 55,
+      "T_F": 28,
+      "J_P": -35
+    },
+    "enneagram": {
+      "primary_type": 7,
+      "wing": 6,
+      "instinct": "sx"
+    },
+    "time_preference": {
+      "discount_rate": 78,
+      "planning_horizon": "short_term",
+      "present_vs_future": -45
+    },
+    "regulatory_focus": {
+      "promotion": 82,
+      "prevention": 28
+    },
+    "decision_style": {
+      "primary": "rational",
+      "secondary": "spontaneous",
+      "risk_seeking": 72,
+      "info_processing": "satisficer",
+      "social_preference": "independent"
+    },
+    "language_style": {
+      "formality": 38,
+      "directness": 75,
+      "emotion_expression": 68,
+      "verbosity": 78,
+      "questioning_style": 55
+    },
+    "emotion_profile": {
+      "baseline_valence": 78,
+      "emotional_range": 72,
+      "stress_response": "fight",
+      "recovery_speed": 82
+    },
+    "social_profile": {
+      "trust_default": 58,
+      "cooperation_tendency": 48,
+      "conformity": 32,
+      "independence": 78
+    },
+    "behavioral_indicators": {
+      "information_seeking": 48,
+      "comparison_behavior": 42,
+      "price_sensitivity": 55,
+      "brand_loyalty": 28
+    },
+    "meta": {
+      "base_model": "gpt-4o-mini",
+      "temperature": 0.7,
+      "prompt_version": "v2.2-full-ppv",
+      "schema_validation": "pass"
+    }
+  },
+  {
+    "id": "Ngô小姐_dbe3a7",
+    "lastName": "Ngô",
+    "gender": "Female",
+    "age": 24,
+    "occupation": "Tour Guide",
+    "timesOfOverseasTravelInsurance": 0,
+    "purchasedBrand": [],
+    "purchasedChannels": [],
+    "personalBackground": "居住地：峴港市清源郡\n職業背景：旅遊導遊，專注於本地和國際旅遊團\n旅遊習慣：因工作常常帶團出國，個人則喜愛短途旅行\n其他：擁有良好的語言能力，能交流多國語言",
+    "interviewHistory": [
+      {
+        "sectionId": "batch",
+        "questionId": "batch_1767921754467_Ngô小姐_dbe3a7",
+        "question": "\"第一次買旅遊險的時候，你怎麼決定要買哪一個旅遊險方案的？請概述當時情境\n▪️參考資訊來源\n▪️購買管道選擇 ＆ 原因\n▪️目前共有多少次自行購買旅遊險的經驗（旅行社代買的情況不算）\"",
+        "answer": "受訪者提到，由於自己從未自行購買過旅遊險，因此無法分享第一次購買的經驗。Ngô 小姐表示，因為她過去曾有過不好的客戶服務經驗，所以在考慮購買旅遊險時會更加謹慎。Ngô 小姐提到，如果有計劃購買，她會先進行大量的研究，包括查看不同保險方案的比較，以確保自己能選擇到最合適的方案。當被問到購買管道的選擇時，Ngô 小姐表示可能會傾向於選擇線上購買，因為這樣可以方便查看各種方案的細節和條款。值得注意的是，雖然Ngô 小姐經常帶團出國，但她個人喜好短途旅行，因此對於旅遊險的需求尚不明確。",
+        "timestamp": "2026-01-09T01:22:34.467Z",
+        "topicTag": "旅遊險意識啟蒙"
+      }
+    ],
+    "currentSectionIndex": 0,
+    "currentQuestionIndex": 0,
+    "isCompleted": false,
+    "createdAt": "2026-01-08T16:35:11.826482",
+    "updatedAt": "2026-01-09T01:22:34.467Z",
+    "version": "v1.0",
+    "source_summary": {
+      "dialogue": 0.4,
+      "questionnaire": 0.3,
+      "behavior": 0.1
+    },
+    "big5": {
+      "openness": 30,
+      "conscientiousness": 27,
+      "extraversion": 51,
+      "agreeableness": 36,
+      "neuroticism": 21
+    },
+    "schwartz_values": {
+      "Conformity": 44,
+      "Tradition": 74,
+      "Universalism": 88,
+      "Self-Direction": 35,
+      "Benevolence": 51
+    },
+    "moral_foundations": {
+      "Care": 21,
+      "Fairness": 60,
+      "Loyalty": 51,
+      "Authority": 34,
+      "Sanctity": 66
+    },
+    "risk_profile": {
+      "overall": 10,
+      "financial": 10,
+      "ethical": 42,
+      "confidence": 0.7
+    },
+    "hexaco": {
+      "honesty_humility": 48,
+      "emotionality": 25,
+      "extraversion": 52,
+      "agreeableness": 38,
+      "conscientiousness": 28,
+      "openness": 32
+    },
+    "disc": {
+      "dominance": 25,
+      "influence": 45,
+      "steadiness": 55,
+      "conscientiousness": 32
+    },
+    "mbti": {
+      "E_I": 18,
+      "S_N": -62,
+      "T_F": -45,
+      "J_P": 25
+    },
+    "enneagram": {
+      "primary_type": 5,
+      "wing": 4,
+      "instinct": "so"
+    },
+    "time_preference": {
+      "discount_rate": 42,
+      "planning_horizon": "medium_term",
+      "present_vs_future": 28
+    },
+    "regulatory_focus": {
+      "promotion": 35,
+      "prevention": 72
+    },
+    "decision_style": {
+      "primary": "analytical",
+      "secondary": "avoidant",
+      "risk_seeking": 18,
+      "info_processing": "maximizer",
+      "social_preference": "independent"
+    },
+    "language_style": {
+      "formality": 62,
+      "directness": 38,
+      "emotion_expression": 28,
+      "verbosity": 35,
+      "questioning_style": 75
+    },
+    "emotion_profile": {
+      "baseline_valence": 45,
+      "emotional_range": 28,
+      "stress_response": "freeze",
+      "recovery_speed": 45
+    },
+    "social_profile": {
+      "trust_default": 32,
+      "cooperation_tendency": 42,
+      "conformity": 52,
+      "independence": 65
+    },
+    "behavioral_indicators": {
+      "information_seeking": 88,
+      "comparison_behavior": 82,
+      "price_sensitivity": 72,
+      "brand_loyalty": 45
+    },
+    "meta": {
+      "base_model": "gpt-4o-mini",
+      "temperature": 0.7,
+      "prompt_version": "v2.2-full-ppv",
+      "schema_validation": "pass"
+    }
+  },
+  {
+    "id": "Phan先生_efde2e",
+    "lastName": "Phan",
+    "gender": "Male",
+    "age": 31,
+    "occupation": "Financial Analyst",
+    "timesOfOverseasTravelInsurance": 2,
+    "purchasedBrand": [
+      "PVI"
+    ],
+    "purchasedChannels": [
+      "Bank/Credit card",
+      "Mobile app"
+    ],
+    "personalBackground": "居住地：河內青池郡\n職業背景：金融分析師，在銀行工作\n旅遊習慣：多數出國旅遊是為了參加金融培訓和會議\n其他：喜歡理財和投資，追求新知識",
+    "interviewHistory": [
+      {
+        "sectionId": "batch",
+        "questionId": "batch_1767921763232_Phan先生_efde2e",
+        "question": "\"第一次買旅遊險的時候，你怎麼決定要買哪一個旅遊險方案的？請概述當時情境\n▪️參考資訊來源\n▪️購買管道選擇 ＆ 原因\n▪️目前共有多少次自行購買旅遊險的經驗（旅行社代買的情況不算）\"",
+        "answer": "Phan 先生表示，第一次購買旅遊險時，他主要參考了銀行提供的資訊，因為當時正通過該銀行準備出國參加金融會議。受訪者提到，他選擇通過銀行的管道購買旅遊險的原因是方便，並且他信任該銀行提供的產品。根據Phan 先生的說法，他目前共有兩次自行購買旅遊險的經驗，都是通過銀行或手機應用程式進行的購買，而這些購買主要是針對較高風險的出國旅遊。他強調過去曾有一次保險理賠成功的經驗，讓他感到保險的價值所在。觀察到Phan 先生在描述這些經歷時，語氣顯得非常實際和理性。",
+        "timestamp": "2026-01-09T01:22:43.232Z",
+        "topicTag": "旅遊險意識啟蒙"
+      }
+    ],
+    "currentSectionIndex": 0,
+    "currentQuestionIndex": 0,
+    "isCompleted": false,
+    "createdAt": "2026-01-08T16:35:11.828301",
+    "updatedAt": "2026-01-09T01:22:43.232Z",
+    "version": "v1.0",
+    "source_summary": {
+      "dialogue": 0.2,
+      "questionnaire": 0.3,
+      "behavior": 0.3
+    },
+    "big5": {
+      "openness": 84,
+      "conscientiousness": 61,
+      "extraversion": 24,
+      "agreeableness": 84,
+      "neuroticism": 57
+    },
+    "schwartz_values": {
+      "Security": 52,
+      "Achievement": 51,
+      "Benevolence": 55,
+      "Universalism": 34,
+      "Self-Direction": 63
+    },
+    "moral_foundations": {
+      "Care": 43,
+      "Fairness": 80,
+      "Loyalty": 19,
+      "Authority": 56,
+      "Sanctity": 17
+    },
+    "risk_profile": {
+      "overall": 40,
+      "financial": 43,
+      "ethical": 66,
+      "confidence": 0.74
+    },
+    "hexaco": {
+      "honesty_humility": 72,
+      "emotionality": 42,
+      "extraversion": 28,
+      "agreeableness": 82,
+      "conscientiousness": 62,
+      "openness": 85
+    },
+    "disc": {
+      "dominance": 32,
+      "influence": 28,
+      "steadiness": 48,
+      "conscientiousness": 68
+    },
+    "mbti": {
+      "E_I": -42,
+      "S_N": 58,
+      "T_F": 72,
+      "J_P": 15
+    },
+    "enneagram": {
+      "primary_type": 4,
+      "wing": 3,
+      "instinct": "sp"
+    },
+    "time_preference": {
+      "discount_rate": 38,
+      "planning_horizon": "long_term",
+      "present_vs_future": 55
+    },
+    "regulatory_focus": {
+      "promotion": 68,
+      "prevention": 48
+    },
+    "decision_style": {
+      "primary": "intuitive",
+      "secondary": "analytical",
+      "risk_seeking": 42,
+      "info_processing": "maximizer",
+      "social_preference": "collaborative"
+    },
+    "language_style": {
+      "formality": 58,
+      "directness": 42,
+      "emotion_expression": 52,
+      "verbosity": 48,
+      "questioning_style": 62
+    },
+    "emotion_profile": {
+      "baseline_valence": 55,
+      "emotional_range": 58,
+      "stress_response": "flight",
+      "recovery_speed": 52
+    },
+    "social_profile": {
+      "trust_default": 58,
+      "cooperation_tendency": 68,
+      "conformity": 48,
+      "independence": 58
+    },
+    "behavioral_indicators": {
+      "information_seeking": 72,
+      "comparison_behavior": 68,
+      "price_sensitivity": 52,
+      "brand_loyalty": 62
+    },
+    "meta": {
+      "base_model": "gpt-4o-mini",
+      "temperature": 0.7,
+      "prompt_version": "v2.2-full-ppv",
+      "schema_validation": "pass"
+    }
+  },
+  {
+    "id": "Vũ小姐_242e62",
+    "lastName": "Vũ",
+    "gender": "Female",
+    "age": 38,
+    "occupation": "Civil Engineer",
+    "timesOfOverseasTravelInsurance": 5,
+    "purchasedBrand": [
+      "AIA",
+      "Liberty"
+    ],
+    "purchasedChannels": [
+      "Official website",
+      "Travel agency"
+    ],
+    "personalBackground": "居住地：胡志明市新平郡\n職業背景：土木工程師，參與大型公共基礎設施項目\n旅遊習慣：熱愛冒險旅遊，經常參加極限運動旅行團\n其他：熱心於環境和可持續發展相關議題",
+    "interviewHistory": [
+      {
+        "sectionId": "batch",
+        "questionId": "batch_1767921747340_Vũ小姐_242e62",
+        "question": "\"第一次買旅遊險的時候，你怎麼決定要買哪一個旅遊險方案的？請概述當時情境\n▪️參考資訊來源\n▪️購買管道選擇 ＆ 原因\n▪️目前共有多少次自行購買旅遊險的經驗（旅行社代買的情況不算）\"",
+        "answer": "Vũ 小姐表示，第一次購買旅遊險時，她考慮了多種因素來決定合適的方案。受訪者提到，她主要參考了網上的評論和專業評價，以確保選擇的保險方案能夠提供優質的服務和合理的保障。根據Vũ 小姐的說法，她選擇了通過官方網站自行購買，因為這樣可以詳細閱讀條款並比較不同方案的細節。值得注意的是，Vũ 小姐強調她至今已自行購買旅遊險三次，其餘兩次則是由旅行社代為購買。她對於自行購買過程的透明度和便利性表示滿意。",
+        "timestamp": "2026-01-09T01:22:27.340Z",
+        "topicTag": "旅遊險意識啟蒙"
+      }
+    ],
+    "currentSectionIndex": 0,
+    "currentQuestionIndex": 0,
+    "isCompleted": false,
+    "createdAt": "2026-01-08T16:35:11.828833",
+    "updatedAt": "2026-01-09T01:22:27.340Z",
+    "version": "v1.0",
+    "source_summary": {
+      "dialogue": 0.3,
+      "questionnaire": 0.4,
+      "behavior": 0.4
+    },
+    "big5": {
+      "openness": 28,
+      "conscientiousness": 38,
+      "extraversion": 46,
+      "agreeableness": 63,
+      "neuroticism": 85
+    },
+    "schwartz_values": {
+      "Achievement": 69,
+      "Hedonism": 40,
+      "Power": 44,
+      "Stimulation": 32,
+      "Tradition": 55
+    },
+    "moral_foundations": {
+      "Care": 53,
+      "Fairness": 58,
+      "Loyalty": 26,
+      "Authority": 36,
+      "Sanctity": 21
+    },
+    "risk_profile": {
+      "overall": 56,
+      "financial": 35,
+      "ethical": 52,
+      "confidence": 0.8
+    },
+    "hexaco": {
+      "honesty_humility": 52,
+      "emotionality": 82,
+      "extraversion": 48,
+      "agreeableness": 62,
+      "conscientiousness": 42,
+      "openness": 32
+    },
+    "disc": {
+      "dominance": 58,
+      "influence": 42,
+      "steadiness": 62,
+      "conscientiousness": 38
+    },
+    "mbti": {
+      "E_I": 8,
+      "S_N": -38,
+      "T_F": 18,
+      "J_P": -55
+    },
+    "enneagram": {
+      "primary_type": 2,
+      "wing": 1,
+      "instinct": "sx"
+    },
+    "time_preference": {
+      "discount_rate": 68,
+      "planning_horizon": "short_term",
+      "present_vs_future": -35
+    },
+    "regulatory_focus": {
+      "promotion": 58,
+      "prevention": 55
+    },
+    "decision_style": {
+      "primary": "intuitive",
+      "secondary": "dependent",
+      "risk_seeking": 58,
+      "info_processing": "satisficer",
+      "social_preference": "collaborative"
+    },
+    "language_style": {
+      "formality": 42,
+      "directness": 55,
+      "emotion_expression": 82,
+      "verbosity": 65,
+      "questioning_style": 38
+    },
+    "emotion_profile": {
+      "baseline_valence": 68,
+      "emotional_range": 78,
+      "stress_response": "fawn",
+      "recovery_speed": 68
+    },
+    "social_profile": {
+      "trust_default": 78,
+      "cooperation_tendency": 82,
+      "conformity": 55,
+      "independence": 35
+    },
+    "behavioral_indicators": {
+      "information_seeking": 35,
+      "comparison_behavior": 28,
+      "price_sensitivity": 42,
+      "brand_loyalty": 78
+    },
+    "meta": {
+      "base_model": "gpt-4o-mini",
+      "temperature": 0.7,
+      "prompt_version": "v2.2-full-ppv",
+      "schema_validation": "pass"
+    }
+  },
+  {
+    "id": "Nguyễn小姐_714c23",
+    "lastName": "Nguyễn",
+    "gender": "Female",
+    "age": 21,
+    "occupation": "學生",
+    "timesOfOverseasTravelInsurance": 0,
+    "purchasedBrand": [],
+    "purchasedChannels": [],
+    "personalBackground": "居住地：胡志明市\n職業背景：大學生，主修金融管理\n旅遊習慣：因為學業關係，目前尚未出國旅遊\n其他：參加學校的英語競賽及活動，對未來出國留學感興趣",
+    "interviewHistory": [],
+    "currentSectionIndex": 0,
+    "currentQuestionIndex": 0,
+    "isCompleted": false,
+    "createdAt": "2026-01-09T11:28:27.042596",
+    "updatedAt": "2026-01-09T11:28:27.042610",
+    "version": "v1.0",
+    "source_summary": {
+      "dialogue": 0.3,
+      "questionnaire": 0.4,
+      "behavior": 0.3
+    },
+    "big5": {
+      "openness": 72,
+      "conscientiousness": 78,
+      "extraversion": 45,
+      "agreeableness": 71,
+      "neuroticism": 55
+    },
+    "hexaco": {
+      "honesty_humility": 75,
+      "emotionality": 62,
+      "extraversion": 48,
+      "agreeableness": 68,
+      "conscientiousness": 80,
+      "openness": 70
+    },
+    "disc": {
+      "dominance": 35,
+      "influence": 42,
+      "steadiness": 70,
+      "conscientiousness": 78
+    },
+    "mbti": {
+      "E_I": -25,
+      "S_N": 30,
+      "T_F": 15,
+      "J_P": 40
+    },
+    "enneagram": {
+      "primary_type": 6,
+      "wing": 5,
+      "instinct": "sp"
+    },
+    "schwartz_values": {
+      "Conformity": 65,
+      "Tradition": 55,
+      "Benevolence": 70,
+      "Universalism": 62,
+      "Self-Direction": 58
+    },
+    "moral_foundations": {
+      "Care": 72,
+      "Fairness": 68,
+      "Loyalty": 60,
+      "Authority": 55,
+      "Sanctity": 48
+    },
+    "risk_profile": {
+      "overall": 28,
+      "financial": 22,
+      "ethical": 35,
+      "social": 40,
+      "health": 25,
+      "confidence": 0.75
+    },
+    "time_preference": {
+      "discount_rate": 35,
+      "planning_horizon": "long_term",
+      "present_vs_future": 45
+    },
+    "regulatory_focus": {
+      "promotion": 55,
+      "prevention": 72
+    },
+    "decision_style": {
+      "primary": "analytical",
+      "secondary": "dependent",
+      "risk_seeking": 25,
+      "info_processing": "maximizer",
+      "social_preference": "collaborative"
+    },
+    "language_style": {
+      "formality": 70,
+      "directness": 45,
+      "emotion_expression": 50,
+      "verbosity": 55,
+      "questioning_style": 65
+    },
+    "emotion_profile": {
+      "baseline_valence": 60,
+      "emotional_range": 45,
+      "stress_response": "freeze",
+      "recovery_speed": 55
+    },
+    "social_profile": {
+      "trust_default": 55,
+      "cooperation_tendency": 72,
+      "conformity": 65,
+      "independence": 45
+    },
+    "behavioral_indicators": {
+      "information_seeking": 80,
+      "comparison_behavior": 75,
+      "price_sensitivity": 70,
+      "brand_loyalty": 40
+    },
+    "meta": {
+      "base_model": "gpt-4o-mini",
+      "temperature": 0.7,
+      "prompt_version": "v2.2-full-ppv",
+      "schema_validation": "pass"
+    }
+  },
+  {
+    "id": "Trần先生_b92ac6",
+    "lastName": "Trần",
+    "gender": "Male",
+    "age": 23,
+    "occupation": "學生",
+    "timesOfOverseasTravelInsurance": 1,
+    "purchasedBrand": [
+      "PVI"
+    ],
+    "purchasedChannels": [
+      "手機App"
+    ],
+    "personalBackground": "居住地：河內市\n職業背景：在河內大學攻讀資訊科技專業\n旅遊習慣：每年和家人一起出國旅行一次，偏好訪問歷史名勝\n其他：曾經去過泰國和馬來西亞，對科技產品非常感興趣",
+    "interviewHistory": [],
+    "currentSectionIndex": 0,
+    "currentQuestionIndex": 0,
+    "isCompleted": false,
+    "createdAt": "2026-01-09T11:28:27.044529",
+    "updatedAt": "2026-01-09T11:28:27.044535",
+    "version": "v1.0",
+    "source_summary": {
+      "dialogue": 0.4,
+      "questionnaire": 0.3,
+      "behavior": 0.3
+    },
+    "big5": {
+      "openness": 85,
+      "conscientiousness": 52,
+      "extraversion": 68,
+      "agreeableness": 55,
+      "neuroticism": 38
+    },
+    "hexaco": {
+      "honesty_humility": 58,
+      "emotionality": 35,
+      "extraversion": 72,
+      "agreeableness": 52,
+      "conscientiousness": 55,
+      "openness": 88
+    },
+    "disc": {
+      "dominance": 60,
+      "influence": 72,
+      "steadiness": 35,
+      "conscientiousness": 48
+    },
+    "mbti": {
+      "E_I": 45,
+      "S_N": 65,
+      "T_F": -55,
+      "J_P": -40
+    },
+    "enneagram": {
+      "primary_type": 7,
+      "wing": 8,
+      "instinct": "so"
+    },
+    "schwartz_values": {
+      "Stimulation": 78,
+      "Self-Direction": 82,
+      "Achievement": 65,
+      "Hedonism": 70,
+      "Power": 45
+    },
+    "moral_foundations": {
+      "Care": 52,
+      "Fairness": 58,
+      "Loyalty": 45,
+      "Authority": 35,
+      "Sanctity": 30
+    },
+    "risk_profile": {
+      "overall": 72,
+      "financial": 65,
+      "ethical": 55,
+      "social": 78,
+      "health": 60,
+      "confidence": 0.82
+    },
+    "time_preference": {
+      "discount_rate": 70,
+      "planning_horizon": "short_term",
+      "present_vs_future": -35
+    },
+    "regulatory_focus": {
+      "promotion": 82,
+      "prevention": 35
+    },
+    "decision_style": {
+      "primary": "spontaneous",
+      "secondary": "intuitive",
+      "risk_seeking": 75,
+      "info_processing": "satisficer",
+      "social_preference": "independent"
+    },
+    "language_style": {
+      "formality": 35,
+      "directness": 72,
+      "emotion_expression": 65,
+      "verbosity": 70,
+      "questioning_style": 55
+    },
+    "emotion_profile": {
+      "baseline_valence": 75,
+      "emotional_range": 68,
+      "stress_response": "fight",
+      "recovery_speed": 78
+    },
+    "social_profile": {
+      "trust_default": 68,
+      "cooperation_tendency": 55,
+      "conformity": 32,
+      "independence": 80
+    },
+    "behavioral_indicators": {
+      "information_seeking": 55,
+      "comparison_behavior": 40,
+      "price_sensitivity": 45,
+      "brand_loyalty": 25
+    },
+    "meta": {
+      "base_model": "gpt-4o-mini",
+      "temperature": 0.7,
+      "prompt_version": "v2.2-full-ppv",
+      "schema_validation": "pass"
+    }
+  },
+  {
+    "id": "Lê小姐_c62046",
+    "lastName": "Lê",
+    "gender": "Female",
+    "age": 22,
+    "occupation": "學生",
+    "timesOfOverseasTravelInsurance": 2,
+    "purchasedBrand": [
+      "AIA",
+      "Liberty"
+    ],
+    "purchasedChannels": [
+      "官網",
+      "銀行/信用卡"
+    ],
+    "personalBackground": "居住地：峴港\n職業背景：大學生，正在學習國際貿易\n旅遊習慣：常參加學校的國際交流活動\n其他：喜歡拍攝旅遊紀錄片，學校相機俱樂部成員",
+    "interviewHistory": [],
+    "currentSectionIndex": 0,
+    "currentQuestionIndex": 0,
+    "isCompleted": false,
+    "createdAt": "2026-01-09T11:28:27.045772",
+    "updatedAt": "2026-01-09T11:28:27.045777",
+    "version": "v1.0",
+    "source_summary": {
+      "dialogue": 0.35,
+      "questionnaire": 0.35,
+      "behavior": 0.3
+    },
+    "big5": {
+      "openness": 78,
+      "conscientiousness": 62,
+      "extraversion": 75,
+      "agreeableness": 82,
+      "neuroticism": 42
+    },
+    "hexaco": {
+      "honesty_humility": 72,
+      "emotionality": 55,
+      "extraversion": 78,
+      "agreeableness": 80,
+      "conscientiousness": 65,
+      "openness": 75
+    },
+    "disc": {
+      "dominance": 45,
+      "influence": 82,
+      "steadiness": 58,
+      "conscientiousness": 55
+    },
+    "mbti": {
+      "E_I": 55,
+      "S_N": 40,
+      "T_F": 60,
+      "J_P": 15
+    },
+    "enneagram": {
+      "primary_type": 2,
+      "wing": 3,
+      "instinct": "so"
+    },
+    "schwartz_values": {
+      "Benevolence": 85,
+      "Universalism": 78,
+      "Self-Direction": 70,
+      "Stimulation": 65,
+      "Achievement": 60
+    },
+    "moral_foundations": {
+      "Care": 88,
+      "Fairness": 75,
+      "Loyalty": 70,
+      "Authority": 42,
+      "Sanctity": 38
+    },
+    "risk_profile": {
+      "overall": 55,
+      "financial": 48,
+      "ethical": 42,
+      "social": 68,
+      "health": 45,
+      "confidence": 0.78
+    },
+    "time_preference": {
+      "discount_rate": 50,
+      "planning_horizon": "medium_term",
+      "present_vs_future": 15
+    },
+    "regulatory_focus": {
+      "promotion": 72,
+      "prevention": 55
+    },
+    "decision_style": {
+      "primary": "intuitive",
+      "secondary": "dependent",
+      "risk_seeking": 52,
+      "info_processing": "satisficer",
+      "social_preference": "collaborative"
+    },
+    "language_style": {
+      "formality": 55,
+      "directness": 50,
+      "emotion_expression": 75,
+      "verbosity": 68,
+      "questioning_style": 60
+    },
+    "emotion_profile": {
+      "baseline_valence": 72,
+      "emotional_range": 65,
+      "stress_response": "fawn",
+      "recovery_speed": 70
+    },
+    "social_profile": {
+      "trust_default": 75,
+      "cooperation_tendency": 85,
+      "conformity": 55,
+      "independence": 52
+    },
+    "behavioral_indicators": {
+      "information_seeking": 65,
+      "comparison_behavior": 60,
+      "price_sensitivity": 55,
+      "brand_loyalty": 62
+    },
+    "meta": {
+      "base_model": "gpt-4o-mini",
+      "temperature": 0.7,
+      "prompt_version": "v2.2-full-ppv",
+      "schema_validation": "pass"
+    }
+  },
+  {
+    "id": "Phạm先生_d10686",
+    "lastName": "Phạm",
+    "gender": "Male",
+    "age": 24,
+    "occupation": "學生",
+    "timesOfOverseasTravelInsurance": 3,
+    "purchasedBrand": [
+      "Prudential",
+      "Bao Viet",
+      "Cathay"
+    ],
+    "purchasedChannels": [
+      "第三方平台",
+      "旅行社"
+    ],
+    "personalBackground": "居住地：芽莊\n職業背景：國際關係學院學生\n旅遊習慣：每年至少兩次出國參加學術會議\n其他：擅長日語和韓語，計畫未來移居日本留學",
+    "interviewHistory": [],
+    "currentSectionIndex": 0,
+    "currentQuestionIndex": 0,
+    "isCompleted": false,
+    "createdAt": "2026-01-09T11:28:27.046920",
+    "updatedAt": "2026-01-09T11:28:27.046923",
+    "version": "v1.0",
+    "source_summary": {
+      "dialogue": 0.4,
+      "questionnaire": 0.4,
+      "behavior": 0.2
+    },
+    "big5": {
+      "openness": 68,
+      "conscientiousness": 85,
+      "extraversion": 58,
+      "agreeableness": 52,
+      "neuroticism": 35
+    },
+    "hexaco": {
+      "honesty_humility": 82,
+      "emotionality": 42,
+      "extraversion": 55,
+      "agreeableness": 48,
+      "conscientiousness": 88,
+      "openness": 65
+    },
+    "disc": {
+      "dominance": 55,
+      "influence": 50,
+      "steadiness": 45,
+      "conscientiousness": 85
+    },
+    "mbti": {
+      "E_I": 10,
+      "S_N": 25,
+      "T_F": -70,
+      "J_P": 75
+    },
+    "enneagram": {
+      "primary_type": 1,
+      "wing": 2,
+      "instinct": "sp"
+    },
+    "schwartz_values": {
+      "Achievement": 80,
+      "Conformity": 72,
+      "Security": 68,
+      "Tradition": 60,
+      "Power": 55
+    },
+    "moral_foundations": {
+      "Care": 55,
+      "Fairness": 82,
+      "Loyalty": 75,
+      "Authority": 70,
+      "Sanctity": 65
+    },
+    "risk_profile": {
+      "overall": 35,
+      "financial": 28,
+      "ethical": 25,
+      "social": 45,
+      "health": 22,
+      "confidence": 0.88
+    },
+    "time_preference": {
+      "discount_rate": 25,
+      "planning_horizon": "long_term",
+      "present_vs_future": 70
+    },
+    "regulatory_focus": {
+      "promotion": 60,
+      "prevention": 78
+    },
+    "decision_style": {
+      "primary": "analytical",
+      "secondary": "avoidant",
+      "risk_seeking": 22,
+      "info_processing": "optimizer",
+      "social_preference": "independent"
+    },
+    "language_style": {
+      "formality": 82,
+      "directness": 65,
+      "emotion_expression": 35,
+      "verbosity": 45,
+      "questioning_style": 72
+    },
+    "emotion_profile": {
+      "baseline_valence": 58,
+      "emotional_range": 35,
+      "stress_response": "flight",
+      "recovery_speed": 62
+    },
+    "social_profile": {
+      "trust_default": 45,
+      "cooperation_tendency": 55,
+      "conformity": 70,
+      "independence": 60
+    },
+    "behavioral_indicators": {
+      "information_seeking": 90,
+      "comparison_behavior": 88,
+      "price_sensitivity": 65,
+      "brand_loyalty": 72
+    },
+    "meta": {
+      "base_model": "gpt-4o-mini",
+      "temperature": 0.7,
+      "prompt_version": "v2.2-full-ppv",
+      "schema_validation": "pass"
+    }
+  },
+  {
+    "id": "Vũ小姐_3cf3f8",
+    "lastName": "Vũ",
+    "gender": "Female",
+    "age": 20,
+    "occupation": "學生",
+    "timesOfOverseasTravelInsurance": 0,
+    "purchasedBrand": [],
+    "purchasedChannels": [],
+    "personalBackground": "居住地：胡志明市\n職業背景：電子工程系學生\n旅遊習慣：喜歡在假期回家鄉探親，尚未出國\n其他：活躍於學校的義工團隊，喜歡參加社會服務活動",
+    "interviewHistory": [],
+    "currentSectionIndex": 0,
+    "currentQuestionIndex": 0,
+    "isCompleted": false,
+    "createdAt": "2026-01-09T11:28:27.048002",
+    "updatedAt": "2026-01-09T11:28:27.048005",
+    "version": "v1.0",
+    "source_summary": {
+      "dialogue": 0.3,
+      "questionnaire": 0.3,
+      "behavior": 0.4
+    },
+    "big5": {
+      "openness": 55,
+      "conscientiousness": 70,
+      "extraversion": 38,
+      "agreeableness": 88,
+      "neuroticism": 62
+    },
+    "hexaco": {
+      "honesty_humility": 90,
+      "emotionality": 72,
+      "extraversion": 35,
+      "agreeableness": 85,
+      "conscientiousness": 72,
+      "openness": 52
+    },
+    "disc": {
+      "dominance": 22,
+      "influence": 35,
+      "steadiness": 88,
+      "conscientiousness": 72
+    },
+    "mbti": {
+      "E_I": -60,
+      "S_N": -35,
+      "T_F": 45,
+      "J_P": 30
+    },
+    "enneagram": {
+      "primary_type": 9,
+      "wing": 1,
+      "instinct": "sx"
+    },
+    "schwartz_values": {
+      "Benevolence": 92,
+      "Universalism": 85,
+      "Tradition": 75,
+      "Conformity": 70,
+      "Security": 78
+    },
+    "moral_foundations": {
+      "Care": 95,
+      "Fairness": 72,
+      "Loyalty": 82,
+      "Authority": 60,
+      "Sanctity": 72
+    },
+    "risk_profile": {
+      "overall": 18,
+      "financial": 15,
+      "ethical": 12,
+      "social": 25,
+      "health": 10,
+      "confidence": 0.70
+    },
+    "time_preference": {
+      "discount_rate": 28,
+      "planning_horizon": "medium_term",
+      "present_vs_future": 35
+    },
+    "regulatory_focus": {
+      "promotion": 38,
+      "prevention": 85
+    },
+    "decision_style": {
+      "primary": "dependent",
+      "secondary": "avoidant",
+      "risk_seeking": 15,
+      "info_processing": "satisficer",
+      "social_preference": "collaborative"
+    },
+    "language_style": {
+      "formality": 65,
+      "directness": 28,
+      "emotion_expression": 55,
+      "verbosity": 35,
+      "questioning_style": 45
+    },
+    "emotion_profile": {
+      "baseline_valence": 55,
+      "emotional_range": 58,
+      "stress_response": "freeze",
+      "recovery_speed": 45
+    },
+    "social_profile": {
+      "trust_default": 72,
+      "cooperation_tendency": 90,
+      "conformity": 78,
+      "independence": 28
+    },
+    "behavioral_indicators": {
+      "information_seeking": 50,
+      "comparison_behavior": 45,
+      "price_sensitivity": 82,
+      "brand_loyalty": 55
+    },
+    "meta": {
+      "base_model": "gpt-4o-mini",
+      "temperature": 0.7,
+      "prompt_version": "v2.2-full-ppv",
+      "schema_validation": "pass"
+    }
+  }
+]
