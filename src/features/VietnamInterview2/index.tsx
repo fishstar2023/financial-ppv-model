@@ -1,14 +1,14 @@
 import { useState, useEffect, useRef } from 'react';
 import {
   Card, Button, Input, Select, Tabs, Space, Typography, Tag, Spin, Empty,
-  Progress, Statistic, Row, Col, Collapse, Checkbox, Alert, Badge, Tooltip, Divider, message,
+  Progress, Statistic, Row, Col, Collapse, Checkbox, Alert, Badge, Tooltip, Divider, message, Avatar,
 } from 'antd';
 import {
   TeamOutlined, UserOutlined, RobotOutlined, SendOutlined, SaveOutlined,
   DeleteOutlined, BarChartOutlined, FileTextOutlined, DownloadOutlined,
-  CopyOutlined, CheckCircleFilled, CloseCircleFilled, ExpandOutlined,
-  CompressOutlined, QuestionCircleOutlined, TagOutlined, HistoryOutlined,
-  ExperimentOutlined, PlayCircleOutlined, HomeOutlined, PlusOutlined,
+  CopyOutlined, CheckCircleFilled, CloseCircleFilled,
+  QuestionCircleOutlined, HistoryOutlined,
+  ExperimentOutlined, PlayCircleOutlined, HomeOutlined, EyeOutlined,
 } from '@ant-design/icons';
 import {
   VietnamPersona,
@@ -32,7 +32,7 @@ const colors = {
   info: '#7a95c4',
 };
 
-export const VietnamInterview = () => {
+export const VietnamInterview2 = () => {
   const [activeTab, setActiveTab] = useState<string>('home');
   const [personas, setPersonas] = useState<VietnamPersona[]>([]);
   const [currentPersona, setCurrentPersona] = useState<VietnamPersona | null>(null);
@@ -94,7 +94,7 @@ export const VietnamInterview = () => {
 
   const loadPersonas = async () => {
     try {
-      const res = await fetch('http://localhost:8787/api/vietnam_personas');
+      const res = await fetch('http://localhost:8787/api/vietnam2_personas');
       if (res.ok) {
         const data = await res.json();
         setPersonas(data);
@@ -112,7 +112,7 @@ export const VietnamInterview = () => {
 
     setIsLoadingSemanticGroups(true);
     try {
-      const res = await fetch('http://localhost:8787/api/vietnam_semantic_group', {
+      const res = await fetch('http://localhost:8787/api/vietnam2_semantic_group', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ questions: allQuestions, threshold: 0.72 })
@@ -165,7 +165,7 @@ export const VietnamInterview = () => {
 
   const savePersona = async (persona: VietnamPersona) => {
     try {
-      await fetch('http://localhost:8787/api/vietnam_personas', {
+      await fetch('http://localhost:8787/api/vietnam2_personas', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(persona)
@@ -181,7 +181,7 @@ export const VietnamInterview = () => {
       return;
     }
     try {
-      const res = await fetch(`http://localhost:8787/api/vietnam_personas/${encodeURIComponent(personaId)}`, {
+      const res = await fetch(`http://localhost:8787/api/vietnam2_personas/${encodeURIComponent(personaId)}`, {
         method: 'DELETE'
       });
       if (res.ok) {
@@ -252,7 +252,7 @@ export const VietnamInterview = () => {
 
     setLoading(true);
     try {
-      const res = await fetch('http://localhost:8787/api/generate_vietnam_personas', {
+      const res = await fetch('http://localhost:8787/api/generate_vietnam2_personas', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -303,21 +303,21 @@ export const VietnamInterview = () => {
     setActiveTab('interview');
   };
 
-  const handleFlexibleAIInterview = async () => {
+  const handleGenerateObserverNotes = async () => {
     if (!currentPersona || !currentQuestion.trim()) return;
+    if (isThinking) return;
 
     const requestPersonaId = currentPersona.id;
-    const requestQuestion = currentQuestion;
 
     setIsThinking(true);
 
     try {
-      const res = await fetch('http://localhost:8787/api/vietnam_interview', {
+      const res = await fetch('http://localhost:8787/api/vietnam2_interview', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           persona: currentPersona,
-          question: requestQuestion,
+          question: currentQuestion,
           subQuestions: []
         })
       });
@@ -333,8 +333,8 @@ export const VietnamInterview = () => {
         }
       }
     } catch (e) {
-      console.error('AI interview failed:', e);
-      message.error('AI 訪談失敗');
+      console.error('AI generate failed:', e);
+      message.error('AI 生成失敗');
     } finally {
       setIsThinking(false);
     }
@@ -362,7 +362,7 @@ export const VietnamInterview = () => {
     setCurrentPersona(updatedPersona);
     setCurrentQuestion('');
     setCurrentAnswer('');
-    message.success('回答已儲存');
+    message.success('記錄已儲存');
   };
 
   const getAllTopicTags = (): string[] => {
@@ -506,7 +506,7 @@ export const VietnamInterview = () => {
       setCurrentProcessingPersona(personaName);
 
       try {
-        const res = await fetch('http://localhost:8787/api/vietnam_interview', {
+        const res = await fetch('http://localhost:8787/api/vietnam2_interview', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -534,7 +534,7 @@ export const VietnamInterview = () => {
             updatedAt: new Date().toISOString()
           };
 
-          await fetch('http://localhost:8787/api/vietnam_personas', {
+          await fetch('http://localhost:8787/api/vietnam2_personas', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(updatedPersona)
@@ -551,7 +551,7 @@ export const VietnamInterview = () => {
             personaId,
             personaName,
             success: false,
-            error: '訪談請求失敗'
+            error: '儲存失敗'
           });
         }
       } catch (e) {
@@ -571,7 +571,7 @@ export const VietnamInterview = () => {
     setCurrentProcessingPersona('');
     loadPersonas();
     setIsBatchProcessing(false);
-    message.success(`批量訪談完成：${results.filter(r => r.success).length}/${results.length} 成功`);
+    message.success(`批量記錄完成：${results.filter(r => r.success).length}/${results.length} 成功`);
   };
 
   const togglePersonaSelection = (personaId: string) => {
@@ -623,12 +623,12 @@ export const VietnamInterview = () => {
 
     try {
       const [analysisRes, classifyRes] = await Promise.all([
-        fetch('http://localhost:8787/api/vietnam_analysis', {
+        fetch('http://localhost:8787/api/vietnam2_analysis', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(requestBody)
         }),
-        fetch('http://localhost:8787/api/vietnam_classify_multi', {
+        fetch('http://localhost:8787/api/vietnam2_classify_multi', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(requestBody)
@@ -688,14 +688,14 @@ export const VietnamInterview = () => {
               border: 'none',
               marginBottom: 24,
             }}
-            bodyStyle={{ textAlign: 'center', padding: '40px 24px' }}
+            styles={{ body: { textAlign: 'center', padding: '40px 24px' } }}
           >
-            <div style={{ fontSize: 28, marginBottom: 16, fontWeight: 700, color: 'rgba(255,255,255,0.9)' }}>VN</div>
+            <Title level={1} style={{ fontSize: 28, marginBottom: 16, fontWeight: 700, color: 'rgba(255,255,255,0.9)', margin: 0 }}>VN</Title>
             <Title level={2} style={{ margin: '0 0 12px 0', color: 'white' }}>
-              Vietnam Market Research
+              Observer Notes
             </Title>
             <Text style={{ color: 'rgba(255,255,255,0.9)', fontSize: 15 }}>
-              越南旅遊保險市場調研系統 | AI-Powered Consumer Insights
+              第三方觀察者記錄系統 | Third-Party Observation Records
             </Text>
           </Card>
 
@@ -714,7 +714,7 @@ export const VietnamInterview = () => {
             <Col span={6}>
               <Card>
                 <Statistic
-                  title="訪談記錄 Responses"
+                  title="觀察記錄 Records"
                   value={totalResponses}
                   valueStyle={{ color: colors.info }}
                   prefix={<FileTextOutlined />}
@@ -734,7 +734,7 @@ export const VietnamInterview = () => {
             <Col span={6}>
               <Card>
                 <Statistic
-                  title="已訪談 Interviewed"
+                  title="已記錄 Recorded"
                   value={interviewedCount}
                   valueStyle={{ color: colors.warning }}
                   prefix={<CheckCircleFilled />}
@@ -753,7 +753,7 @@ export const VietnamInterview = () => {
                   style={{ textAlign: 'left', background: `${colors.primary}08`, borderColor: `${colors.primary}30` }}
                 >
                   <Tag color={colors.primary} style={{ marginBottom: 8 }}>AI</Tag>
-                  <div style={{ fontWeight: 600, marginBottom: 4 }}>AI Generate</div>
+                  <Text strong style={{ display: 'block', marginBottom: 4 }}>AI Generate</Text>
                   <Text type="secondary" style={{ fontSize: 12 }}>生成模擬受訪者</Text>
                 </Card>
               </Col>
@@ -769,9 +769,9 @@ export const VietnamInterview = () => {
                     cursor: personas.length === 0 ? 'not-allowed' : 'pointer'
                   }}
                 >
-                  <Tag color={colors.info} style={{ marginBottom: 8 }}>BTH</Tag>
-                  <div style={{ fontWeight: 600, marginBottom: 4 }}>Batch Interview</div>
-                  <Text type="secondary" style={{ fontSize: 12 }}>批量訪談多位受訪者</Text>
+                  <Tag color={colors.info} style={{ marginBottom: 8 }}>OBS</Tag>
+                  <Text strong style={{ display: 'block', marginBottom: 4 }}>Batch Notes</Text>
+                  <Text type="secondary" style={{ fontSize: 12 }}>批量生成觀察記錄</Text>
                 </Card>
               </Col>
               <Col span={8}>
@@ -781,8 +781,8 @@ export const VietnamInterview = () => {
                   style={{ textAlign: 'left', background: `${colors.warning}08`, borderColor: `${colors.warning}30` }}
                 >
                   <Tag color={colors.warning} style={{ marginBottom: 8 }}>RPT</Tag>
-                  <div style={{ fontWeight: 600, marginBottom: 4 }}>Analysis</div>
-                  <Text type="secondary" style={{ fontSize: 12 }}>分析回答並產生報告</Text>
+                  <Text strong style={{ display: 'block', marginBottom: 4 }}>Analysis</Text>
+                  <Text type="secondary" style={{ fontSize: 12 }}>分析記錄並產生報告</Text>
                 </Card>
               </Col>
             </Row>
@@ -793,29 +793,24 @@ export const VietnamInterview = () => {
             <Row gutter={24}>
               {[
                 { step: 1, title: 'Generate', desc: 'AI 生成受訪者 Personas' },
-                { step: 2, title: 'Batch Interview', desc: '批量發送問題給多位受訪者' },
-                { step: 3, title: 'Analyze', desc: 'AI 分析回答並產生圖表報告' },
+                { step: 2, title: 'Batch Notes', desc: '批量生成觀察記錄' },
+                { step: 3, title: 'Analyze', desc: 'AI 分析記錄並產生報告' },
                 { step: 4, title: 'Export', desc: '匯出 PDF 研究報告' }
               ].map((item, idx) => (
                 <Col span={6} key={idx} style={{ textAlign: 'center' }}>
-                  <div
+                  <Avatar
+                    size={48}
                     style={{
-                      width: 48,
-                      height: 48,
-                      borderRadius: '50%',
                       background: colors.primary,
                       color: 'white',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      margin: '0 auto 12px',
+                      marginBottom: 12,
                       fontSize: 16,
                       fontWeight: 700
                     }}
                   >
                     {item.step}
-                  </div>
-                  <div style={{ fontWeight: 600, marginBottom: 4 }}>Step {item.step}: {item.title}</div>
+                  </Avatar>
+                  <Text strong style={{ display: 'block', marginBottom: 4 }}>Step {item.step}: {item.title}</Text>
                   <Text type="secondary" style={{ fontSize: 12 }}>{item.desc}</Text>
                 </Col>
               ))}
@@ -889,7 +884,7 @@ export const VietnamInterview = () => {
                           onClick={() => startInterview(persona)}
                           style={{ background: colors.primary, borderColor: colors.primary }}
                         >
-                          Start Interview
+                          Start Recording
                         </Button>
                       ]}
                     >
@@ -919,7 +914,7 @@ export const VietnamInterview = () => {
     },
     {
       key: 'interview',
-      label: <span><UserOutlined /> Interview</span>,
+      label: <span><EyeOutlined /> Record</span>,
       disabled: !currentPersona,
       children: currentPersona && (
         <div>
@@ -935,7 +930,7 @@ export const VietnamInterview = () => {
                 </Space>
               </Col>
               <Col>
-                <Text type="secondary">{currentPersona.interviewHistory.length} responses recorded</Text>
+                <Text type="secondary">{currentPersona.interviewHistory.length} records</Text>
               </Col>
             </Row>
             <div style={{ marginTop: 12, padding: '12px 16px', background: '#f5f5f5', borderRadius: 8 }}>
@@ -949,8 +944,8 @@ export const VietnamInterview = () => {
             </div>
           </Card>
 
-          {/* Flexible Q&A Panel */}
-          <Card title={<><QuestionCircleOutlined /> Ask Any Question / 輸入任何問題</>}>
+          {/* Observer Notes Panel */}
+          <Card title={<><EyeOutlined /> Observer Notes / 觀察者記錄</>}>
             <Space direction="vertical" size="large" style={{ width: '100%' }}>
               {/* Topic Tag Input */}
               <div>
@@ -981,12 +976,12 @@ export const VietnamInterview = () => {
               {/* Question Input */}
               <div>
                 <Text type="secondary" style={{ display: 'block', marginBottom: 8 }}>
-                  Your Question / 你的問題 (可包含 URL，AI 會自動抓取網頁內容)
+                  觀察主題 / Observation Topic (可包含 URL，AI 會自動抓取網頁內容)
                 </Text>
                 <TextArea
                   value={currentQuestion}
                   onChange={(e) => setCurrentQuestion(e.target.value)}
-                  placeholder="輸入訪談問題... 例如：&#10;- 請參考 https://example.com 這個網站，你覺得設計如何？&#10;- 你過去買旅遊險的經驗是什麼？&#10;- 你會選擇哪種保障方案？為什麼？"
+                  placeholder="輸入觀察主題... 例如：&#10;- 請參考 https://example.com 這個網站，觀察此人的反應&#10;- 此人購買旅遊險時的決策過程&#10;- 此人對不同保障方案的態度"
                   disabled={isThinking}
                   rows={4}
                 />
@@ -994,11 +989,11 @@ export const VietnamInterview = () => {
 
               {/* AI Response Area */}
               <div>
-                <Text type="secondary" style={{ display: 'block', marginBottom: 8 }}>Response / 回覆</Text>
+                <Text type="secondary" style={{ display: 'block', marginBottom: 8 }}>Observer Notes / 觀察記錄</Text>
                 <TextArea
                   value={currentAnswer}
                   onChange={(e) => setCurrentAnswer(e.target.value)}
-                  placeholder={isThinking ? 'AI 正在思考中...' : '點擊「AI 模擬回答」讓 AI 回答，或手動輸入回覆...'}
+                  placeholder={isThinking ? 'AI 正在生成觀察記錄...' : '點擊「AI 生成記錄」讓 AI 生成第三方觀察者視角的記錄，或手動輸入...'}
                   disabled={isThinking}
                   rows={6}
                 />
@@ -1010,12 +1005,12 @@ export const VietnamInterview = () => {
                   <Button
                     type="primary"
                     icon={<RobotOutlined />}
-                    onClick={handleFlexibleAIInterview}
+                    onClick={handleGenerateObserverNotes}
                     disabled={isThinking || !currentQuestion.trim()}
                     loading={isThinking}
                     style={{ background: colors.info, borderColor: colors.info }}
                   >
-                    {isThinking ? 'Thinking...' : 'AI Simulate Response'}
+                    {isThinking ? 'Generating...' : 'AI Generate Notes'}
                   </Button>
                 </Col>
                 <Col>
@@ -1043,14 +1038,14 @@ export const VietnamInterview = () => {
             </Space>
           </Card>
 
-          {/* Previous Answers */}
+          {/* Previous Records */}
           {currentPersona.interviewHistory.length > 0 && (
-            <Card title={`Previous Responses (${currentPersona.interviewHistory.length})`} style={{ marginTop: 24 }}>
+            <Card title={`Previous Records (${currentPersona.interviewHistory.length})`} style={{ marginTop: 24 }}>
               <div style={{ maxHeight: 400, overflowY: 'auto' }}>
                 <Space direction="vertical" style={{ width: '100%' }}>
                   {[...currentPersona.interviewHistory].reverse().map((record, idx) => (
                     <Card key={idx} size="small" style={{ borderLeft: `3px solid ${colors.primary}` }}>
-                      <Text strong style={{ color: colors.primary }}>Q: {record.question}</Text>
+                      <Text strong style={{ color: colors.primary }}>Topic: {record.question}</Text>
                       <Paragraph style={{ marginTop: 8, marginBottom: 4, whiteSpace: 'pre-wrap' }}>
                         {record.answer}
                       </Paragraph>
@@ -1068,13 +1063,13 @@ export const VietnamInterview = () => {
     },
     {
       key: 'batch',
-      label: <span><TeamOutlined /> Batch</span>,
+      label: <span><TeamOutlined /> Batch Notes</span>,
       disabled: personas.length === 0,
       children: (
         <div>
-          <Card title="批量訪談 / Batch Interview" style={{ marginBottom: 24 }}>
+          <Card title="批量觀察記錄 / Batch Observer Notes" style={{ marginBottom: 24 }}>
             <Paragraph type="secondary">
-              選擇多位受訪者，讓他們同時回答同一個問題。回答會自動儲存到每位受訪者的訪談記錄中。
+              選擇多位受訪者，AI 會為每位生成第三方觀察者視角的記錄。記錄會自動儲存到每位受訪者的訪談記錄中。
             </Paragraph>
 
             {/* Persona Selection */}
@@ -1170,11 +1165,11 @@ export const VietnamInterview = () => {
 
             {/* Question Input */}
             <div style={{ marginBottom: 20 }}>
-              <Text type="secondary" style={{ display: 'block', marginBottom: 8 }}>訪談問題 / Question</Text>
+              <Text type="secondary" style={{ display: 'block', marginBottom: 8 }}>觀察主題 / Observation Topic</Text>
               <TextArea
                 value={batchQuestion}
                 onChange={(e) => setBatchQuestion(e.target.value)}
-                placeholder="輸入要讓所有受訪者回答的問題..."
+                placeholder="輸入要觀察的主題，AI 會為每位受訪者生成第三方觀察者視角的記錄..."
                 disabled={isBatchProcessing}
                 rows={4}
               />
@@ -1193,7 +1188,7 @@ export const VietnamInterview = () => {
               {isBatchProcessing ? (
                 <>Processing {batchProgress}% - {currentProcessingPersona || 'Preparing...'}</>
               ) : (
-                <>Start Batch Interview ({selectedPersonaIds.length} personas)</>
+                <>Start Batch Notes ({selectedPersonaIds.length} personas)</>
               )}
             </Button>
 
@@ -1279,7 +1274,7 @@ export const VietnamInterview = () => {
         <div>
           <Card title="Summary Report / 總結報告" style={{ marginBottom: 24 }}>
             {getAllQuestions().length === 0 && getAllTopicTags().length === 0 ? (
-              <Empty description="尚無訪談紀錄可分析。請先完成一些訪談。" />
+              <Empty description="尚無觀察紀錄可分析。請先完成一些觀察記錄。" />
             ) : (
               <Space direction="vertical" size="large" style={{ width: '100%' }}>
                 {/* Topic Tag Filter */}
@@ -1322,7 +1317,7 @@ export const VietnamInterview = () => {
                 {/* Question Selector */}
                 <div>
                   <Text strong style={{ display: 'block', marginBottom: 10 }}>
-                    選擇要分析的問題 / Select Question to Analyze
+                    選擇要分析的主題 / Select Topic to Analyze
                     {selectedTopicTag && <Text type="secondary"> (已篩選: {selectedTopicTag})</Text>}
                     {isLoadingSemanticGroups && <Text type="secondary" style={{ marginLeft: 8 }}>🔍 語義分析中...</Text>}
                   </Text>
@@ -1333,7 +1328,7 @@ export const VietnamInterview = () => {
                       setAnalysisResult('');
                     }}
                     disabled={isLoadingSemanticGroups}
-                    placeholder={isLoadingSemanticGroups ? '-- 載入語義分組中... --' : '-- 選擇問題 --'}
+                    placeholder={isLoadingSemanticGroups ? '-- 載入語義分組中... --' : '-- 選擇主題 --'}
                     style={{ width: '100%' }}
                     size="large"
                   >
@@ -1341,7 +1336,7 @@ export const VietnamInterview = () => {
                       const responseCount = getResponsesForQuestion(q).length;
                       return (
                         <Select.Option key={idx} value={q}>
-                          {q.length > 60 ? q.substring(0, 60) + '...' : q} ({responseCount} 人回答)
+                          {q.length > 60 ? q.substring(0, 60) + '...' : q} ({responseCount} records)
                         </Select.Option>
                       );
                     })}
@@ -1351,7 +1346,7 @@ export const VietnamInterview = () => {
                 {/* Response Preview */}
                 {selectedQuestion && (
                   <div>
-                    <Text strong>Response Preview ({getResponsesForQuestion(selectedQuestion).length} respondents)</Text>
+                    <Text strong>Records Preview ({getResponsesForQuestion(selectedQuestion).length} records)</Text>
                     <div style={{ maxHeight: 300, overflowY: 'auto', marginTop: 12 }}>
                       <Space direction="vertical" style={{ width: '100%' }}>
                         {getResponsesForQuestion(selectedQuestion).map((resp, idx) => (
@@ -1386,7 +1381,7 @@ export const VietnamInterview = () => {
                 </Button>
 
                 {selectedQuestion && getResponsesForQuestion(selectedQuestion).length < 2 && (
-                  <Alert message="需要至少 2 位受訪者的回答才能進行分析" type="warning" showIcon />
+                  <Alert message="需要至少 2 筆觀察記錄才能進行分析" type="warning" showIcon />
                 )}
               </Space>
             )}
@@ -1416,14 +1411,13 @@ export const VietnamInterview = () => {
                       const timestamp = new Date().toISOString().split('T')[0];
                       const formattedDate = new Date().toLocaleDateString('zh-TW', { year: 'numeric', month: 'long', day: 'numeric' });
 
-                      // Create PDF content (simplified - keeping the same structure as original)
                       const pdfContent = document.createElement('div');
                       pdfContent.innerHTML = createPDFContent(selectedQuestion, responses, analysisResult, classificationData, timestamp, formattedDate);
 
                       const html2pdf = (await import('html2pdf.js')).default;
                       const opt = {
                         margin: 10,
-                        filename: `越南旅遊保險調研報告_${timestamp}.pdf`,
+                        filename: `觀察者記錄分析報告_${timestamp}.pdf`,
                         image: { type: 'jpeg' as const, quality: 0.98 },
                         html2canvas: { scale: 2, useCORS: true },
                         jsPDF: { unit: 'mm' as const, format: 'a4' as const, orientation: 'portrait' as const }
@@ -1477,7 +1471,7 @@ export const VietnamInterview = () => {
                                       <Cell key={`cell-${index}`} fill={entry.color} />
                                     ))}
                                   </Pie>
-                                  <RechartsTooltip formatter={(value) => [`${value} 人`]} />
+                                  <RechartsTooltip formatter={(value) => [`${value} 筆`]} />
                                 </PieChart>
                               </ResponsiveContainer>
                             </div>
@@ -1491,7 +1485,7 @@ export const VietnamInterview = () => {
                                   </Col>
                                   <Col flex="auto">{cat.name}</Col>
                                   <Col flex="none">
-                                    <Text strong>{cat.count} 人</Text>
+                                    <Text strong>{cat.count} 筆</Text>
                                     <Text type="secondary" style={{ marginLeft: 8 }}>({cat.percentage}%)</Text>
                                   </Col>
                                 </Row>
@@ -1509,7 +1503,7 @@ export const VietnamInterview = () => {
                               <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                               <XAxis dataKey="name" tick={{ fontSize: 12 }} angle={-30} textAnchor="end" height={60} />
                               <YAxis tick={{ fontSize: 12 }} allowDecimals={false} />
-                              <RechartsTooltip formatter={(value) => [`${value} 人`]} />
+                              <RechartsTooltip formatter={(value) => [`${value} 筆`]} />
                               <Bar dataKey="count" radius={[4, 4, 0, 0]}>
                                 {dimension.categories.map((entry, index) => (
                                   <Cell key={`cell-${index}`} fill={entry.color} />
@@ -1528,7 +1522,7 @@ export const VietnamInterview = () => {
                               <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                               <XAxis type="number" tick={{ fontSize: 12 }} allowDecimals={false} />
                               <YAxis type="category" dataKey="name" tick={{ fontSize: 12 }} width={90} />
-                              <RechartsTooltip formatter={(value) => [`${value} 人`]} />
+                              <RechartsTooltip formatter={(value) => [`${value} 筆`]} />
                               <Bar dataKey="count" radius={[0, 4, 4, 0]}>
                                 {dimension.categories.map((entry, index) => (
                                   <Cell key={`cell-${index}`} fill={entry.color} />
@@ -1542,7 +1536,7 @@ export const VietnamInterview = () => {
                       {/* Classification Details */}
                       {dimension.details.length > 0 && (
                         <Collapse ghost style={{ marginTop: 16 }}>
-                          <Panel header={`各受訪者分類結果 (${dimension.details.length} 人)`} key="1">
+                          <Panel header={`各受訪者分類結果 (${dimension.details.length} 筆)`} key="1">
                             <Space wrap>
                               {dimension.details.map((detail, idx) => (
                                 <Tag
@@ -1564,7 +1558,7 @@ export const VietnamInterview = () => {
               {/* Loading state */}
               {isClassifying && !classificationData && (
                 <Card style={{ textAlign: 'center', marginBottom: 20 }}>
-                  <Spin tip="Classifying responses and generating charts..." />
+                  <Spin tip="Classifying records and generating charts..." />
                 </Card>
               )}
 
@@ -1613,10 +1607,10 @@ const createPDFContent = (
   return `
 <div style="font-family: 'Microsoft JhengHei', 'PingFang TC', sans-serif; padding: 20px; color: #1f2937;">
   <h1 style="color: #1e3a5f; font-size: 20pt; text-align: center; border-bottom: 2px solid #1e3a5f; padding-bottom: 12px; margin-bottom: 8px;">
-    越南消費者旅遊保險市場調研報告
+    第三方觀察者記錄分析報告
   </h1>
   <p style="text-align: center; color: #64748b; font-size: 11pt; margin-bottom: 25px;">
-    Vietnam Consumer Travel Insurance Market Research Report
+    Third-Party Observer Notes Analysis Report
   </p>
 
   <h2 style="color: #1e3a5f; font-size: 13pt; margin-top: 30px; border-left: 4px solid #1e3a5f; padding-left: 12px;">
@@ -1628,12 +1622,12 @@ const createPDFContent = (
       <td style="padding: 10px 14px; border: 1px solid #e2e8f0; font-size: 12px;">${formattedDate}</td>
     </tr>
     <tr>
-      <td style="padding: 10px 14px; border: 1px solid #e2e8f0; font-weight: 600; background: #1e3a5f; color: white; font-size: 11px;">訪談問題</td>
+      <td style="padding: 10px 14px; border: 1px solid #e2e8f0; font-weight: 600; background: #1e3a5f; color: white; font-size: 11px;">觀察主題</td>
       <td style="padding: 10px 14px; border: 1px solid #e2e8f0; font-size: 12px;">${selectedQuestion}</td>
     </tr>
     <tr>
-      <td style="padding: 10px 14px; border: 1px solid #e2e8f0; font-weight: 600; background: #1e3a5f; color: white; font-size: 11px;">樣本數量</td>
-      <td style="padding: 10px 14px; border: 1px solid #e2e8f0; font-size: 12px;">${responses.length} 位受訪者</td>
+      <td style="padding: 10px 14px; border: 1px solid #e2e8f0; font-weight: 600; background: #1e3a5f; color: white; font-size: 11px;">記錄數量</td>
+      <td style="padding: 10px 14px; border: 1px solid #e2e8f0; font-size: 12px;">${responses.length} 筆觀察記錄</td>
     </tr>
   </table>
 
@@ -1645,7 +1639,7 @@ const createPDFContent = (
   </div>
 
   <h2 style="color: #1e3a5f; font-size: 13pt; margin-top: 30px; border-left: 4px solid #1e3a5f; padding-left: 12px;">
-    三、訪談紀錄詳情 | Interview Details
+    三、觀察紀錄詳情 | Observation Details
   </h2>
   ${responses.map((r, i) => `
   <div style="border: 1px solid #e2e8f0; border-radius: 6px; margin: 15px 0; overflow: hidden; page-break-inside: avoid;">
@@ -1662,7 +1656,7 @@ const createPDFContent = (
   `).join('')}
 
   <div style="text-align: center; margin-top: 30px; padding-top: 15px; border-top: 1px solid #e2e8f0; color: #94a3b8; font-size: 9px;">
-    <p style="margin: 0;">Report Generated by Vietnam Interview AI System</p>
+    <p style="margin: 0;">Report Generated by Observer Notes AI System</p>
     <p style="margin: 4px 0 0 0;">${timestamp}</p>
   </div>
 </div>`;
@@ -1831,7 +1825,7 @@ const HistoryTabContent = ({
   const totalResponses = personas.reduce((sum, p) => sum + (p.interviewHistory?.length || 0), 0);
 
   if (personas.length === 0) {
-    return <Empty description="尚無訪談記錄。請先生成受訪者並開始訪談。" />;
+    return <Empty description="尚無觀察記錄。請先生成受訪者並開始記錄。" />;
   }
 
   return (
@@ -1841,7 +1835,7 @@ const HistoryTabContent = ({
         <Row justify="space-between" align="middle">
           <Col>
             <Text type="secondary">
-              {personas.length} personas • {totalResponses} responses • {questionGroups.size} questions
+              {personas.length} personas • {totalResponses} records • {questionGroups.size} topics
             </Text>
           </Col>
           <Col>
@@ -1851,7 +1845,7 @@ const HistoryTabContent = ({
                 onClick={() => setViewMode('by-question')}
                 style={viewMode === 'by-question' ? { background: colors.primary, borderColor: colors.primary } : {}}
               >
-                By Question
+                By Topic
               </Button>
               <Button
                 type={viewMode === 'by-persona' ? 'primary' : 'default'}
@@ -1881,14 +1875,14 @@ const HistoryTabContent = ({
                   <Row justify="space-between" align="middle" style={{ width: '100%' }}>
                     <Col flex="auto">
                       <Space direction="vertical" size={4}>
-                        <Text strong>Q: {question.length > 80 ? question.slice(0, 80) + '...' : question}</Text>
+                        <Text strong>Topic: {question.length > 80 ? question.slice(0, 80) + '...' : question}</Text>
                         {topicTag && <Tag color={colors.accent}>{topicTag}</Tag>}
                       </Space>
                     </Col>
                     <Col flex="none">
                       <Space>
-                        <Badge count={`${responses.length} 人回答`} style={{ backgroundColor: colors.primary }} />
-                        <Tooltip title="刪除此問題的所有回答">
+                        <Badge count={`${responses.length} records`} style={{ backgroundColor: colors.primary }} />
+                        <Tooltip title="刪除此主題的所有記錄">
                           <Button
                             type="text"
                             danger
@@ -1964,7 +1958,7 @@ const HistoryTabContent = ({
               }
               extra={
                 <Space>
-                  <Text type="secondary">{persona.interviewHistory?.length || 0} responses</Text>
+                  <Text type="secondary">{persona.interviewHistory?.length || 0} records</Text>
                   {!persona.isCompleted && (
                     <Button
                       type="primary"
@@ -1996,11 +1990,11 @@ const HistoryTabContent = ({
                 />
               )}
               <Collapse ghost>
-                <Panel header={`Show ${persona.interviewHistory?.length || 0} Responses`} key="1">
+                <Panel header={`Show ${persona.interviewHistory?.length || 0} Records`} key="1">
                   <Space direction="vertical" style={{ width: '100%' }}>
                     {persona.interviewHistory?.map((record, idx) => (
                       <Card key={idx} size="small" style={{ borderLeft: `3px solid ${colors.primary}` }}>
-                        <Text strong style={{ color: colors.primary }}>Q: {record.question}</Text>
+                        <Text strong style={{ color: colors.primary }}>Topic: {record.question}</Text>
                         <Paragraph style={{ marginTop: 8, marginBottom: 0 }}>{record.answer}</Paragraph>
                       </Card>
                     ))}

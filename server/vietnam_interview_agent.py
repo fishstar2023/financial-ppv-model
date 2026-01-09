@@ -329,6 +329,69 @@ def interview_vietnam_persona(
     structure_style = structure_styles[(hash_val // 13) % len(structure_styles)]
     ending_style = ending_styles[(hash_val // 17) % len(ending_styles)]
 
+    # ===== PPV 驅動的說話風格 =====
+    language_style = persona.get('language_style', {})
+    verbosity = language_style.get('verbosity', 50)
+    formality = language_style.get('formality', 50)
+    directness = language_style.get('directness', 50)
+    emotion_expression = language_style.get('emotion_expression', 50)
+
+    # 正式程度影響用詞
+    if formality >= 70:
+        formality_style = "FORMAL: 用詞較正式，避免太口語化的表達，如「您」而非「你」，較少使用網路用語"
+    elif formality <= 30:
+        formality_style = "CASUAL: 非常口語化，使用網路用語、俚語，如「超扯」「傻眼」「hen」「der」"
+    else:
+        formality_style = "NEUTRAL: 一般口語，自然但不過於隨便"
+
+    # 直接程度影響表達方式
+    if directness >= 70:
+        directness_style = "DIRECT: 開門見山，不繞圈子，直接說重點，少用「可能」「也許」"
+    elif directness <= 30:
+        directness_style = "INDIRECT: 委婉表達，用很多「可能」「好像」「不太確定」，避免強烈表態"
+    else:
+        directness_style = "BALANCED: 適度直接，會先鋪墊再說重點"
+
+    # 情緒表達影響語氣
+    if emotion_expression >= 70:
+        emotion_style = "EXPRESSIVE: 情緒豐富，多用感嘆詞「哇」「天啊」「超...」，語氣起伏大"
+    elif emotion_expression <= 30:
+        emotion_style = "RESERVED: 情緒內斂，平鋪直敘，很少用感嘆詞，語調平穩"
+    else:
+        emotion_style = "MODERATE: 適度表達情緒，偶爾用感嘆詞"
+
+    # 根據 verbosity 設定回答長度指引（連續縮放描述）
+    # 計算目標字數範圍（verbosity 0→100 映射到 40→500 字）
+    target_chars_min = int(40 + (verbosity / 100) * 360)  # 40 ~ 400
+    target_chars_max = int(80 + (verbosity / 100) * 520)  # 80 ~ 600
+    target_sentences_min = max(1, int(1 + (verbosity / 100) * 7))  # 1 ~ 8
+    target_sentences_max = max(2, int(2 + (verbosity / 100) * 10))  # 2 ~ 12
+
+    # 根據 verbosity 選擇說話風格描述
+    if verbosity >= 70:
+        verbosity_persona = "You are VERY TALKATIVE. You love sharing details, tangents, and related stories."
+        verbosity_tips = "Add background context, use phrases like '對了，順便說一下...', go on tangents freely."
+    elif verbosity >= 50:
+        verbosity_persona = "You speak at a normal pace, balancing detail with brevity."
+        verbosity_tips = "Include 1-2 examples, provide some context but don't over-explain."
+    elif verbosity >= 30:
+        verbosity_persona = "You prefer being CONCISE. You get to the point quickly."
+        verbosity_tips = "Skip unnecessary details, focus on the key point, avoid tangents."
+    else:
+        verbosity_persona = "You are a person of VERY FEW WORDS. Almost terse."
+        verbosity_tips = "Use fragments like '就那樣', '還好', '沒什麼'. Don't elaborate. Be brief!"
+
+    length_instruction = f"""
+# 📏 YOUR SPEAKING VERBOSITY (verbosity={verbosity}/100)
+{verbosity_persona}
+
+⚠️ TARGET LENGTH:
+- Characters: {target_chars_min}-{target_chars_max} 繁體中文字
+- Sentences: {target_sentences_min}-{target_sentences_max} 句
+
+💡 STYLE TIP: {verbosity_tips}
+"""
+
     instructions = [
         "# ROLE: Vietnamese Travel Insurance Interviewee",
         "",
@@ -407,8 +470,15 @@ def interview_vietnam_persona(
         "- Sound like you're TALKING, not writing an essay",
         "- Include natural speech patterns: pauses, self-corrections, tangents",
         "- You are Vietnamese living in Vietnam - reference Vietnamese context (VND, local places)",
-        "- Give detailed answers (4-6 sentences) with specific observations",
         "- Share genuine emotions and opinions, not generic comments",
+        "",
+        "# 🗣️ YOUR PERSONAL SPEAKING STYLE (MUST FOLLOW!):",
+        "",
+        f"**Formality**: {formality_style}",
+        f"**Directness**: {directness_style}",
+        f"**Emotion**: {emotion_style}",
+        "",
+        length_instruction,
         "",
         "# ✅ GOOD OPENING EXAMPLES (PICK ONE OF THESE PATTERNS!):",
         "",
@@ -470,11 +540,35 @@ Current Interview Question:
 Please respond naturally as a Vietnamese interviewee. Share your genuine experiences and thoughts.
 """
 
-    print(f"🇻🇳 [Vietnam Interview] Simulating response for: {persona.get('lastName', 'Unknown')}")
+    print(f"🇻🇳 [Vietnam Interview] Simulating response for: {persona.get('lastName', 'Unknown')} (verbosity={verbosity})")
 
-    # 建立 Agent - 使用較高 temperature 增加回答多樣性
+    # ===== 動態參數調整（連續縮放，非離散區間）=====
+
+    # 1. Temperature: 連續縮放 (verbosity 0→100 映射到 temp 0.6→1.0)
+    dynamic_temperature = 0.6 + (verbosity / 100) * 0.4  # 0.6 ~ 1.0
+
+    # 2. Max tokens: 連續縮放（最有效的硬性控制）
+    # verbosity 0→100 映射到 80→800 tokens（10倍差距！）
+    min_tokens = 80
+    max_tokens_limit = 800
+    max_tokens = int(min_tokens + (verbosity / 100) * (max_tokens_limit - min_tokens))
+
+    # 3. 額外：加入隨機擾動（±15%），增加同一 persona 不同問題的變化
+    import random
+    random.seed(hash(question) % 10000)  # 同一問題產生相同擾動
+    noise = random.uniform(0.85, 1.15)
+    max_tokens = int(max_tokens * noise)
+    max_tokens = max(60, min(900, max_tokens))  # 確保在合理範圍
+
+    print(f"   📊 Dynamic params: temp={dynamic_temperature:.2f}, max_tokens={max_tokens} (v={verbosity})")
+
+    # 建立 Agent - 動態參數
     agent = Agent(
-        model=OpenAIChat(id="gpt-4o", temperature=0.95),
+        model=OpenAIChat(
+            id="gpt-4o",
+            temperature=dynamic_temperature,
+            max_tokens=max_tokens
+        ),
         description="You are a Vietnamese person being interviewed about travel insurance experiences.",
         instructions=instructions,
         markdown=False
@@ -486,6 +580,225 @@ Please respond naturally as a Vietnamese interviewee. Share your genuine experie
     except Exception as e:
         print(f"❌ Vietnam interview failed: {e}")
         return "（抱歉，系統發生錯誤，請再試一次）"
+
+
+def interview_vietnam_persona_observer(
+    persona: Dict[str, Any],
+    question: str,
+    sub_questions: List[str] = None
+) -> str:
+    """
+    使用 Agno Agent 模擬越南受訪者回答問題 - 第三方觀察者視角輸出
+
+    輸出格式：「Nguyễn 先生表示...」而非第一人稱
+
+    Args:
+        persona: 受訪者基本資料
+        question: 當前訪談問題
+        sub_questions: 追問項目列表
+
+    Returns:
+        以第三方觀察者視角撰寫的記錄
+    """
+
+    # 建立受訪者名稱
+    persona_name = f"{persona.get('lastName', 'Unknown')} {'先生' if persona.get('gender') == 'Male' else '小姐'}"
+
+    # 建立受訪者背景描述
+    background = f"""
+# INTERVIEWEE PROFILE (for your reference):
+- Name: {persona_name}
+- Age: {persona.get('age', 30)} tuổi (years old)
+- Occupation: {persona.get('occupation', 'Unknown')}
+- Travel Insurance Experience: Bought {persona.get('timesOfOverseasTravelInsurance', 0)} times
+- Brands Used: {', '.join(persona.get('purchasedBrand', [])) or 'None'}
+- Purchase Channels: {', '.join(persona.get('purchasedChannels', [])) or 'None'}
+- Background: {persona.get('personalBackground', 'No additional background')}
+"""
+
+    # 建立訪談歷史摘要
+    history_summary = ""
+    if persona.get('interviewHistory'):
+        history_summary = "\n# PREVIOUS INTERVIEW RESPONSES (for context):\n"
+        for record in persona['interviewHistory'][-5:]:  # 只取最近5筆
+            history_summary += f"Q: {record.get('question', '')}\n"
+            history_summary += f"A: {record.get('answer', '')}\n\n"
+
+    # 建立追問項目
+    sub_q_text = ""
+    if sub_questions:
+        sub_q_text = "\n## Sub-questions to address:\n"
+        for sq in sub_questions:
+            sub_q_text += f"- {sq}\n"
+
+    # 🌐 自動抓取問題中的 URL 內容
+    urls_found, url_content = extract_and_fetch_urls(question, sub_questions)
+    if urls_found:
+        print(f"🌐 [URL Fetcher] Found {len(urls_found)} URL(s), injecting real content into prompt")
+
+    # 使用 persona ID 的 hash 來產生穩定但多樣化的個性特徵
+    import hashlib
+    persona_id = persona.get('id', str(persona.get('lastName', '')))
+    hash_val = int(hashlib.md5(persona_id.encode()).hexdigest(), 16)
+
+    # 保險態度選項
+    insurance_attitudes = [
+        "TRUSTING: Believes insurance is valuable and worth buying",
+        "SKEPTICAL: Thinks insurance companies try to avoid paying claims",
+        "PRAGMATIC: Buys only when required or for high-risk trips",
+        "ANXIOUS: Worried about not having enough coverage",
+        "INDIFFERENT: Doesn't really care about insurance details",
+        "PRICE_SENSITIVE: Mainly looks at the cheapest options",
+        "BRAND_LOYAL: Sticks with one trusted company",
+        "RESEARCH_HEAVY: Compares many options before deciding",
+    ]
+
+    # 過往經驗選項
+    past_experiences = [
+        "SMOOTH: All purchases went smoothly, good impressions overall",
+        "SAVED_BIG: Insurance once covered a huge expense",
+        "CLAIM_DENIED: Had a claim rejected, still frustrated about it",
+        "NEVER_NEEDED: Bought many times but never had to use it",
+        "BAD_SERVICE: Had poor customer service experience",
+        "GOOD_SERVICE: Had great customer service experience",
+    ]
+
+    insurance_attitude = insurance_attitudes[(hash_val // 3) % len(insurance_attitudes)]
+    past_experience = past_experiences[(hash_val // 19) % len(past_experiences)]
+
+    # ===== 回答長度控制（連續縮放）=====
+    verbosity = persona.get('language_style', {}).get('verbosity', 50)
+
+    # 連續計算目標字數（observer 版本略短於 interview）
+    obs_chars_min = int(30 + (verbosity / 100) * 270)  # 30 ~ 300
+    obs_chars_max = int(60 + (verbosity / 100) * 390)  # 60 ~ 450
+    obs_sentences_min = max(1, int(1 + (verbosity / 100) * 5))  # 1 ~ 6
+    obs_sentences_max = max(2, int(2 + (verbosity / 100) * 6))  # 2 ~ 8
+
+    # 根據 verbosity 選擇觀察描述
+    if verbosity >= 70:
+        obs_style_desc = "This interviewee is VERY TALKATIVE - capture their detailed, tangent-filled responses."
+    elif verbosity >= 50:
+        obs_style_desc = "This interviewee gives balanced responses with moderate detail."
+    elif verbosity >= 30:
+        obs_style_desc = "This interviewee is BRIEF - note their concise, to-the-point style."
+    else:
+        obs_style_desc = f"This interviewee says VERY LITTLE. Record briefly: \"{persona_name}只簡短回答：『還好。』\""
+
+    observer_length = f"""
+# 📏 INTERVIEWEE VERBOSITY: {verbosity}/100
+{obs_style_desc}
+
+⚠️ TARGET LENGTH FOR THIS RECORD:
+- Characters: {obs_chars_min}-{obs_chars_max}
+- Sentences: {obs_sentences_min}-{obs_sentences_max}
+"""
+
+    # 使用 hash 選擇不同的記錄風格
+    note_styles = [
+        "DIRECT_QUOTE: 多使用直接引述，如「他說：『...』」",
+        "SUMMARY: 用簡潔的方式總結受訪者的觀點",
+        "BEHAVIORAL: 多描述受訪者的行為和反應，如表情、語氣、猶豫等",
+        "ANALYTICAL: 帶有分析性的觀察，指出受訪者觀點的特點",
+        "NARRATIVE: 用敘事的方式記錄，像在說故事一樣",
+        "FACTUAL: 純粹記錄事實，不加評論",
+    ]
+
+    note_style = note_styles[(hash_val // 23) % len(note_styles)]
+
+    instructions = [
+        "# ROLE: Third-Party Research Observer",
+        "",
+        "You are a research observer recording interview notes in Traditional Chinese.",
+        f"The interviewee is '{persona_name}'.",
+        "",
+        background,
+        history_summary,
+        "",
+        "# CRITICAL RULES:",
+        "",
+        "1. NEVER use first-person (我、我的). Write as an observer.",
+        f"2. Refer to the interviewee as '{persona_name}' or '受訪者' or '他/她'.",
+        "3. Write naturally - DO NOT follow a fixed template or formula.",
+        "",
+        "# YOUR RECORDING STYLE FOR THIS NOTE:",
+        f"**Style**: {note_style}",
+        "",
+        "# 🎭 INTERVIEWEE'S CHARACTERISTICS:",
+        f"- Attitude: {insurance_attitude}",
+        f"- Past experience: {past_experience}",
+        "",
+        "# VARIETY IS KEY - Avoid these patterns:",
+        "❌ Don't always start with '觀察到...'",
+        "❌ Don't always use '值得注意的是...'",
+        "❌ Don't follow the same sentence structure for every note",
+        "❌ Don't mechanically list '他表示...根據他的說法...值得注意的是...'",
+        "",
+        "# GOOD VARIETY EXAMPLES (use different ones each time):",
+        f"- 直接開始內容：'{persona_name}每年出國一到兩次，主要去東南亞國家。'",
+        f"- 引述：'{persona_name}說：「我通常不太比較，看到便宜的就買了。」'",
+        f"- 行為描述：'{persona_name}想了一下才回答，似乎在回憶過去的經驗。'",
+        f"- 簡潔總結：'對於保險，{persona_name}持實用主義態度，價格是主要考量。'",
+        "",
+        observer_length,
+        "",
+        "# OUTPUT:",
+        "- Be specific with details (destinations, amounts, experiences)",
+        "- Make it sound like natural field notes, not a form template",
+    ]
+
+    # 如果有抓取到 URL 內容，加入 instructions
+    if url_content:
+        instructions.append("")
+        instructions.append(url_content)
+
+    # 建立問題提示
+    question_prompt = f"""
+訪談問題：{question}
+{sub_q_text}
+
+請用第三方觀察者的角度，記錄 {persona_name} 對這個問題的回答。
+寫得自然一點，不要用固定的模板。直接寫內容，不需要開場白。
+"""
+
+    print(f"📋 [Observer Notes] Recording response for: {persona_name} (verbosity={verbosity})")
+
+    # ===== 動態參數調整（連續縮放）=====
+    # Temperature: 連續縮放
+    dynamic_temperature = 0.6 + (verbosity / 100) * 0.35  # 0.6 ~ 0.95
+
+    # Max tokens: 連續縮放（observer 略短）
+    min_tokens = 60
+    max_tokens_limit = 600
+    max_tokens = int(min_tokens + (verbosity / 100) * (max_tokens_limit - min_tokens))
+
+    # 加入隨機擾動
+    import random
+    random.seed(hash(question) % 10000)
+    noise = random.uniform(0.85, 1.15)
+    max_tokens = int(max_tokens * noise)
+    max_tokens = max(50, min(700, max_tokens))
+
+    print(f"   📊 Dynamic params: temp={dynamic_temperature:.2f}, max_tokens={max_tokens} (v={verbosity})")
+
+    # 建立 Agent - 動態參數
+    agent = Agent(
+        model=OpenAIChat(
+            id="gpt-4o",
+            temperature=dynamic_temperature,
+            max_tokens=max_tokens
+        ),
+        description=f"You are a research observer recording interview notes about {persona_name}.",
+        instructions=instructions,
+        markdown=False
+    )
+
+    try:
+        response = agent.run(question_prompt, stream=False)
+        return response.content
+    except Exception as e:
+        print(f"❌ Observer notes generation failed: {e}")
+        return f"（記錄失敗：{str(e)}）"
 
 
 # 測試用
@@ -508,3 +821,12 @@ if __name__ == "__main__":
         ["旅遊地點、頻率、大概的天數和預算範圍", "型態（自助/半自助/跟團）"]
     )
     print(f"\n回答: {result}")
+
+    print("\n--- Observer Notes Version ---\n")
+
+    result_observer = interview_vietnam_persona_observer(
+        test_persona,
+        "請概述自己的旅遊習慣與型態",
+        ["旅遊地點、頻率、大概的天數和預算範圍", "型態（自助/半自助/跟團）"]
+    )
+    print(f"\n觀察記錄: {result_observer}")
