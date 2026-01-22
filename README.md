@@ -133,56 +133,217 @@ src/
 
 ---
 
-## 🚀 Quick Start
+## 🚀 Quick Start (新手完整指南)
 
-### 1. Prerequisites
-- **Python 3.9+** with pip
-- **Node.js 18+** with npm
-- **OpenAI API Key**
+> 💡 **給完全新手的說明**：以下步驟假設你從未使用過 Python 或 Node.js，會一步步帶你完成安裝。
 
-### 2. Environment Setup
+---
 
-Create `.env` file in the project root:
+### Step 0: 安裝必要軟體
+
+在開始之前，請先確認你的電腦已安裝以下軟體：
+
+#### 📦 安裝 Python 3.9+
+
+**Mac 用戶**：
 ```bash
-OPENAI_API_KEY=sk-your-api-key-here
-OPENAI_MODEL=gpt-4o
-PORT=8787
+# 使用 Homebrew 安裝（如果沒有 Homebrew，先執行下一行）
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+# 安裝 Python
+brew install python@3.11
 ```
 
-### 3. Install Dependencies
+**Windows 用戶**：
+1. 前往 https://www.python.org/downloads/
+2. 下載 Python 3.11 或更新版本
+3. 安裝時**務必勾選** "Add Python to PATH"
+4. 完成安裝
 
-**Backend**:
+**驗證安裝**：
 ```bash
-# Create virtual environment
-python3 -m venv .venv
-source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+python3 --version
+# 應該顯示：Python 3.11.x 或更高
+```
 
-# Install packages
+#### 📦 安裝 Node.js 18+
+
+**Mac 用戶**：
+```bash
+brew install node@18
+```
+
+**Windows 用戶**：
+1. 前往 https://nodejs.org/
+2. 下載 LTS 版本（建議 18.x 或 20.x）
+3. 執行安裝程式，一路下一步即可
+
+**驗證安裝**：
+```bash
+node --version
+# 應該顯示：v18.x.x 或更高
+
+npm --version
+# 應該顯示：9.x.x 或更高
+```
+
+#### 🔑 取得 OpenAI API Key
+
+1. 前往 https://platform.openai.com/signup 註冊帳號
+2. 登入後前往 https://platform.openai.com/api-keys
+3. 點擊 "Create new secret key"
+4. 複製並保存這個 key（格式像 `sk-xxxxxxxxxxxxxxxx`）
+5. ⚠️ **重要**：這個 key 只會顯示一次，請妥善保存！
+
+---
+
+### Step 1: 下載專案
+
+打開終端機（Mac: Terminal / Windows: PowerShell），執行：
+
+```bash
+# 複製專案到你的電腦
+git clone https://github.com/你的帳號/market-research-simulator.git
+
+# 進入專案目錄
+cd market-research-simulator
+```
+
+> 💡 **沒有 Git？**
+> - Mac: `brew install git`
+> - Windows: 下載 https://git-scm.com/download/win
+
+---
+
+### Step 2: 設定環境變數
+
+在專案根目錄建立 `.env` 檔案：
+
+**Mac/Linux**：
+```bash
+# 建立 .env 檔案
+cat > .env << 'EOF'
+OPENAI_API_KEY=sk-在這裡貼上你的API金鑰
+OPENAI_MODEL=gpt-4o
+PORT=8787
+EOF
+```
+
+**Windows (PowerShell)**：
+```powershell
+# 建立 .env 檔案
+@"
+OPENAI_API_KEY=sk-在這裡貼上你的API金鑰
+OPENAI_MODEL=gpt-4o
+PORT=8787
+"@ | Out-File -FilePath .env -Encoding UTF8
+```
+
+> ⚠️ **重要**：把 `sk-在這裡貼上你的API金鑰` 換成你在 Step 0 取得的真實 API Key！
+
+---
+
+### Step 3: 安裝 Python 後端套件
+
+```bash
+# 建立 Python 虛擬環境（隔離專案的套件）
+python3 -m venv .venv
+
+# 啟動虛擬環境
+# Mac/Linux:
+source .venv/bin/activate
+
+# Windows:
+.venv\Scripts\activate
+
+# 你應該會看到命令列前面出現 (.venv)
+
+# 安裝所有 Python 套件
 pip install -r server/requirements.txt
 ```
 
-**Frontend**:
+**預期輸出**：
+```
+Successfully installed agno-2.3.18 fastapi-0.115.6 ...
+```
+
+> 🔧 **遇到問題？**
+> - 如果出現 "pip not found"，試試 `pip3` 替代 `pip`
+> - 如果權限不足，試試 `pip install --user -r server/requirements.txt`
+
+---
+
+### Step 4: 安裝 Node.js 前端套件
+
 ```bash
+# 安裝所有前端套件
 npm install
 ```
 
-### 4. Run the Application
+**預期輸出**：
+```
+added 200+ packages in 30s
+```
 
-**Terminal 1 - Start Backend**:
+> 🔧 **遇到問題？**
+> - 如果出現網路錯誤，試試 `npm install --registry=https://registry.npmmirror.com`
+
+---
+
+### Step 5: 啟動應用程式
+
+你需要開啟**兩個**終端機視窗：
+
+**終端機 1 - 啟動後端 API**：
 ```bash
+# 確保在專案目錄且虛擬環境已啟動
+source .venv/bin/activate  # Windows: .venv\Scripts\activate
+
+# 啟動後端
 npm run dev:api
-# Server runs at http://localhost:8787
 ```
 
-**Terminal 2 - Start Frontend**:
+**預期輸出**：
+```
+INFO:     Uvicorn running on http://0.0.0.0:8787
+INFO:     Application startup complete.
+```
+
+**終端機 2 - 啟動前端**：
 ```bash
+# 開啟新的終端機視窗，進入專案目錄
+cd market-research-simulator
+
+# 啟動前端
 npm run dev
-# App runs at http://127.0.0.1:5176
 ```
 
-### 5. Access the Platform
+**預期輸出**：
+```
+  VITE v6.2.0  ready in 500 ms
 
-Open your browser and navigate to: **http://127.0.0.1:5176**
+  ➜  Local:   http://127.0.0.1:5176/
+```
+
+---
+
+### Step 6: 開始使用！
+
+打開瀏覽器，前往：**http://127.0.0.1:5176**
+
+🎉 **恭喜！你已經成功啟動 Market Research Simulator！**
+
+---
+
+### ❓ 常見問題
+
+| 問題 | 解決方案 |
+|------|----------|
+| `command not found: python3` | 重新安裝 Python 並確保加入 PATH |
+| `port 8787 already in use` | 執行 `lsof -i :8787` 找出佔用程序並關閉 |
+| `OPENAI_API_KEY not set` | 檢查 .env 檔案是否存在且內容正確 |
+| `npm install` 失敗 | 刪除 `node_modules` 資料夾後重試 |
+| 網頁顯示空白 | 開啟開發者工具 (F12) 查看 Console 錯誤 |
 
 ---
 
