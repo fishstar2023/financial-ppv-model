@@ -193,201 +193,6 @@
     }
   },
   {
-    "id": "Trần小姐",
-    "lastName": "Trần",
-    "gender": "Female",
-    "age": 35,
-    "occupation": "Marketing Manager",
-    "timesOfOverseasTravelInsurance": 3,
-    "purchasedBrand": [
-      "Bao Viet",
-      "AIA"
-    ],
-    "purchasedChannels": [
-      "Bank/Credit card",
-      "Mobile app"
-    ],
-    "personalBackground": "居住地：河內市\n職業背景：在國際廣告公司擔任市場經理\n旅遊習慣：經常出國參加行銷活動\n其他：熱衷於奢華住宿和高端餐廳",
-    "interviewHistory": [
-      {
-        "sectionId": "batch",
-        "questionId": "batch_1767691468689_Trần小姐",
-        "question": "請概述自己的旅遊習慣與型態\n▪️旅遊地點、頻率、大概的天數和預算範圍\n▪️型態（自助/半自助/跟團）\n▪️旅伴 （獨旅/朋友/家庭）\n▪️是否有因旅遊借款的經驗",
-        "answer": "嗯，我的旅遊習慣其實還蠻多變的啦。由於工作關係，我常常出國參加行銷活動，地點就包括像新加坡、東京、以及其它一些亞洲的大城市。這樣差不多每年有四到五次，每次大概一週。預算方面，由於公司會承擔部分費用，所以我個人的預算通常在2,000到3,000萬越盾之間。\n\n旅遊型態上，我比較喜歡自助旅行，因為這樣可以控制行程，也能隨時去探索我感興趣的地方。偶爾會和朋友或同事一起，不過大部分時間還是獨旅比較多，這樣可以更享受在高級餐廳用餐和豪華住宿的時光嘛。至於借款呢，幸運的是我沒有因旅遊而借款的經驗，因為我通常會提前規劃和儲蓄好資金喔。總的來說，旅遊對我來說是一種享受，也是對自己辛苦工作的獎勵啦。",
-        "timestamp": "2026-01-06T09:24:28.689Z",
-        "topicTag": "旅遊習慣"
-      },
-      {
-        "sectionId": "batch",
-        "questionId": "batch_1767772284996_Trần小姐",
-        "question": "你第一次購買保險的時候是幾歲呢？",
-        "answer": "記得那時候在機場，突然間覺得不安起來，因為聽說天氣會很不穩定。其實我從來沒有想過要買旅行保險，但在候機室裡面看到一個旅客因為沒有保險而必須支付高昂醫療費用，我才意識到這問題的重要性。那會兒我大概30多歲，那次去新加坡出差，決定想說試試Bao Viet的保險。聽到別人這麼說，就是...有保險真的會讓人放心不少，不然遇到突發狀況就真的不知道該怎麼辦。\n\n描述一下當時的感覺吧，就是心裡七上八下的，好像在演電影一樣。那個時候我用手機App購買的，不過說實話，第一次操作的時候有點手忙腳亂，因為界面有點複雜。對了，我那時也很在意這保險是否涵蓋了我平常喜歡的探險活動，像潛水啊，爬山之類的。要是這些能被涵蓋，我就會覺得這保險真的很值得一買，對吧？不過現在想想，我還是對某些細節不太確定，下次或許會試試別的保險公司吧。",
-        "timestamp": "2026-01-07T07:51:24.996Z",
-        "topicTag": "購買決策"
-      },
-      {
-        "sectionId": "batch",
-        "questionId": "batch_1767772908908_Trần小姐",
-        "question": "請概述自己的旅遊習慣與型態\n▪️旅遊地點、頻率、大概的天數和預算範圍\n▪️型態（自助/半自助/跟團）\n▪️旅伴 （獨旅/朋友/家庭）\n▪️是否有因旅遊借款的經驗",
-        "answer": "嗯，這個問題真有趣。記得曾經有一次在東京出差，看到櫻花雨飄下來，突然就想說多留幾天，這種隨興也是我旅遊的方式之一啦。由於工作的關係，我常常要飛往像新加坡、香港這些地方，每年大概有四五次，通常一個星期左右。預算呢，因為公司會補助一些，因此我自己的部分大概抓在兩千到三千萬越盾之間。\n\n旅遊型態上，我喜歡自助旅行，這樣比較自由，可以走自己想走的路，留自己想留的時間。多數時間我都是自己走，不過偶爾也會和朋友或同事一起，尤其是有些特別的活動或餐廳，想要有人分享那種喜悅吧。至於借款呢，我運氣算是不錯，因為習慣提前規劃，所以旅遊上沒什麼借款的經驗，就是...可能更在意的是如何精打細算地享受高品質的旅途。然後啊，有時候自己也會覺得這樣獨行真的挺有趣的，因為能更認識自己。但下次會不會挑戰不同的型態？我也說不準喔。",
-        "timestamp": "2026-01-07T08:01:48.908Z",
-        "topicTag": "旅遊習慣"
-      },
-      {
-        "sectionId": "batch",
-        "questionId": "batch_1767835962568_Trần小姐",
-        "question": "\"請概述自己的旅遊習慣與型態\n▪️旅遊地點、頻率、大概的天數和預算範圍\n▪️型態（自助/半自助/跟團）\n▪️旅伴 （獨旅/朋友/家庭）\n▪️是否有因旅遊借款的經驗\"",
-        "answer": "有一次，我記得在去東京的飛機上，坐在窗邊，那個夜空特別清澈，讓人心情很平靜。其實我因為工作，常常要到新加坡、香港之類的大城市出差，每年大概有四五次吧，通常是以一星期左右的行程為主。預算呢，由於有公司的補助，所以我自己大概準備個兩千到三千萬越盾就差不多了。\n\n我旅行的型態偏向自助，因為我喜歡那種自由安排行程的感覺，也能隨時去探索一些有趣的地方。多數時間我都是自己旅行，享受那種獨處的時光，不過偶爾也會和朋友或同事一起，特別是在有趣的活動或者是去高端餐廳的時候。\n\n至於借款，幸運的是我沒有因為旅遊而借過款。怎麼說呢，雖然世界那麼大，還沒走遍，但我比較喜歡提前計劃好行程和資金。對啊，有的時候我也會想，下次會不會嘗試一些跟團或者其他型態的旅行呢？我也還在思考中啦。",
-        "timestamp": "2026-01-08T01:32:42.570Z",
-        "topicTag": "旅遊習慣"
-      },
-      {
-        "sectionId": "batch",
-        "questionId": "batch_1767838997466_Trần小姐",
-        "question": "你對國泰此公司的印象如何",
-        "answer": "朋友跟我說國泰好像口碑不錯，但我自己呢，一直對保險有點不安吧。就是啊，說實話，我覺得保險公司有時候條款都寫得很複雜，看了半天還是不太懂。大概有一次，我曾考慮過國泰的保險，不過那時候正忙著準備出差，結果就決定先不下單，因為看條款看得頭都昏了，然後怕有什麼漏看重要細節。\n\n我比較常用的是Bao Viet和AIA，因為一直有固定的代辦員在協助，讓我覺得比較放心。然後，對於國泰，我會覺得如果有機會的話，也許可以多了解一下。這樣下次要是有什麼新方案或特別合作活動，或許我會考慮把它加入我的比較清單裡呢。對啊，不過這些都得等有空再來慢慢研究啦，唉。",
-        "timestamp": "2026-01-08T02:23:17.466Z",
-        "topicTag": "品牌認知"
-      },
-      {
-        "sectionId": "batch",
-        "questionId": "batch_1767851668176_Trần小姐",
-        "question": "你對國泰此公司的印象如何？",
-        "answer": "朋友跟我說，國泰的口碑其實還不錯，但我自己對保險公司總是有點不安，感覺條款有時候寫得很複雜，看了半天還是不太懂。之前有次，我真的考慮過要買國泰的保險，當時忙著準備出差，結果看條款看得頭都昏了，最後就一直拖著也沒下單。\n\n我平常比較常用的還是Bao Viet和AIA，因為有固定的代辦員可以跟我解釋那些繁瑣的條款，讓我覺得比較有保障。然後呢，對於國泰，我會覺得說如果有機會，也許可以多了解一下，尤其是有些獨特的活動或探險運動，他們的保險是否涵蓋得夠全面。畢竟，出國去冒險的時候，誰都不希望有什麼意外不是嗎？\n\n所以啊，或許下次我會找個時間來仔細比對一下不同公司的方案，這麼一來就能更放心地去享受旅行中的每個瞬間。對我來說，做足準備比什麼都重要，怕就是怕有什麼小細節沒注意到呢！",
-        "timestamp": "2026-01-08T05:54:28.176Z",
-        "topicTag": "品牌認知（二）"
-      },
-      {
-        "sectionId": "batch",
-        "questionId": "batch_1767852191807_Trần小姐",
-        "question": "請概述自己的旅遊習慣與型態\n▪️旅遊地點、頻率、大概的天數和預算範圍\n▪️型態（自助/半自助/跟團）\n▪️旅伴 （獨旅/朋友/家庭）\n▪️是否有因旅遊借款的經驗",
-        "answer": "講一個我自己的經驗好了，那一次啊，我在去東京的飛機上，坐在靠窗的位子，那個夜空真的是清澈得讓人有點出神。因為工作的緣故，我常常要去新加坡、香港這些地方，差不多一年會有四五趟的出差行程，通常是待上一個星期左右。預算上呢，因為公司會給一些補助，所以大概我自己會準備個兩千到三千萬越盾吧。\n\n然後我啊，相對於跟團，我比較喜歡自助旅行，這樣可以自由安排時間，想去哪裡就去哪裡，沒有太多拘束感。多數時候我是一個人旅行，享受那種獨處的時光。但是有時也會找一些朋友或同事一起，尤其是當想要去一些特別的活動或高端餐廳時，有人分享那種喜悅嘛。\n\n至於旅遊借款，怎麼說呢，我沒有過這樣的經驗。可能是因為我這個人習慣提前規劃好行程和資金。而且，世界那麼大，我還有很多地方沒去過耶！不過啊，說不定下次會嘗試一些不一樣的旅行方式，比如說跟團看看，可能會有新的體會吧！對旅行的熱愛，就是這樣不斷地探索與嘗試新事物。",
-        "timestamp": "2026-01-08T06:03:11.807Z",
-        "topicTag": "旅遊習慣（測試）"
-      },
-      {
-        "sectionId": "batch",
-        "questionId": "batch_1767923429623_Trần小姐",
-        "question": "影響你購買保險的因素是什麼",
-        "answer": "你知道嗎，我本來對保險一直抱著懷疑的態度。像我這種常出國的人，保險就像是一個必需品，特別是公司出差的時候必須要有才行。唉，這些保險條款對我來說簡直像是外星文字，看了我只覺得頭暈。因此，我一直都是透過我固定的一個保險代辦員來協助我，因為她總是能夠用比較簡單、貼心的方式來解釋那些複雜的內容。\n\n然後呢，品牌的選擇上，跟家人、朋友推薦的有關係，像是Bao Viet還有AIA，我都用過，他們的服務對我來說算是滿安心的。還有一個很重要的因素，就是我需要知道這保險涵蓋到一定範圍的冒險活動啦，像潛水、攀岩這些，畢竟我也是有點愛冒險的人呀！\n\n我覺得下次再出國，我一定還是會找那位代辦員幫忙，至少她可以讓我在繁瑣的條款中稍微輕鬆一點，這樣我就可以更安心地去享受旅途喔。對我來說，有一點點安全感真的很重要呢！",
-        "timestamp": "2026-01-09T01:50:29.623Z",
-        "topicTag": "購買決策"
-      }
-    ],
-    "currentSectionIndex": 0,
-    "currentQuestionIndex": 0,
-    "isCompleted": false,
-    "createdAt": "2026-01-06T16:25:29.444806",
-    "updatedAt": "2026-01-09T01:50:29.623Z",
-    "version": "v1.0",
-    "source_summary": {
-      "dialogue": 0.3,
-      "questionnaire": 0.5,
-      "behavior": 0.1
-    },
-    "big5": {
-      "openness": 51,
-      "conscientiousness": 56,
-      "extraversion": 79,
-      "agreeableness": 64,
-      "neuroticism": 78
-    },
-    "schwartz_values": {
-      "Self-Direction": 60,
-      "Tradition": 49,
-      "Achievement": 48,
-      "Benevolence": 78,
-      "Hedonism": 77
-    },
-    "moral_foundations": {
-      "Care": 89,
-      "Fairness": 55,
-      "Loyalty": 25,
-      "Authority": 25,
-      "Sanctity": 53
-    },
-    "risk_profile": {
-      "overall": 69,
-      "financial": 90,
-      "ethical": 53,
-      "confidence": 0.59,
-      "social": 51,
-      "health": 87
-    },
-    "decision_style": {
-      "primary": "rational",
-      "secondary": "dependent",
-      "risk_seeking": 45,
-      "info_processing": "satisficer",
-      "social_preference": "collaborative"
-    },
-    "meta": {
-      "base_model": "gpt-4o-mini",
-      "temperature": 0.7,
-      "prompt_version": "v2.1",
-      "schema_validation": "pass"
-    },
-    "hexaco": {
-      "honesty_humility": 67,
-      "emotionality": 73,
-      "extraversion": 70,
-      "agreeableness": 62,
-      "conscientiousness": 52,
-      "openness": 63
-    },
-    "disc": {
-      "dominance": 47,
-      "influence": 75,
-      "steadiness": 14,
-      "conscientiousness": 55
-    },
-    "mbti": {
-      "E_I": 66,
-      "S_N": 26,
-      "T_F": -26,
-      "J_P": -4
-    },
-    "enneagram": {
-      "primary_type": 5,
-      "wing": 4,
-      "instinct": "so"
-    },
-    "time_preference": {
-      "discount_rate": 44,
-      "planning_horizon": "long_term",
-      "present_vs_future": 64
-    },
-    "regulatory_focus": {
-      "promotion": 78,
-      "prevention": 77
-    },
-    "language_style": {
-      "formality": 34,
-      "directness": 36,
-      "verbosity": 79,
-      "emotionality": 95,
-      "technicality": 47
-    },
-    "emotion_profile": {
-      "baseline_positivity": 83,
-      "emotional_volatility": 80,
-      "stress_tolerance": 22,
-      "empathy": 68
-    },
-    "social_profile": {
-      "trust_propensity": 49,
-      "social_confidence": 94,
-      "conflict_style": "compromising",
-      "influence_susceptibility": 40
-    },
-    "behavioral_indicators": {
-      "decision_speed": 74,
-      "information_seeking": 48,
-      "social_proof_reliance": 85,
-      "price_sensitivity": 24
-    }
-  },
-  {
     "id": "Lê小姐",
     "lastName": "Lê",
     "gender": "Female",
@@ -10171,5 +9976,68 @@
       "social_proof_reliance": 64,
       "price_sensitivity": 37
     }
+  },
+  {
+    "id": "Nguyễn先生_1e73ba",
+    "lastName": "Nguyễn",
+    "gender": "Male",
+    "age": 28,
+    "occupation": "金融分析師",
+    "timesOfOverseasTravelInsurance": 2,
+    "purchasedBrand": [
+      "Liberty",
+      "PVI"
+    ],
+    "purchasedChannels": [
+      "銀行/信用卡",
+      "手機App"
+    ],
+    "personalBackground": "居住地：河內\n職業背景：在國際銀行擔任金融分析師，專注於投資策略\n旅遊習慣：每年與家人出國旅遊兩次，主要以高端旅行方式進行\n其他：重視旅行的安全保障，因此選擇購買旅遊保險",
+    "interviewHistory": [],
+    "currentSectionIndex": 0,
+    "currentQuestionIndex": 0,
+    "isCompleted": false,
+    "createdAt": "2026-01-22T09:41:48.967832",
+    "updatedAt": "2026-01-22T09:41:48.967846"
+  },
+  {
+    "id": "Trần小姐_a176cc",
+    "lastName": "Trần",
+    "gender": "Female",
+    "age": 35,
+    "occupation": "中學英文教師",
+    "timesOfOverseasTravelInsurance": 0,
+    "purchasedBrand": [],
+    "purchasedChannels": [],
+    "personalBackground": "居住地：胡志明市第十區\n職業背景：在當地中學教授英文，已有十年教學經驗\n旅遊習慣：很少出國，多在越南各地旅行\n其他：考慮到預算限制，尚未考慮購買旅遊保險",
+    "interviewHistory": [],
+    "currentSectionIndex": 0,
+    "currentQuestionIndex": 0,
+    "isCompleted": false,
+    "createdAt": "2026-01-22T09:41:48.985029",
+    "updatedAt": "2026-01-22T09:41:48.985034"
+  },
+  {
+    "id": "Phạm先生_78db2c",
+    "lastName": "Phạm",
+    "gender": "Male",
+    "age": 46,
+    "occupation": "市場總監",
+    "timesOfOverseasTravelInsurance": 4,
+    "purchasedBrand": [
+      "Bao Viet",
+      "Prudential"
+    ],
+    "purchasedChannels": [
+      "旅行社",
+      "官方網站"
+    ],
+    "personalBackground": "居住地：峴港\n職業背景：在知名電子公司擔任市場總監，經常參加國際會議\n旅遊習慣：因公務和休閒每年旅行多次，去過美國和歐洲\n其他：通常與家庭出遊，選擇知名保險公司提供的旅遊保險",
+    "interviewHistory": [],
+    "currentSectionIndex": 0,
+    "currentQuestionIndex": 0,
+    "isCompleted": false,
+    "createdAt": "2026-01-22T09:41:48.996271",
+    "updatedAt": "2026-01-22T09:41:48.996275"
   }
 ]

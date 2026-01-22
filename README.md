@@ -1,8 +1,24 @@
 # 🎯 Market Research Simulator
 
+![Version](https://img.shields.io/badge/version-1.0.0-blue)
+![Python](https://img.shields.io/badge/python-3.9+-green)
+![Node](https://img.shields.io/badge/node-18+-green)
+![License](https://img.shields.io/badge/license-MIT-yellow)
+
 **AI-Powered Synthetic Persona Interview Platform**
 
 A comprehensive market research tool that generates diverse synthetic personas and conducts automated interviews to gather consumer insights without privacy concerns or high sampling costs.
+
+## 📦 Version Information
+
+| Component | Version |
+|-----------|---------|
+| **Application** | 1.0.0 |
+| **PPV Schema** | 2.0 |
+| **Frontend** | React 19 + Vite 6.2 |
+| **Backend** | FastAPI 0.115.6 |
+| **Agent Framework** | Agno 2.3.18 |
+| **LLM** | OpenAI GPT-4o |
 
 ---
 
