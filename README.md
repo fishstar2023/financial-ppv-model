@@ -20,41 +20,53 @@ A comprehensive market research tool that generates diverse synthetic personas a
 | **Agent Framework** | Agno 2.3.18 |
 | **LLM** | OpenAI GPT-4o |
 
-### Python Dependencies (server/requirements.txt)
+### Python Dependencies
 
-| Category | Package | Version |
-|----------|---------|---------|
-| **Core Framework** | agno | 2.3.18 |
-| | fastapi | 0.115.6 |
-| | uvicorn | 0.32.1 |
-| | starlette | 0.41.3 |
-| **AI/LLM** | openai | 2.14.0 |
-| | pydantic | 2.12.5 |
-| | pydantic-settings | 2.11.0 |
-| | pydantic_core | 2.41.5 |
-| **Utilities** | python-dotenv | 1.0.1 |
-| | pypdf | 6.5.0 |
-| | httpx | 0.28.1 |
-| **Async Support** | anyio | 4.12.0 |
-| | httpcore | 1.0.9 |
-| | sniffio | 1.3.1 |
-| **Type Hints** | typing_extensions | 4.15.0 |
-| | typing-inspection | 0.4.2 |
-| **Testing** | pytest | 8.4.2 |
+直接複製到 `server/requirements.txt`:
 
-### Node.js Dependencies (package.json)
+```txt
+# Market Research Simulator - Python Dependencies v1.0.0
+agno==2.3.18
+fastapi==0.115.6
+uvicorn[standard]==0.32.1
+starlette==0.41.3
+openai==2.14.0
+pydantic==2.12.5
+pydantic-settings==2.11.0
+pydantic_core==2.41.5
+python-dotenv==1.0.1
+pypdf==6.5.0
+httpx==0.28.1
+anyio==4.12.0
+httpcore==1.0.9
+sniffio==1.3.1
+typing_extensions==4.15.0
+typing-inspection==0.4.2
+pytest==8.4.2
+```
 
-| Category | Package | Version |
-|----------|---------|---------|
-| **Framework** | react | 19.0.0 |
-| | react-dom | 19.0.0 |
-| **Build Tool** | vite | 6.2.0 |
-| **UI Library** | antd | 5.24.6 |
-| | @lobehub/ui | 1.164.4 |
-| **Icons** | lucide-react | 0.469.0 |
-| | @ant-design/icons | 5.6.1 |
-| **Markdown** | react-markdown | 10.0.2 |
-| | remark-gfm | 4.0.1 |
+### Node.js Dependencies
+
+直接複製到 `package.json` 的 `dependencies`:
+
+```json
+{
+  "dependencies": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "antd": "^5.24.6",
+    "@lobehub/ui": "^1.164.4",
+    "lucide-react": "^0.469.0",
+    "@ant-design/icons": "^5.6.1",
+    "react-markdown": "^10.0.2",
+    "remark-gfm": "^4.0.1"
+  },
+  "devDependencies": {
+    "vite": "^6.2.0",
+    "@vitejs/plugin-react": "^4.4.1"
+  }
+}
+```
 
 ---
 
