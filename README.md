@@ -5,6 +5,9 @@
 ![Node](https://img.shields.io/badge/node-18+-green)
 ![License](https://img.shields.io/badge/license-MIT-yellow)
 
+[![Open in VS Code Web](https://img.shields.io/badge/Open%20in-VS%20Code%20Web-007ACC?logo=visual-studio-code&logoColor=white)](https://vscode.dev/github/fishstar2023/financial-ppv-model)
+[![Clone in VS Code](https://img.shields.io/badge/Clone%20in-VS%20Code-007ACC?logo=visual-studio-code&logoColor=white)](vscode://vscode.git/clone?url=https://github.com/fishstar2023/financial-ppv-model.git)
+
 **AI-Powered Synthetic Persona Interview Platform**
 
 A comprehensive market research tool that generates diverse synthetic personas and conducts automated interviews to gather consumer insights without privacy concerns or high sampling costs.
