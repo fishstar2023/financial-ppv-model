@@ -111,10 +111,12 @@ function App() {
             onMouseEnter={(e) => {
               e.currentTarget.style.transform = 'translateY(-6px)';
               e.currentTarget.style.boxShadow = '0 20px 60px rgba(139, 115, 101, 0.15)';
+              e.currentTarget.style.border = '2px solid rgba(168, 155, 142, 0.4)';
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.transform = 'translateY(0)';
               e.currentTarget.style.boxShadow = '0 4px 24px rgba(0,0,0,0.06)';
+              e.currentTarget.style.border = 'none';
             }}
           >
             <div style={{
@@ -156,10 +158,12 @@ function App() {
             onMouseEnter={(e) => {
               e.currentTarget.style.transform = 'translateY(-6px)';
               e.currentTarget.style.boxShadow = '0 20px 60px rgba(130, 140, 128, 0.15)';
+              e.currentTarget.style.border = '2px solid rgba(157, 168, 155, 0.4)';
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.transform = 'translateY(0)';
               e.currentTarget.style.boxShadow = '0 4px 24px rgba(0,0,0,0.06)';
+              e.currentTarget.style.border = 'none';
             }}
           >
             <div style={{
@@ -417,16 +421,16 @@ function App() {
   return (
     <div style={{
       minHeight: '100vh',
-      background: 'linear-gradient(135deg, #f5f8fa 0%, #e8eef3 100%)',
+      background: 'linear-gradient(135deg, #f5f2ef 0%, #e8e4df 100%)',
       padding: '0'
     }}>
       {/* 頂部欄 */}
       <header style={{
         background: 'rgba(255, 255, 255, 0.85)',
         backdropFilter: 'blur(10px)',
-        borderBottom: '1px solid rgba(157, 180, 199, 0.2)',
+        borderBottom: '1px solid rgba(155, 139, 125, 0.2)',
         padding: '20px 32px',
-        boxShadow: '0 2px 12px rgba(90, 107, 122, 0.08)'
+        boxShadow: '0 2px 12px rgba(125, 110, 98, 0.08)'
       }}>
         <div style={{ maxWidth: '1400px', margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
@@ -437,12 +441,12 @@ function App() {
                 width: '40px',
                 height: '40px',
                 background: currentPage === 'market'
-                  ? 'linear-gradient(135deg, #9db4c7 0%, #7a95ab 100%)'
+                  ? 'linear-gradient(135deg, #a89b8e 0%, #8b7365 100%)'
                   : currentPage === 'vietnam2'
-                    ? 'linear-gradient(135deg, #7a95ab 0%, #5a7a8a 100%)'
+                    ? 'linear-gradient(135deg, #9b8b7d 0%, #7d6e62 100%)'
                     : currentPage === 'ppv'
-                      ? 'linear-gradient(135deg, #a8859e 0%, #8a6580 100%)'
-                      : 'linear-gradient(135deg, #8b9e85 0%, #6b8065 100%)',
+                      ? 'linear-gradient(135deg, #b0a09a 0%, #8e7d75 100%)'
+                      : 'linear-gradient(135deg, #9da89b 0%, #828c80 100%)',
                 borderRadius: '12px',
                 display: 'flex',
                 alignItems: 'center',
@@ -450,7 +454,7 @@ function App() {
                 color: 'white',
                 fontWeight: 600,
                 fontSize: '20px',
-                boxShadow: '0 4px 12px rgba(90, 107, 122, 0.15)',
+                boxShadow: '0 4px 12px rgba(125, 110, 98, 0.15)',
                 transition: 'all 0.3s ease',
                 border: 'none',
                 cursor: 'pointer'

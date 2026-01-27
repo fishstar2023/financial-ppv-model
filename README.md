@@ -206,10 +206,10 @@ npm --version
 
 ```bash
 # 複製專案到你的電腦
-git clone https://github.com/你的帳號/market-research-simulator.git
+git clone https://github.com/fishstar2023/financial-ppv-model.git
 
 # 進入專案目錄
-cd market-research-simulator
+cd financial-ppv-model
 ```
 
 > 💡 **沒有 Git？**
@@ -315,7 +315,7 @@ INFO:     Application startup complete.
 **終端機 2 - 啟動前端**：
 ```bash
 # 開啟新的終端機視窗，進入專案目錄
-cd market-research-simulator
+cd financial-ppv-model
 
 # 啟動前端
 npm run dev
